@@ -65,7 +65,7 @@ const homeJS = {
                                     <span class="truncate max-w-[140px]" title="${c.nome}">${c.nome}</span>
                                 </td>
                                 <td class="py-3 ${corTexto} text-right font-bold text-sm whitespace-nowrap font-mono">
-                                    ${c.saldo_atual_formatado}
+                                    <span class="valor-sensivel">${c.saldo_atual_formatado}</span>
                                 </td>
                             </tr>
                             `;

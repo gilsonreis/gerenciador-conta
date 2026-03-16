@@ -55,4 +55,28 @@ $(document).ready(function() {
         closeMobile.on('click', fecharMenuMenu);
         overlayMobile.on('click', fecharMenuMenu);
     }
+    
+    // Configuração do Modo Privacidade
+    const btnPrivacidade = $('.btn-toggle-privacidade');
+    const iconesPrivacidade = btnPrivacidade.find('i');
+    
+    // Ao iniciar a página, verificar o localStorage
+    if (localStorage.getItem('modo_privacidade') === 'ativo') {
+        $('body').addClass('modo-privacidade');
+        iconesPrivacidade.removeClass('fa-eye').addClass('fa-eye-slash text-blue-500');
+    }
+    
+    // Evento de clique para todos os botões (desktop e mobile)
+    btnPrivacidade.on('click', function() {
+        $('body').toggleClass('modo-privacidade');
+        
+        if ($('body').hasClass('modo-privacidade')) {
+            localStorage.setItem('modo_privacidade', 'ativo');
+            iconesPrivacidade.removeClass('fa-eye').addClass('fa-eye-slash text-blue-500');
+        } else {
+            localStorage.setItem('modo_privacidade', 'inativo');
+            iconesPrivacidade.removeClass('fa-eye-slash text-blue-500').addClass('fa-eye');
+        }
+    });
+
 });

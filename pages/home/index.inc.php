@@ -8,7 +8,7 @@
         <div class="flex justify-between items-start mb-4">
             <div>
                 <p class="text-sm font-medium text-emerald-800 dark:text-emerald-400/80 uppercase tracking-wider mb-1">Entradas Previstas</p>
-                <h3 class="text-3xl font-bold text-emerald-600 dark:text-emerald-500" id="dash-entradas">R$ 0,00</h3>
+                <h3 class="text-3xl font-bold text-emerald-600 dark:text-emerald-500 valor-sensivel" id="dash-entradas">R$ 0,00</h3>
             </div>
             <div class="p-3 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-500 rounded-xl">
                 <i class="fa-solid fa-arrow-trend-up text-xl"></i>
@@ -20,7 +20,7 @@
         <div class="flex justify-between items-start mb-4">
             <div>
                 <p class="text-sm font-medium text-red-800 dark:text-red-400/80 uppercase tracking-wider mb-1">Saídas Previstas</p>
-                <h3 class="text-3xl font-bold text-red-600 dark:text-red-500" id="dash-saidas">R$ 0,00</h3>
+                <h3 class="text-3xl font-bold text-red-600 dark:text-red-500 valor-sensivel" id="dash-saidas">R$ 0,00</h3>
             </div>
             <div class="p-3 bg-red-50 dark:bg-red-900/20 text-red-500 rounded-xl">
                 <i class="fa-solid fa-arrow-trend-down text-xl"></i>
@@ -33,7 +33,7 @@
         <div class="flex justify-between items-start mb-4 relative z-10">
             <div>
                 <p class="text-sm font-medium text-blue-800 dark:text-blue-400/80 uppercase tracking-wider mb-1" id="dash-saldo-label">Saldo do Mês</p>
-                <h3 class="text-3xl font-bold text-blue-600 dark:text-blue-500 transition-colors duration-500" id="dash-saldo">R$ 0,00</h3>
+                <h3 class="text-3xl font-bold text-blue-600 dark:text-blue-500 transition-colors duration-500 valor-sensivel" id="dash-saldo">R$ 0,00</h3>
             </div>
             <div class="p-3 bg-blue-50 dark:bg-blue-900/20 text-blue-500 rounded-xl transition-colors duration-500" id="dash-saldo-icon">
                 <i class="fa-solid fa-scale-balanced text-xl"></i>
@@ -50,7 +50,7 @@
         </div>
         <h4 class="text-lg font-bold text-gray-800 dark:text-white mb-2">Seu Custo de Vida Essencial</h4>
         <p class="text-gray-500 dark:text-gray-400 max-w-sm mb-4">Rastreie o quanto da sua renda está comprometida apenas pelo custo base de sobrevivência (Soma das despesas com flag de conta fixa).</p>
-        <div class="text-3xl font-black text-gray-800 dark:text-gray-200" id="dash-custovida">R$ 0,00</div>
+        <div class="text-3xl font-black text-gray-800 dark:text-gray-200 valor-sensivel" id="dash-custovida">R$ 0,00</div>
     </div>
 
     <!-- Minhas Contas Table Area -->
@@ -111,14 +111,14 @@
     <!-- Histórico -->
     <div class="bg-white dark:bg-darkcard rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-darkborder">
         <h4 class="text-lg font-bold text-gray-800 dark:text-white mb-4">Histórico (Últimos 12 meses)</h4>
-        <div class="relative w-full h-72 flex items-center justify-center">
+        <div class="relative w-full h-72 flex items-center justify-center valor-sensivel">
             <canvas id="chart-historico"></canvas>
         </div>
     </div>
     <!-- Projeção -->
     <div class="bg-white dark:bg-darkcard rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-darkborder">
         <h4 class="text-lg font-bold text-gray-800 dark:text-white mb-4">Projeção (Próximos 12 meses)</h4>
-        <div class="relative w-full h-72 flex items-center justify-center">
+        <div class="relative w-full h-72 flex items-center justify-center valor-sensivel">
             <canvas id="chart-projecao"></canvas>
         </div>
     </div>

@@ -18,8 +18,8 @@ const contasJS = {
                                 ${d.nome}
                             </div>
                         </td>
-                        <td class="p-4 text-right text-gray-500 dark:text-gray-400 font-medium">
-                            R$ ${d.saldo_inicial_formatado}
+                        <td class="p-4 text-right text-gray-500 dark:text-gray-400 font-medium whitespace-nowrap">
+                            R$ <span class="valor-sensivel">${d.saldo_inicial_formatado}</span>
                         </td>
                         <td class="p-4 text-center">
                             <button onclick="contasJS.editar(${d.id})" class="text-blue-500 opacity-0 group-hover:opacity-100 hover:bg-blue-50 dark:hover:bg-blue-900/20 p-2 rounded-lg transition-all" title="Editar"><i class="fa-solid fa-pen"></i></button>

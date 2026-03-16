@@ -60,6 +60,15 @@ if (strpos($pagina, '-') !== false) {
         }
     </script>
     <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        /* Modo Privacidade (Valores Sensíveis) */
+        body.modo-privacidade .valor-sensivel {
+            filter: blur(6px);
+            opacity: 0.6;
+            user-select: none;
+            transition: filter 0.3s ease, opacity 0.3s ease;
+        }
+    </style>
     <!-- Font Awesome API para icones (Free) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- jQuery CDN -->
@@ -73,7 +82,12 @@ if (strpos($pagina, '-') !== false) {
     <aside class="w-64 bg-white dark:bg-darkcard border-r border-gray-200 dark:border-darkborder hidden md:flex flex-col">
         <div class="p-6 border-b border-gray-200 dark:border-darkborder mb-4">
             <h1 class="text-xl font-bold bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent"><i class="fa-solid fa-wallet mr-2"></i>Controle Familiar</h1>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mt-2 truncate"><i class="fa-solid fa-user-circle mr-1"></i><?= htmlspecialchars($_SESSION['usuario_nome'] ?? 'Usuário') ?></p>
+            <div class="flex justify-between items-center mt-2">
+                <p class="text-sm text-gray-500 dark:text-gray-400 truncate"><i class="fa-solid fa-user-circle mr-1"></i><?= htmlspecialchars($_SESSION['usuario_nome'] ?? 'Usuário') ?></p>
+                <button type="button" class="btn-toggle-privacidade text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors" title="Alternar Modo Privacidade">
+                    <i class="fa-regular fa-eye text-lg"></i>
+                </button>
+            </div>
         </div>
         <nav class="flex-1 px-4 space-y-1 overflow-y-auto">
             <a href="?pagina=home-index" class="flex items-center gap-3 py-3 px-4 rounded-lg transition duration-200 hover:bg-gray-50 dark:hover:bg-white/5 <?= str_starts_with($pagina, 'home') ? 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-blue-400' : 'text-gray-600 dark:text-gray-300' ?>"><i class="fa-solid fa-house w-5 text-center"></i> Dashboard</a>
@@ -100,9 +114,14 @@ if (strpos($pagina, '-') !== false) {
         <!-- Topbar Mobile -->
         <header class="md:hidden bg-white dark:bg-darkcard border-b border-gray-200 dark:border-darkborder p-4 flex justify-between items-center shadow-sm z-10">
             <h1 class="text-lg font-bold bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent"><i class="fa-solid fa-wallet mr-2"></i>Controle Familiar</h1>
-            <button id="mobile-menu-btn" class="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white p-2">
-                <i class="fa-solid fa-bars text-xl"></i>
-            </button>
+            <div class="flex gap-2">
+                <button type="button" class="btn-toggle-privacidade text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white p-2" title="Alternar Modo Privacidade">
+                    <i class="fa-regular fa-eye text-xl"></i>
+                </button>
+                <button id="mobile-menu-btn" class="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white p-2">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+            </div>
         </header>
 
         <!-- Menu Mobile Overlay -->

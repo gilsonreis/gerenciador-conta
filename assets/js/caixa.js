@@ -48,7 +48,7 @@ const caixaJS = {
                             ${descInfo}
                             ${walletBadge}
                         </td>
-                        <td class="p-4 text-right text-emerald-600 dark:text-emerald-400 font-bold whitespace-nowrap">${caixaJS.formatarMoeda(e.valor)}</td>
+                        <td class="p-4 text-right text-emerald-600 dark:text-emerald-400 font-bold whitespace-nowrap"><span class="valor-sensivel">${caixaJS.formatarMoeda(e.valor)}</span></td>
                         <td class="p-4 text-center">
                             <button onclick="caixaJS.editar(${e.id})" class="text-blue-500 opacity-0 group-hover:opacity-100 hover:bg-blue-50 dark:hover:bg-blue-900/20 p-2 rounded-lg transition-all" title="Editar"><i class="fa-solid fa-pen"></i></button>
                             <button onclick="caixaJS.excluir(${e.id})" class="text-red-500 opacity-0 group-hover:opacity-100 hover:bg-red-50 dark:hover:bg-red-900/20 p-2 rounded-lg transition-all ml-1" title="Excluir"><i class="fa-solid fa-trash"></i></button>
