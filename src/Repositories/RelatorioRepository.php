@@ -117,4 +117,44 @@ class RelatorioRepository {
         $stmt->execute($params);
         return $stmt->fetchAll();
     }
+    public function contasAPagar(int $instituicaoId, array $filtros) {
+        $params = ['inst' => $instituicaoId];
+        $whereFilters = [];
+        
+        $status = $filtros['status_vencimento'] ?? 'todos';
+        $mes = (int)($filtros['mes'] ?? date('m'));
+        $ano = (int)($filtros['ano'] ?? date('Y'));
+
+        if ($status === 'atrasados') {
+            $whereFilters[] = "p.data_vencimento < CURDATE()";
+        } elseif ($status === 'mes') {
+            $whereFilters[] = "MONTH(p.data_vencimento) = :mes AND YEAR(p.data_vencimento) = :ano";
+            $params['mes'] = $mes;
+            $params['ano'] = $ano;
+        } elseif ($status === 'futuro') {
+            $whereFilters[] = "p.data_vencimento > LAST_DAY(CURDATE())";
+        }
+
+        $whereSql = !empty($whereFilters) ? "AND " . implode(" AND ", $whereFilters) : "";
+
+        $sql = "
+            SELECT 
+                p.*,
+                l.descricao,
+                cat.nome as categoria_nome,
+                u.nome as usuario_nome
+            FROM parcelas p
+            JOIN lancamentos l ON p.lancamento_id = l.id
+            JOIN categorias cat ON l.categoria_id = cat.id
+            JOIN usuarios u ON l.usuario_id = u.id
+            WHERE l.instituicao_id = :inst
+            AND p.data_pagamento IS NULL
+            $whereSql
+            ORDER BY p.data_vencimento ASC
+        ";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll();
+    }
 }
