@@ -49,6 +49,17 @@
                 </div>
             </div>
 
+            <div class="mb-4" id="bloco-alertas" style="display: none;">
+                <label class="flex items-center gap-2 cursor-pointer group p-3 border border-gray-200 dark:border-darkborder rounded-lg hover:border-primary/50 dark:hover:border-primary/50 transition-colors">
+                    <input type="checkbox" id="usuario_recebe_alertas" name="recebe_alertas" value="1" checked
+                        class="w-5 h-5 text-primary bg-gray-100 dark:bg-[#121212] border-gray-300 dark:border-darkborder rounded focus:ring-primary focus:ring-2 transition-colors cursor-pointer">
+                    <div class="flex flex-col">
+                        <span class="text-sm font-medium text-gray-800 dark:text-gray-200 group-hover:text-primary transition-colors">Deseja receber e-mails de alerta?</span>
+                        <span class="text-xs text-gray-500 dark:text-gray-400">Marque para receber resumos financeiros de vencimentos</span>
+                    </div>
+                </label>
+            </div>
+
             <div class="mb-4">
                 <label for="usuario_senha" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Senha <span class="text-xs text-gray-400 font-normal">(Opcional ao editar)</span></label>
                 <div class="relative">

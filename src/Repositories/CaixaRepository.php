@@ -14,6 +14,7 @@ class CaixaRepository {
                 ce.id, 
                 ce.conta_id,
                 c.nome as conta_nome,
+                ce.descricao,
                 ce.valor, 
                 ce.data_entrada
             FROM caixa_entradas ce
@@ -50,22 +51,24 @@ class CaixaRepository {
         $valor = (float)str_replace(',', '.', str_replace('.', '', $dados['valor']));
         
         if (!empty($dados['id'])) {
-            $sql = "UPDATE caixa_entradas SET conta_id = :conta_id, valor = :valor, data_entrada = :data_entrada WHERE id = :id AND instituicao_id = :instituicao_id";
+            $sql = "UPDATE caixa_entradas SET conta_id = :conta_id, descricao = :descricao, valor = :valor, data_entrada = :data_entrada WHERE id = :id AND instituicao_id = :instituicao_id";
             $stmt = $this->db->prepare($sql);
             return $stmt->execute([
                 'conta_id' => $dados['conta_id'],
+                'descricao' => $dados['descricao'] ?? null,
                 'valor' => $valor,
                 'data_entrada' => $dados['data_entrada'],
                 'id' => $dados['id'],
                 'instituicao_id' => $instituicaoId
             ]);
         } else {
-            $sql = "INSERT INTO caixa_entradas (instituicao_id, usuario_id, conta_id, valor, data_entrada) VALUES (:instituicao_id, :usuario_id, :conta_id, :valor, :data_entrada)";
+            $sql = "INSERT INTO caixa_entradas (instituicao_id, usuario_id, conta_id, descricao, valor, data_entrada) VALUES (:instituicao_id, :usuario_id, :conta_id, :descricao, :valor, :data_entrada)";
             $stmt = $this->db->prepare($sql);
             return $stmt->execute([
                 'instituicao_id' => $instituicaoId,
                 'usuario_id' => $usuarioId,
                 'conta_id' => $dados['conta_id'],
+                'descricao' => $dados['descricao'] ?? null,
                 'valor' => $valor,
                 'data_entrada' => $dados['data_entrada']
             ]);

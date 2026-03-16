@@ -47,6 +47,7 @@ try {
     exit("Falha crítica: Não foi possível instanciar o Transportador DSN do Mailer: " . $e->getMessage() . "\n");
 }
 
+$baseUrl = $env['BASE_URL'] ?? 'http://localhost';
 
 echo ">> Buscando vencimentos consolidados para Hoje, 3, 5 ou 10 dias...\n";
 
@@ -71,6 +72,7 @@ $sql = "
     WHERE 
         p.data_pagamento IS NULL 
         AND DATEDIFF(p.data_vencimento, CURDATE()) IN (0, 3, 5, 10)
+        AND u.recebe_alertas = 1
     ORDER BY dias_restantes ASC
 ";
 
@@ -91,6 +93,7 @@ if (empty($resultados)) {
         
         if (!isset($alertasPorEmail[$email])) {
             $alertasPorEmail[$email] = [
+                'id' => $linha['usuario_id'],
                 'nome' => $linha['usuario_nome'],
                 'vencimentos' => []
             ];
@@ -190,9 +193,13 @@ if (empty($resultados)) {
             ";
         }
 
+        $unsubscribeLink = $baseUrl . '/cancelar_inscricao.php?u=' . base64_encode($dadosUsuario['id']);
+
         $corpoHtml .= "
                 <p style='margin-top: 30px;'>Acesse o painel para confirmar o pagamento ou ver mais detalhes.</p>
                 <p><small style='color: #94a3b8;'>Este é um alerta automático gerado pelo sistema.</small></p>
+                <hr style='border: none; border-top: 1px solid #e2e8f0; margin-top: 20px; margin-bottom: 20px;'>
+                <p style='font-size: 11px; color: #666;'>Você está recebendo este e-mail pois optou por receber alertas financeiros. <a href='{$unsubscribeLink}'>Clique aqui para cancelar sua inscrição</a>.</p>
             </div>
         </body>
         </html>

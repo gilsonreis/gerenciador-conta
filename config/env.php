@@ -9,6 +9,7 @@ $env = [
     'SMTP_PORT' => '',
     'SMTP_USER' => '',
     'SMTP_PASS' => '',
+    'BASE_URL' => 'http://localhost',
 ];
 
 // Lógica de Sobrescrita de Ambiente
