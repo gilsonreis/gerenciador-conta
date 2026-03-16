@@ -5,7 +5,7 @@ class Database {
 
     public static function getConnection(): PDO {
         if (self::$instance === null) {
-            $host = getenv('DB_HOST') ?: 'db';
+            $host = getenv('DB_HOST') ?: '';
             $dbName = getenv('DB_NAME') ?: 'controle_contas';
             $user = getenv('DB_USER') ?: 'user_contas';
             // Em docker ou local, ajustar a senha conforme ambiente
