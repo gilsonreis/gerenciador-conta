@@ -43,7 +43,7 @@
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <i class="fa-solid fa-envelope text-gray-400"></i>
                         </div>
-                        <input type="email" id="email" name="email" required value="admin@familia.com"
+                        <input type="email" id="email" name="email" required placeholder="admin@familia.com"
                             class="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-darkborder rounded-lg bg-white dark:bg-[#121212] focus:ring-2 focus:ring-primary focus:border-primary transition-colors text-gray-900 dark:text-gray-100"
                             placeholder="seu@email.com">
                     </div>
@@ -55,7 +55,7 @@
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <i class="fa-solid fa-lock text-gray-400"></i>
                         </div>
-                        <input type="password" id="senha" name="senha" required value="123456"
+                        <input type="password" id="senha" name="senha" required placeholder="••••••••"
                             class="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-darkborder rounded-lg bg-white dark:bg-[#121212] focus:ring-2 focus:ring-primary focus:border-primary transition-colors text-gray-900 dark:text-gray-100"
                             placeholder="••••••••">
                     </div>
