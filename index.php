@@ -101,6 +101,9 @@ if (strpos($pagina, '-') !== false) {
             <a href="?pagina=contas-listar" class="flex items-center gap-3 py-3 px-4 rounded-lg transition duration-200 hover:bg-gray-50 dark:hover:bg-white/5 <?= str_starts_with($pagina, 'contas') ? 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-blue-400' : 'text-gray-600 dark:text-gray-300' ?>"><i class="fa-solid fa-building-columns w-5 text-center"></i> Contas Bancárias</a>
             <a href="?pagina=categorias-listar" class="flex items-center gap-3 py-3 px-4 rounded-lg transition duration-200 hover:bg-gray-50 dark:hover:bg-white/5 <?= str_starts_with($pagina, 'categorias') ? 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-blue-400' : 'text-gray-600 dark:text-gray-300' ?>"><i class="fa-solid fa-tags w-5 text-center"></i> Categorias</a>
             <a href="?pagina=usuarios-listar" class="flex items-center gap-3 py-3 px-4 rounded-lg transition duration-200 hover:bg-gray-50 dark:hover:bg-white/5 <?= str_starts_with($pagina, 'usuarios') ? 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-blue-400' : 'text-gray-600 dark:text-gray-300' ?>"><i class="fa-solid fa-users w-5 text-center"></i> Usuários</a>
+            
+            <p class="px-4 pt-4 pb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Análise</p>
+            <a href="?pagina=relatorios-index" class="flex items-center gap-3 py-3 px-4 rounded-lg transition duration-200 hover:bg-gray-50 dark:hover:bg-white/5 <?= str_starts_with($pagina, 'relatorios') ? 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-blue-400' : 'text-gray-600 dark:text-gray-300' ?>"><i class="fa-solid fa-chart-pie w-5 text-center"></i> Relatórios</a>
         </nav>
         <div class="p-4 mt-auto">
             <a href="?pagina=auth-logout" class="flex justify-center items-center gap-2 w-full py-2.5 px-4 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition"><i class="fa-solid fa-right-from-bracket"></i> Sair</a>
@@ -141,6 +144,7 @@ if (strpos($pagina, '-') !== false) {
                 <a href="?pagina=contas-listar" class="block py-3 px-4 rounded-lg <?= str_starts_with($pagina, 'contas') ? 'bg-primary/20 text-blue-400' : 'text-gray-300' ?>">Contas Bancárias</a>
                 <a href="?pagina=categorias-listar" class="block py-3 px-4 rounded-lg <?= str_starts_with($pagina, 'categorias') ? 'bg-primary/20 text-blue-400' : 'text-gray-300' ?>">Categorias</a>
                 <a href="?pagina=usuarios-listar" class="block py-3 px-4 rounded-lg <?= str_starts_with($pagina, 'usuarios') ? 'bg-primary/20 text-blue-400' : 'text-gray-300' ?>">Usuários</a>
+                <a href="?pagina=relatorios-index" class="block py-3 px-4 rounded-lg <?= str_starts_with($pagina, 'relatorios') ? 'bg-primary/20 text-blue-400' : 'text-gray-300' ?>">Relatórios</a>
             </nav>
         </div>
         <?php endif; ?>
