@@ -18,11 +18,6 @@ $repo = new LancamentoRepository();
 if ($lancamentoId) {
     $dados = $repo->buscarLancamentoEParcelas(AuthHelper::getInstituicaoId(), $lancamentoId);
     if ($dados) {
-        if (!empty($dados['parcelas'])) {
-            foreach($dados['parcelas'] as &$p) {
-                $p['valor'] = number_format((float)$p['valor'], 2, ',', '.');
-            }
-        }
         echo json_encode([
             'sucesso' => true, 
             'lancamento' => $dados['lancamento'], 
@@ -35,7 +30,6 @@ if ($lancamentoId) {
 } else {
     $parcela = $repo->buscar(AuthHelper::getInstituicaoId(), $parcelaId);
     if ($parcela) {
-        $parcela['valor'] = number_format((float)$parcela['valor'], 2, ',', '.');
         echo json_encode(['sucesso' => true, 'dados' => $parcela]);
     } else {
         http_response_code(404);

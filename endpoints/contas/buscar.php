@@ -15,7 +15,6 @@ $repo = new ContaRepository();
 $conta = $repo->buscar(AuthHelper::getInstituicaoId(), $id);
 
 if ($conta) {
-    $conta['saldo_inicial'] = number_format((float)$conta['saldo_inicial'], 2, ',', '.');
     echo json_encode(['sucesso' => true, 'dados' => $conta]);
 } else {
     http_response_code(404);
