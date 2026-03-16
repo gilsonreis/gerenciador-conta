@@ -1,0 +1,31 @@
+<?php
+require_once __DIR__ . '/../../src/Helpers/AuthHelper.php';
+require_once __DIR__ . '/../../src/Repositories/CaixaRepository.php';
+
+AuthHelper::requireLogin();
+
+$origem = trim($_POST['origem'] ?? '');
+$valor = trim($_POST['valor'] ?? '');
+$dataEntrada = trim($_POST['data_entrada'] ?? '');
+$id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT) ?: null;
+
+if (empty($origem) || empty($valor) || empty($dataEntrada)) {
+    http_response_code(400);
+    echo json_encode(['erro' => 'Todos os campos são obrigatórios.']);
+    exit;
+}
+
+$dados = [
+    'id' => $id,
+    'origem' => $origem,
+    'valor' => $valor,
+    'data_entrada' => $dataEntrada
+];
+
+$repo = new CaixaRepository();
+if ($repo->salvar(AuthHelper::getInstituicaoId(), AuthHelper::getUsuarioId(), $dados)) {
+    echo json_encode(['sucesso' => true, 'mensagem' => 'Entrada salva com sucesso']);
+} else {
+    http_response_code(500);
+    echo json_encode(['erro' => 'Falha ao salvar a entrada']);
+}

@@ -1,0 +1,99 @@
+<!-- Modal Backdrop -->
+<div id="modal-despesa-backdrop" class="fixed inset-0 bg-black/60 hidden z-40 transition-opacity"></div>
+
+<!-- Modal Panel -->
+<div id="modal-despesa" class="fixed inset-0 hidden z-50 flex items-center justify-center p-4">
+    <div id="modal-despesa-content" class="bg-white dark:bg-darkcard rounded-2xl shadow-2xl w-full max-w-md transform scale-95 opacity-0 transition-all duration-300 overflow-hidden border border-gray-100 dark:border-darkborder max-h-[90vh] flex flex-col">
+        
+        <!-- Header -->
+        <div class="px-6 py-4 border-b border-gray-100 dark:border-darkborder flex justify-between items-center bg-gray-50 dark:bg-white/5 shrink-0">
+            <h3 class="text-lg font-bold text-gray-800 dark:text-white" id="modal-despesa-title">Nova Despesa</h3>
+            <button type="button" onclick="despesasJS.fecharModal()" class="text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors">
+                <i class="fa-solid fa-times text-xl"></i>
+            </button>
+        </div>
+
+        <!-- Form -->
+        <form id="form-despesa" class="p-6 overflow-y-auto">
+            <input type="hidden" id="parcela_id" name="id">
+            
+            <div class="mb-4">
+                <label for="despesa_descricao" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Descrição</label>
+                <input type="text" id="despesa_descricao" name="descricao" required 
+                    class="w-full px-4 py-2.5 bg-white dark:bg-[#121212] border border-gray-300 dark:border-darkborder rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-gray-900 dark:text-white transition-colors"
+                    placeholder="Ex: Conta de Luz, Supermercado">
+            </div>
+
+            <div class="mb-4">
+                <label for="despesa_categoria" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Categoria</label>
+                <select id="despesa_categoria" name="categoria_id" required
+                    class="w-full px-4 py-2.5 bg-white dark:bg-[#121212] border border-gray-300 dark:border-darkborder rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-gray-900 dark:text-white transition-colors">
+                    <option value="">Selecione...</option>
+                    <!-- Populate via JS -->
+                </select>
+            </div>
+
+            <div class="mb-5">
+                <label class="flex items-center gap-2 cursor-pointer group p-3 border border-gray-200 dark:border-darkborder rounded-lg hover:border-primary/50 dark:hover:border-primary/50 transition-colors">
+                    <input type="checkbox" id="despesa_conta_fixa" name="conta_fixa" value="1" 
+                        class="w-5 h-5 text-primary bg-gray-100 dark:bg-[#121212] border-gray-300 dark:border-darkborder rounded focus:ring-primary focus:ring-2 transition-colors cursor-pointer">
+                    <div class="flex flex-col">
+                        <span class="text-sm font-medium text-gray-800 dark:text-gray-200 group-hover:text-primary transition-colors">Conta Fixa de Sobrevivência</span>
+                        <span class="text-xs text-gray-500 dark:text-gray-400">Marque se for custo essencial (luz, água, aluguel)</span>
+                    </div>
+                </label>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label for="despesa_valor" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Valor</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <span class="text-gray-500 dark:text-gray-400">R$</span>
+                        </div>
+                        <input type="text" id="despesa_valor" name="valor" required 
+                            class="pl-10 w-full px-4 py-2.5 bg-white dark:bg-[#121212] border border-gray-300 dark:border-darkborder rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-gray-900 dark:text-white transition-colors"
+                            placeholder="0,00"
+                            oninput="this.value = this.value.replace(/[^0-9,.]/g, '')">
+                    </div>
+                </div>
+                
+                <div>
+                    <label for="despesa_data" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" id="label-vencimento">Vencimento Inicial</label>
+                    <input type="date" id="despesa_data" name="data_vencimento" required 
+                        class="w-full px-4 py-2.5 bg-white dark:bg-[#121212] border border-gray-300 dark:border-darkborder rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-gray-900 dark:text-white transition-colors [color-scheme:light] dark:[color-scheme:dark]">
+                </div>
+            </div>
+
+            <div id="bloco-parcelamento" class="mb-4">
+                <label for="despesa_parcelas" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Parcelamento</label>
+                <div class="flex items-center gap-3">
+                    <span class="text-sm text-gray-500">Em</span>
+                    <input type="number" id="despesa_parcelas" name="total_parcelas" min="1" max="120" value="1"
+                        class="w-24 text-center px-3 py-2 bg-white dark:bg-[#121212] border border-gray-300 dark:border-darkborder rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-gray-900 dark:text-white transition-colors">
+                    <span class="text-sm text-gray-500">vez(es)</span>
+                </div>
+                <p class="text-xs text-gray-500 mt-2"><i class="fa-solid fa-circle-info mr-1"></i> Para pagamento à vista, mantenha 1.</p>
+            </div>
+
+            <div class="mb-4">
+                <label for="despesa_status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status do Pagamento</label>
+                <select id="despesa_status" name="status" required
+                    class="w-full px-4 py-2.5 bg-white dark:bg-[#121212] border border-gray-300 dark:border-darkborder rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-gray-900 dark:text-white transition-colors">
+                    <option value="pendente">Pendente / Não Pago</option>
+                    <option value="pago">Pago / Quitado</option>
+                </select>
+            </div>
+
+            <!-- Actions -->
+            <div class="mt-8 flex justify-end gap-3 shrink-0">
+                <button type="button" onclick="despesasJS.fecharModal()" class="px-4 py-2 flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors font-medium border border-transparent dark:hover:border-darkborder">
+                    Cancelar
+                </button>
+                <button type="submit" id="btn-salvar-despesa" class="px-6 py-2 bg-primary hover:bg-blue-600 text-white rounded-lg transition-colors font-medium shadow-sm flex items-center gap-2">
+                    <i class="fa-solid fa-check"></i> Salvar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

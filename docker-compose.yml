@@ -1,0 +1,43 @@
+services:
+  app:
+    platform: linux/amd64 # Resolve a compatibilidade no Mac M1/M2/M3
+    image: webdevops/php-apache-dev:8.4
+    container_name: gerenciador_contas_app
+    ports:
+      - "8892:80"
+    volumes:
+      - ./:/app
+    environment:
+      - WEB_DOCUMENT_ROOT=/app
+      - PHP_DATE_TIMEZONE=America/Sao_Paulo
+      - PHP_DISPLAY_ERRORS=1
+    depends_on:
+      - db
+
+  db:
+    # O MySQL 8 já possui versão nativa para ARM64, então geralmente não precisa da tag platform
+    image: mysql:8
+    container_name: gerenciador_contas_db
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=controle_contas
+      - MYSQL_USER=user_contas
+      - MYSQL_PASSWORD=senha_contas
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  phpmyadmin:
+    platform: linux/amd64 # Resolve o aviso de plataforma no Mac
+    image: phpmyadmin/phpmyadmin
+    container_name: gerenciador_contas_pma
+    ports:
+      - "8893:80"
+    environment:
+      - PMA_HOST=db
+    depends_on:
+      - db
+
+volumes:
+  mysql_data:
