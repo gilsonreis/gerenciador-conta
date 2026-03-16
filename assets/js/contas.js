@@ -44,7 +44,13 @@ const contasJS = {
             if(res.sucesso) {
                 $('#conta_id').val(res.dados.id);
                 $('#conta_nome').val(res.dados.nome);
-                $('#conta_saldo').val(res.dados.saldo_inicial);
+                
+                let saldoFormatado = '';
+                if(res.dados.saldo_inicial) {
+                    saldoFormatado = parseFloat(res.dados.saldo_inicial).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                }
+                $('#conta_saldo').val(saldoFormatado);
+                
                 $('#modal-conta-title').text('Editar Conta');
                 contasJS.mostrarModal();
             }

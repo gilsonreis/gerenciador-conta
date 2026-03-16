@@ -156,7 +156,11 @@ const despesasJS = {
                 
                 // Em Edição, exibir o bloco dos Valores populado mas 100% blindado contra edição local
                 $('#bloco-valores').show();
-                $('#despesa_valor').val(parcelas.length > 0 ? parcelas[0].valor : '').prop('readonly', true).prop('required', false);
+                let valorParaExibir = '';
+                if (parcelas.length > 0 && parcelas[0].valor) {
+                    valorParaExibir = parseFloat(parcelas[0].valor).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                }
+                $('#despesa_valor').val(valorParaExibir).prop('readonly', true).prop('required', false);
                 $('#despesa_data').val(parcelas.length > 0 ? parcelas[0].data_vencimento.split(' ')[0] : '').prop('readonly', true).prop('required', false);
                 
                 if (parcelas.length > 1) {
