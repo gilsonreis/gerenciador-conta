@@ -162,9 +162,12 @@ class RelatorioRepository {
         $formato = ($agrupamento === 'anual') ? '%Y' : '%m/%Y';
         
         $params = [
-            'inst' => $instituicaoId,
-            'inicio' => $filtros['data_inicio'],
-            'fim' => $filtros['data_fim']
+            'inst1' => $instituicaoId,
+            'inicio1' => $filtros['data_inicio'],
+            'fim1' => $filtros['data_fim'],
+            'inst2' => $instituicaoId,
+            'inicio2' => $filtros['data_inicio'],
+            'fim2' => $filtros['data_fim']
         ];
 
         $sql = "
@@ -179,8 +182,8 @@ class RelatorioRepository {
                     valor as entrada, 
                     0 as saida 
                 FROM caixa_entradas 
-                WHERE instituicao_id = :inst 
-                AND data_entrada BETWEEN :inicio AND :fim
+                WHERE instituicao_id = :inst1 
+                AND data_entrada BETWEEN :inicio1 AND :fim1
                 
                 UNION ALL
                 
@@ -190,8 +193,8 @@ class RelatorioRepository {
                     (valor - desconto) as valor 
                 FROM parcelas p
                 JOIN lancamentos l ON p.lancamento_id = l.id
-                WHERE l.instituicao_id = :inst 
-                AND data_pagamento BETWEEN :inicio AND :fim 
+                WHERE l.instituicao_id = :inst2 
+                AND data_pagamento BETWEEN :inicio2 AND :fim2 
                 AND data_pagamento IS NOT NULL
             ) as consolidador 
             GROUP BY periodo 
