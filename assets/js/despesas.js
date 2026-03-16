@@ -59,9 +59,9 @@ const despesasJS = {
         let dadosFiltrados = this.dadosOriginais;
         
         if (this.filtroAtual === 'pendentes') {
-            dadosFiltrados = this.dadosOriginais.filter(d => d.status === 'pendente');
+            dadosFiltrados = this.dadosOriginais.filter(d => d.qtd_parcelas_pagas < d.qtd_total_parcelas);
         } else if (this.filtroAtual === 'pagas') {
-            dadosFiltrados = this.dadosOriginais.filter(d => d.status === 'pago');
+            dadosFiltrados = this.dadosOriginais.filter(d => d.qtd_parcelas_pagas == d.qtd_total_parcelas);
         }
 
         let html = '';
@@ -69,17 +69,25 @@ const despesasJS = {
             html = `<tr><td colspan="6" class="p-8 text-center text-gray-500 dark:text-gray-400">Nenhuma despesa ${this.filtroAtual === 'todas' ? 'encontrada' : this.filtroAtual} para este mês.</td></tr>`;
         } else {
             dadosFiltrados.forEach(d => {
-                const isPago = d.status === 'pago';
-                const statusColorBase = isPago ? 'text-emerald-500' : 'text-gray-400 hover:text-emerald-500';
-                const iconStatus = isPago ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle';
+                const isTotalPago = parseInt(d.qtd_parcelas_pagas) === parseInt(d.qtd_total_parcelas);
+                const statusColorBase = isTotalPago ? 'text-emerald-500' : 'text-gray-400 hover:text-emerald-500';
+                const iconStatus = isTotalPago ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle';
                 
+                const statusBadge = isTotalPago 
+                    ? '<span class="px-2 py-1 bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400 rounded text-xs font-bold whitespace-nowrap">Pago</span>'
+                    : `<span class="px-2 py-1 bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400 rounded text-xs font-bold whitespace-nowrap">Pendente (${d.qtd_parcelas_pagas}/${d.qtd_total_parcelas})</span>`;
+
                 html += `
-                <tr class="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group ${isPago ? 'opacity-70' : ''}">
+                <tr class="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group ${isTotalPago ? 'opacity-70' : ''}">
                     <!-- Checkbox de Pagamento Rápido -->
                     <td class="p-4 text-center align-middle">
-                        <button onclick="despesasJS.alternarStatus(${d.parcela_id})" class="${statusColorBase} transition-colors text-xl" title="Marcar como ${isPago ? 'Pendente' : 'Pago'}">
+                        ${!isTotalPago ? `
+                        <button onclick="despesasJS.pagarProxima(${d.lancamento_id})" class="${statusColorBase} transition-colors text-xl" title="Pagar Próxima Parcela">
                             <i class="${iconStatus}"></i>
                         </button>
+                        ` : `
+                        <i class="${iconStatus} text-emerald-500 text-xl"></i>
+                        `}
                     </td>
                     <td class="p-4 text-gray-500 dark:text-gray-400 text-sm whitespace-nowrap">
                         ${despesasJS.formatarDataBR(d.data_vencimento)}
@@ -95,6 +103,9 @@ const despesasJS = {
                     </td>
                     <td class="p-4 text-gray-500 dark:text-gray-400 text-sm">
                         <span class="bg-gray-100 dark:bg-white/5 px-2 py-1 rounded text-xs">${d.categoria_nome}</span>
+                    </td>
+                    <td class="p-4 text-center">
+                        ${statusBadge}
                     </td>
                     <td class="p-4 text-right text-red-500 font-bold whitespace-nowrap"><span class="valor-sensivel">${despesasJS.formatarMoeda(d.valor)}</span></td>
                     <td class="p-4 text-center">
@@ -240,6 +251,77 @@ const despesasJS = {
     pagarParcelaDireto: function(parcelaId, lancamentoId) {
         // Redireciona para o detalhe para usar a mesma modal logic
         this.abrirDetalhes(parcelaId);
+    },
+
+    pagarProxima: function(lancamentoId) {
+        $.get('ajax.php?acao=contas-listar', function(resContas) {
+            let optionsContas = '<option value="">Selecione a Conta...</option>';
+            resContas.dados.forEach(c => {
+                optionsContas += `<option value="${c.id}">${c.nome}</option>`;
+            });
+
+            const dataHoje = new Date().toISOString().substring(0, 10);
+
+            Swal.fire({
+                title: 'Pagar Próxima Parcela',
+                html: `
+                    <div class="text-left mt-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Data do Pagto</label>
+                        <input type="date" id="swal-pag-data" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-gray-900 mb-4" value="${dataHoje}">
+                        
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Carteira de Pagamento</label>
+                        <select id="swal-pag-conta" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-gray-900 mb-4">
+                            ${optionsContas}
+                        </select>
+
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Desconto Recebido</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><span class="text-gray-500">R$</span></div>
+                            <input type="text" id="swal-pag-desc" class="moeda_brl pl-10 w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-gray-900" value="0,00">
+                        </div>
+                    </div>
+                `,
+                didOpen: () => {
+                    $('.moeda_brl').mask('#.##0,00', {reverse: true});
+                },
+                showCancelButton: true,
+                confirmButtonColor: '#10b981',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Confirmar Pagamento',
+                cancelButtonText: 'Cancelar',
+                preConfirm: () => {
+                    const conta = document.getElementById('swal-pag-conta').value;
+                    if(!conta) {
+                        Swal.showValidationMessage('Selecione uma carteira!');
+                        return false;
+                    }
+                    return {
+                        data_pagamento: document.getElementById('swal-pag-data').value,
+                        desconto: document.getElementById('swal-pag-desc').value,
+                        conta_pagamento_id: conta
+                    }
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post('ajax.php?acao=despesas-pagar_proxima', {
+                        lancamento_id: lancamentoId,
+                        data_pagamento: result.value.data_pagamento,
+                        desconto: result.value.desconto,
+                        conta_pagamento_id: result.value.conta_pagamento_id
+                    }, function(res) {
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'success',
+                            title: res.mensagem,
+                            showConfirmButton: false,
+                            timer: 3000
+                        });
+                        despesasJS.carregar();
+                    }, 'json');
+                }
+            });
+        });
     },
     
     pagarParcelaDetalhe: function(parcelaId, lancamentoId, isPaga) {

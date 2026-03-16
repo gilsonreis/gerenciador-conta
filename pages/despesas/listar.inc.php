@@ -89,6 +89,7 @@
                     <th class="p-4 font-semibold">Vencimento</th>
                     <th class="p-4 font-semibold">Descrição</th>
                     <th class="p-4 font-semibold">Categoria</th>
+                    <th class="p-4 font-semibold text-center">Status</th>
                     <th class="p-4 font-semibold text-right">Valor</th>
                     <th class="p-4 font-semibold w-24 text-center">Ações</th>
                 </tr>

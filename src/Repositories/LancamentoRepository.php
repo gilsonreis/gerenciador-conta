@@ -21,7 +21,9 @@ class LancamentoRepository {
                 p.valor,
                 p.desconto,
                 p.data_vencimento,
-                p.data_pagamento
+                p.data_pagamento,
+                (SELECT COUNT(*) FROM parcelas WHERE lancamento_id = l.id) as qtd_total_parcelas,
+                (SELECT COUNT(*) FROM parcelas WHERE lancamento_id = l.id AND data_pagamento IS NOT NULL) as qtd_parcelas_pagas
             FROM parcelas p
             JOIN lancamentos l ON p.lancamento_id = l.id
             JOIN categorias c ON l.categoria_id = c.id
