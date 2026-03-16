@@ -5,11 +5,11 @@ class Database {
 
     public static function getConnection(): PDO {
         if (self::$instance === null) {
-            $host = getenv('DB_HOST') ?: '';
-            $dbName = getenv('DB_NAME') ?: 'controle_contas';
-            $user = getenv('DB_USER') ?: 'user_contas';
+            $host = getenv('DB_HOST') ?: 'localhost';
+            $dbName = getenv('DB_NAME') ?: 'simplify1_financeiro';
+            $user = getenv('DB_USER') ?: 'simplify1_financeiro';
             // Em docker ou local, ajustar a senha conforme ambiente
-            $password = getenv('DB_PASS') ?: 'senha_contas';
+            $password = getenv('DB_PASS') ?: 'zusn++akGZ1bfm&C';
             
             try {
                 $dsn = "mysql:host=$host;dbname=$dbName;charset=utf8mb4";
