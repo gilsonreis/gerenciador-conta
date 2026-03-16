@@ -86,4 +86,35 @@ class RelatorioRepository {
         $stmt->execute($params);
         return $stmt->fetchAll();
     }
+    public function despesasPorCategoria(int $instituicaoId, int $mes, int $ano, string $status = 'todas') {
+        $params = [
+            'inst' => $instituicaoId,
+            'mes_ano' => sprintf('%04d-%02d', $ano, $mes)
+        ];
+        
+        $whereStatus = "";
+        if ($status === 'pagas') {
+            $whereStatus = "AND p.data_pagamento IS NOT NULL";
+        } elseif ($status === 'pendentes') {
+            $whereStatus = "AND p.data_pagamento IS NULL";
+        }
+
+        $sql = "
+            SELECT 
+                c.nome as categoria_nome,
+                SUM(p.valor) as total
+            FROM parcelas p
+            JOIN lancamentos l ON p.lancamento_id = l.id
+            JOIN categorias c ON l.categoria_id = c.id
+            WHERE l.instituicao_id = :inst
+            AND DATE_FORMAT(p.data_vencimento, '%Y-%m') = :mes_ano
+            $whereStatus
+            GROUP BY c.id
+            ORDER BY total DESC
+        ";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll();
+    }
 }
