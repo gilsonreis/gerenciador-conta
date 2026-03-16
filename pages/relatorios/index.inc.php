@@ -12,7 +12,7 @@ AuthHelper::requireLogin();
 </div>
 
 <!-- Hub Grid -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
     
     <!-- Card: Fluxo de Caixa -->
     <div class="bg-white dark:bg-darkcard rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-darkborder hover:shadow-md transition-shadow group">
