@@ -66,10 +66,6 @@
                     Entrar
                 </button>
             </form>
-            
-            <div class="mt-6 text-center text-xs text-gray-500 dark:text-gray-400">
-                Mock Mode: clique em entrar para gerar um usuário aleatório.
-            </div>
         </div>
     </div>
 
