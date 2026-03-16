@@ -9,7 +9,7 @@ class RelatorioRepository {
     }
 
     public function fluxoCaixaDetalhado(int $instituicaoId, array $filtros) {
-        $params = ['inst' => $instituicaoId];
+        $params = [];
         $whereFilters = [];
 
         // Filtro de Data
@@ -40,7 +40,7 @@ class RelatorioRepository {
                 ce.conta_id
             FROM caixa_entradas ce
             JOIN contas co ON ce.conta_id = co.id
-            WHERE ce.instituicao_id = :inst
+            WHERE ce.instituicao_id = :inst1
         ";
 
         $subQuerySaidas = "
@@ -56,16 +56,20 @@ class RelatorioRepository {
             JOIN lancamentos l ON p.lancamento_id = l.id
             JOIN categorias cat ON l.categoria_id = cat.id
             JOIN contas co ON p.conta_pagamento_id = co.id
-            WHERE l.instituicao_id = :inst AND p.data_pagamento IS NOT NULL
+            WHERE l.instituicao_id = :inst2 AND p.data_pagamento IS NOT NULL
         ";
 
         $unionQuery = "";
         if (empty($filtros['tipo_movimento']) || $filtros['tipo_movimento'] === 'todos') {
             $unionQuery = "($subQueryEntradas) UNION ALL ($subQuerySaidas)";
+            $params['inst1'] = $instituicaoId;
+            $params['inst2'] = $instituicaoId;
         } elseif ($filtros['tipo_movimento'] === 'entrada') {
             $unionQuery = "$subQueryEntradas";
+            $params['inst1'] = $instituicaoId;
         } elseif ($filtros['tipo_movimento'] === 'saida') {
             $unionQuery = "$subQuerySaidas";
+            $params['inst2'] = $instituicaoId;
         }
 
         $whereSql = !empty($whereFilters) ? "WHERE " . implode(" AND ", $whereFilters) : "";
