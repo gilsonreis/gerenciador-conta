@@ -28,6 +28,20 @@ AuthHelper::requireLogin();
         </a>
     </div>
 
+    <!-- Card: Despesas por Categoria -->
+    <div class="bg-white dark:bg-darkcard rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-darkborder hover:shadow-md transition-shadow group">
+        <div class="w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-emerald-500 group-hover:text-white transition-all text-emerald-500">
+            <i class="fa-solid fa-chart-pie text-xl"></i>
+        </div>
+        
+        <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-2">Despesas por Categoria</h3>
+        <p class="text-gray-500 dark:text-gray-400 text-sm mb-6">Analise para onde seu dinheiro está indo. Agrupamento de gastos mensais por categoria.</p>
+        
+        <a href="?pagina=relatorios-despesas_categoria" class="inline-flex items-center gap-2 text-emerald-500 font-semibold hover:gap-3 transition-all">
+            Acessar Relatório <i class="fa-solid fa-arrow-right text-xs"></i>
+        </a>
+    </div>
+
     <!-- Futuros Relatórios (Placeholders) -->
     <div class="bg-gray-50/50 dark:bg-white/5 rounded-2xl p-6 border border-dashed border-gray-200 dark:border-darkborder flex flex-col items-center justify-center text-center opacity-60">
         <div class="w-12 h-12 bg-gray-200 dark:bg-darkborder rounded-xl flex items-center justify-center mb-4 text-gray-400">
