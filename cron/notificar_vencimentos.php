@@ -52,7 +52,7 @@ $sql = "
     SELECT 
         p.id as parcela_id,
         p.numero_parcela,
-        l.total_parcelas,
+        p.total_parcelas,
         p.valor,
         p.data_vencimento,
         DATEDIFF(p.data_vencimento, CURDATE()) as dias_restantes,
