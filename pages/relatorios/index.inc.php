@@ -56,8 +56,22 @@ AuthHelper::requireLogin();
         </a>
     </div>
 
+    <!-- Card: Resumo Consolidado -->
+    <div class="bg-white dark:bg-darkcard rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-darkborder hover:shadow-md transition-shadow group">
+        <div class="w-12 h-12 bg-indigo-500/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-indigo-500 group-hover:text-white transition-all text-indigo-500">
+            <i class="fa-solid fa-chart-column text-xl"></i>
+        </div>
+        
+        <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-2">Resumo Consolidado</h3>
+        <p class="text-gray-500 dark:text-gray-400 text-sm mb-6">Visão macro do seu faturamento e despesas. Agrupamento de totais por mês ou por ano para análise de crescimento.</p>
+        
+        <a href="?pagina=relatorios-resumo_consolidado" class="inline-flex items-center gap-2 text-indigo-500 font-semibold hover:gap-3 transition-all">
+            Acessar Relatório <i class="fa-solid fa-arrow-right text-xs"></i>
+        </a>
+    </div>
+
     <!-- Futuros Relatórios (Placeholders) -->
-    <div class="bg-gray-50/50 dark:bg-white/5 rounded-2xl p-6 border border-dashed border-gray-200 dark:border-darkborder flex flex-col items-center justify-center text-center opacity-60">
+    <!-- <div class="bg-gray-50/50 dark:bg-white/5 rounded-2xl p-6 border border-dashed border-gray-200 dark:border-darkborder flex flex-col items-center justify-center text-center opacity-60">
         <div class="w-12 h-12 bg-gray-200 dark:bg-darkborder rounded-xl flex items-center justify-center mb-4 text-gray-400">
             <i class="fa-solid fa-lock text-xl"></i>
         </div>
@@ -71,6 +85,6 @@ AuthHelper::requireLogin();
         </div>
         <h3 class="text-lg font-bold text-gray-400 mb-1">Projeção Anual</h3>
         <p class="text-gray-400 text-xs">Em breve...</p>
-    </div>
+    </div> -->
 
 </div>
