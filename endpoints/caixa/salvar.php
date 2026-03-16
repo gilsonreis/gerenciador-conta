@@ -15,12 +15,13 @@ if (!$contaId || empty($valor_raw) || empty($dataEntrada)) {
     exit;
 }
 
-$valor = (float)str_replace(',', '.', str_replace('.', '', $valor_raw));
+$descricao = trim($_POST['descricao'] ?? '');
 
 $dados = [
     'id' => $id,
     'conta_id' => $contaId,
-    'valor' => $valor,
+    'valor' => $valor_raw,
+    'descricao' => $descricao,
     'data_entrada' => $dataEntrada
 ];
 
