@@ -27,12 +27,14 @@ try {
 } catch (Exception $e) {
     exit("Falha crítica: Não foi possível conectar ao banco de dados: " . $e->getMessage() . "\n");
 }
+// Importação das Variáveis Nativas
+$env = require __DIR__ . '/../config/env.php';
 
 // Configuração STMTP DSN (Symfony)
-$smtpUser = getenv('SMTP_USER') ?: 'sender@simplifysoftwares.com.br';
-$smtpPass = getenv('SMTP_PASS') ?: '2FMok%knm#n8Zrq2';
-$smtpHost = getenv('SMTP_HOST') ?: 'simplifysoftwares.com.br'; // Exemplo usando hostinger/google/aws
-$smtpPort = getenv('SMTP_PORT') ?: '587';
+$smtpUser = $env['SMTP_USER'];
+$smtpPass = $env['SMTP_PASS'];
+$smtpHost = $env['SMTP_HOST']; 
+$smtpPort = $env['SMTP_PORT'];
 
 // Trocamos o rawulrencode que protege senhas com caracteres especiais na URL de DSN.
 // Adicionado ?verify_peer=0 para não travar na divergência de nome do Certificado SSL do servidor compartilhado
