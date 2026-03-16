@@ -157,4 +157,54 @@ class RelatorioRepository {
         $stmt->execute($params);
         return $stmt->fetchAll();
     }
+    public function resumoConsolidado(int $instituicaoId, array $filtros) {
+        $agrupamento = $filtros['agrupamento'] ?? 'mensal';
+        $formato = ($agrupamento === 'anual') ? '%Y' : '%m/%Y';
+        
+        $params = [
+            'inst' => $instituicaoId,
+            'inicio' => $filtros['data_inicio'],
+            'fim' => $filtros['data_fim']
+        ];
+
+        $sql = "
+            SELECT 
+                periodo, 
+                SUM(entrada) as total_entradas, 
+                SUM(saida) as total_saidas, 
+                (SUM(entrada) - SUM(saida)) as saldo_periodo 
+            FROM (
+                SELECT 
+                    DATE_FORMAT(data_entrada, '$formato') as periodo, 
+                    valor as entrada, 
+                    0 as saida 
+                FROM caixa_entradas 
+                WHERE instituicao_id = :inst 
+                AND data_entrada BETWEEN :inicio AND :fim
+                
+                UNION ALL
+                
+                SELECT 
+                    DATE_FORMAT(data_pagamento, '$formato') as periodo, 
+                    0 as entrada, 
+                    (valor - desconto) as valor 
+                FROM parcelas p
+                JOIN lancamentos l ON p.lancamento_id = l.id
+                WHERE l.instituicao_id = :inst 
+                AND data_pagamento BETWEEN :inicio AND :fim 
+                AND data_pagamento IS NOT NULL
+            ) as consolidador 
+            GROUP BY periodo 
+            ORDER BY STR_TO_DATE(CONCAT('01/', periodo), '%d/%m/%Y') ASC, periodo ASC
+        ";
+
+        // Ajuste na ordenação se for anual
+        if ($agrupamento === 'anual') {
+            $sql = str_replace("ORDER BY STR_TO_DATE(CONCAT('01/', periodo), '%d/%m/%Y') ASC, periodo ASC", "ORDER BY periodo ASC", $sql);
+        }
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll();
+    }
 }
