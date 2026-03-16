@@ -16,6 +16,17 @@ $(document).ready(function() {
                     window.location.href = 'index.php?pagina=home-index';
                 }
             },
+            error: function(xhr) {
+                let msg = 'Erro ao processar o login.';
+                if (xhr.responseJSON && xhr.responseJSON.erro) {
+                    msg = xhr.responseJSON.erro;
+                }
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Ops...',
+                    text: msg
+                });
+            },
             complete: function() {
                 // Em caso de catch ou sucesso, libera botao (caso falhe o redirect por ex)
                 btn.prop('disabled', false).html('Entrar');
