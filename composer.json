@@ -1,0 +1,13 @@
+{
+    "name": "gilsonreis/gerenciador-contas",
+    "type": "project",
+    "require": {
+        "symfony/mailer": "^8.0"
+    },
+    "authors": [
+        {
+            "name": "Gilson Reis",
+            "email": "gilsonc.reis@gmail.com"
+        }
+    ]
+}

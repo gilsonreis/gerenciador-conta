@@ -15,7 +15,12 @@ echo "========================================================\n";
 echo "Iniciando Rotina de Notificação de Vencimentos - " . date('Y-m-d H:i:s') . "\n";
 echo "========================================================\n\n";
 
+require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../config/Database.php';
+
+use Symfony\Component\Mailer\Transport;
+use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Mime\Email;
 
 try {
     $db = Database::getConnection();
@@ -23,10 +28,22 @@ try {
     exit("Falha crítica: Não foi possível conectar ao banco de dados: " . $e->getMessage() . "\n");
 }
 
-// Cabeçalhos para Email em HTML
-$headers = "MIME-Version: 1.0\r\n";
-$headers .= "Content-type: text/html; charset=UTF-8\r\n";
-$headers .= "From: Controle Familiar <noreply@financeiro.simplifysoftwares.com.br>\r\n"; // Idealmente alterar para domínio válido
+// Configuração STMTP DSN (Symfony)
+$smtpUser = getenv('SMTP_USER') ?: 'sender@simplifysoftwares.com.br';
+$smtpPass = getenv('SMTP_PASS') ?: '2FMok%knm#n8Zrq2';
+$smtpHost = getenv('SMTP_HOST') ?: 'smtp.hostinger.com'; // Exemplo usando hostinger/google/aws
+$smtpPort = getenv('SMTP_PORT') ?: '465';
+
+// Trocamos o rawulrencode que protege senhas com caracteres especiais na URL de DSN.
+$dsn = sprintf('smtps://%s:%s@%s:%s', rawurlencode($smtpUser), rawurlencode($smtpPass), $smtpHost, $smtpPort);
+
+try {
+    $transport = Transport::fromDsn($dsn);
+    $mailer = new Mailer($transport);
+} catch (\Throwable $e) {
+    exit("Falha crítica: Não foi possível instanciar o Transportador DSN do Mailer: " . $e->getMessage() . "\n");
+}
+
 
 echo ">> Buscando vencimentos consolidados para Hoje, 3, 5 ou 10 dias...\n";
 
@@ -178,12 +195,20 @@ if (empty($resultados)) {
         </html>
         ";
 
-        // Envio nativo
-        if (mail($email, $assunto, $corpoHtml, $headers)) {
+        // Envio via Symfony Mailer com Error Handling
+        try {
+            $emailToSend = (new Email())
+                ->from('sender@simplifysoftwares.com.br')
+                ->to($email)
+                ->subject($assunto)
+                ->html($corpoHtml);
+
+            $mailer->send($emailToSend);
+            
             $totalEmailsEnviados++;
             echo "   [✓] Enviado 1 e-mail de resumo para {$email} contendo {$quantidadeAlertasNesteEmail} alerta(s).\n";
-        } else {
-            echo "   [✗] Falha ao enviar e-mail de resumo para {$email}. Verifique a configuração de SMTP do servidor.\n";
+        } catch (\Throwable $e) {
+            echo "   [✗] Erro ao enviar e-mail de resumo para {$email}: " . $e->getMessage() . "\n";
         }
     }
     
