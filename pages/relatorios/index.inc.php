@@ -42,6 +42,20 @@ AuthHelper::requireLogin();
         </a>
     </div>
 
+    <!-- Card: Contas a Pagar -->
+    <div class="bg-white dark:bg-darkcard rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-darkborder hover:shadow-md transition-shadow group">
+        <div class="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-amber-500 group-hover:text-white transition-all text-amber-500">
+            <i class="fa-solid fa-calendar-days text-xl"></i>
+        </div>
+        
+        <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-2">Contas a Pagar (Pendências)</h3>
+        <p class="text-gray-500 dark:text-gray-400 text-sm mb-6">Visualize suas contas em aberto, filtre por mês de vencimento e identifique faturas atrasadas.</p>
+        
+        <a href="?pagina=relatorios-contas_pagar" class="inline-flex items-center gap-2 text-amber-500 font-semibold hover:gap-3 transition-all">
+            Acessar Relatório <i class="fa-solid fa-arrow-right text-xs"></i>
+        </a>
+    </div>
+
     <!-- Futuros Relatórios (Placeholders) -->
     <div class="bg-gray-50/50 dark:bg-white/5 rounded-2xl p-6 border border-dashed border-gray-200 dark:border-darkborder flex flex-col items-center justify-center text-center opacity-60">
         <div class="w-12 h-12 bg-gray-200 dark:bg-darkborder rounded-xl flex items-center justify-center mb-4 text-gray-400">
