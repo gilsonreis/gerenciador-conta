@@ -29,7 +29,7 @@
             <p class="text-xs font-bold text-red-800/70 dark:text-red-400/80 uppercase tracking-widest mb-2 flex items-center gap-2">
                 <i class="fa-solid fa-calculator"></i> Total Previsto no Mês
             </p>
-            <h3 class="text-3xl font-black text-red-700 dark:text-red-400 tracking-tight" id="resumo-total-saidas">R$ 0,00</h3>
+            <h3 class="text-3xl font-black text-red-700 dark:text-red-400 tracking-tight valor-sensivel" id="resumo-total-saidas">R$ 0,00</h3>
         </div>
         <div class="hidden sm:flex items-center justify-center w-14 h-14 rounded-full bg-red-200/50 dark:bg-red-800/50 text-red-600 dark:text-red-300 relative z-10 shadow-inner">
             <i class="fa-solid fa-money-bill-transfer text-2xl"></i>
@@ -43,7 +43,7 @@
             <p class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-2 flex items-center gap-2">
                 <i class="fa-solid fa-shield-cat cursor-help" title="Despesas marcadas como Contas Fixas essenciais"></i> Sobrevivência (Contas Fixas)
             </p>
-            <h3 class="text-3xl font-black text-gray-700 dark:text-gray-300 tracking-tight" id="resumo-custo-vida">R$ 0,00</h3>
+            <h3 class="text-3xl font-black text-gray-700 dark:text-gray-300 tracking-tight valor-sensivel" id="resumo-custo-vida">R$ 0,00</h3>
         </div>
         <div class="hidden sm:flex items-center justify-center w-14 h-14 rounded-full bg-gray-200 dark:bg-darkborder text-gray-500 dark:text-gray-400 relative z-10 shadow-inner">
             <i class="fa-solid fa-house-chimney text-xl"></i>

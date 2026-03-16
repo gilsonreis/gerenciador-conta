@@ -96,7 +96,7 @@ const despesasJS = {
                     <td class="p-4 text-gray-500 dark:text-gray-400 text-sm">
                         <span class="bg-gray-100 dark:bg-white/5 px-2 py-1 rounded text-xs">${d.categoria_nome}</span>
                     </td>
-                    <td class="p-4 text-right text-red-500 font-bold whitespace-nowrap">${despesasJS.formatarMoeda(d.valor)}</td>
+                    <td class="p-4 text-right text-red-500 font-bold whitespace-nowrap"><span class="valor-sensivel">${despesasJS.formatarMoeda(d.valor)}</span></td>
                     <td class="p-4 text-center">
                         <button onclick="despesasJS.abrirDetalhes(${d.parcela_id})" class="text-gray-500 opacity-0 group-hover:opacity-100 hover:bg-gray-100 dark:hover:bg-white/10 p-2 rounded-lg transition-all" title="Ver Detalhes"><i class="fa-solid fa-search"></i></button>
                         <button onclick="despesasJS.editar(${d.parcela_id})" class="text-blue-500 opacity-0 group-hover:opacity-100 hover:bg-blue-50 dark:hover:bg-blue-900/20 p-2 rounded-lg transition-all ml-1" title="Editar Parcela"><i class="fa-solid fa-pen"></i></button>
@@ -203,14 +203,14 @@ const despesasJS = {
                 
                 const btnEditHtml = `<button onclick="despesasJS.editarParcelaDetalhe(${p.id}, ${l.id}, '${p.valor}', '${p.data_vencimento}')" class="text-blue-500 hover:text-blue-700 transition-colors mt-1" title="Editar Parcela / Amortizar Original"><i class="fa-solid fa-pen-to-square"></i></button>`;
 
-                const detalheDesconto = p.desconto > 0 ? `<br><span class="text-xs text-green-500">(- ${despesasJS.formatarMoeda(p.desconto)})</span>` : '';
+                const detalheDesconto = p.desconto > 0 ? `<br><span class="text-xs text-green-500">(- <span class="valor-sensivel">${despesasJS.formatarMoeda(p.desconto)}</span>)</span>` : '';
                 const valorFinal = parseFloat(p.valor) - parseFloat(p.desconto);
 
                 htmlTbody += `
                     <tr class="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
                         <td class="p-4 text-gray-900 dark:text-gray-100 font-medium">${p.numero_parcela} / ${p.total_parcelas}</td>
                         <td class="p-4 text-gray-500 dark:text-gray-400 text-sm whitespace-nowrap">${despesasJS.formatarDataBR(p.data_vencimento)} <br> <span class="text-xs ${isPaga ? 'text-emerald-600' : 'hidden'}">Pago: ${p.data_pagamento ? despesasJS.formatarDataBR(p.data_pagamento) : ''}</span></td>
-                        <td class="p-4 text-right text-red-500 font-bold whitespace-nowrap">${despesasJS.formatarMoeda(valorFinal)} ${detalheDesconto}</td>
+                        <td class="p-4 text-right text-red-500 font-bold whitespace-nowrap"><span class="valor-sensivel">${despesasJS.formatarMoeda(valorFinal)}</span> ${detalheDesconto}</td>
                         <td class="p-4 text-center">${statusBadge}</td>
                         <td class="p-4 text-center flex items-center justify-center gap-3">${btnPayHtml} ${btnEditHtml}</td>
                     </tr>

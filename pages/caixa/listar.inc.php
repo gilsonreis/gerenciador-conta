@@ -26,7 +26,7 @@
         <div class="absolute -right-6 -top-6 w-32 h-32 bg-emerald-200/50 dark:bg-emerald-500/10 rounded-full blur-2xl group-hover:scale-110 transition-transform"></div>
         <div class="relative z-10">
             <p class="text-sm font-semibold text-emerald-800/70 dark:text-emerald-400/80 uppercase tracking-wider mb-2">Total de Entradas no Mês</p>
-            <h3 class="text-4xl font-black text-emerald-700 dark:text-emerald-400 tracking-tight" id="resumo-total-entradas">R$ 0,00</h3>
+            <h3 class="text-4xl font-black text-emerald-700 dark:text-emerald-400 tracking-tight valor-sensivel" id="resumo-total-entradas">R$ 0,00</h3>
         </div>
         <div class="hidden sm:flex items-center justify-center w-16 h-16 rounded-full bg-emerald-200/50 dark:bg-emerald-800/50 text-emerald-600 dark:text-emerald-300 relative z-10">
             <i class="fa-solid fa-piggy-bank text-3xl"></i>
