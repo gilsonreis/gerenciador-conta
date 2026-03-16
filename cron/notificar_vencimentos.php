@@ -31,11 +31,11 @@ try {
 // Configuração STMTP DSN (Symfony)
 $smtpUser = getenv('SMTP_USER') ?: 'sender@simplifysoftwares.com.br';
 $smtpPass = getenv('SMTP_PASS') ?: '2FMok%knm#n8Zrq2';
-$smtpHost = getenv('SMTP_HOST') ?: 'smtp.hostinger.com'; // Exemplo usando hostinger/google/aws
-$smtpPort = getenv('SMTP_PORT') ?: '465';
+$smtpHost = getenv('SMTP_HOST') ?: 'smtp.simplifysoftwares.com.br'; // Exemplo usando hostinger/google/aws
+$smtpPort = getenv('SMTP_PORT') ?: '587';
 
 // Trocamos o rawulrencode que protege senhas com caracteres especiais na URL de DSN.
-$dsn = sprintf('smtps://%s:%s@%s:%s', rawurlencode($smtpUser), rawurlencode($smtpPass), $smtpHost, $smtpPort);
+$dsn = sprintf('smtp://%s:%s@%s:%s', rawurlencode($smtpUser), rawurlencode($smtpPass), $smtpHost, $smtpPort);
 
 try {
     $transport = Transport::fromDsn($dsn);
