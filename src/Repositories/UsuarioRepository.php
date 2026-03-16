@@ -20,7 +20,7 @@ class UsuarioRepository {
     }
 
     public function buscar(int $instituicaoId, int $id) {
-        $sql = "SELECT id, instituicao_id, nome, email FROM usuarios WHERE id = :id AND instituicao_id = :instituicao_id";
+        $sql = "SELECT id, instituicao_id, nome, email, recebe_alertas FROM usuarios WHERE id = :id AND instituicao_id = :instituicao_id";
         $stmt = $this->db->prepare($sql);
         $stmt->execute(['id' => $id, 'instituicao_id' => $instituicaoId]);
         return $stmt->fetch();
@@ -31,30 +31,34 @@ class UsuarioRepository {
         $instituicaoAlvo = !empty($dados['instituicao_id']) ? $dados['instituicao_id'] : $instituicaoId;
 
         if (!empty($dados['id'])) {
-            $sql = "UPDATE usuarios SET instituicao_id = :instituicao_alvo, nome = :nome, email = :email WHERE id = :id AND instituicao_id = :instituicao_id";
+            $sql = "UPDATE usuarios SET instituicao_id = :instituicao_alvo, nome = :nome, email = :email, recebe_alertas = :recebe_alertas WHERE id = :id AND instituicao_id = :instituicao_id";
             $params = [
                 'nome' => $dados['nome'], 
                 'email' => $dados['email'], 
                 'id' => $dados['id'], 
                 'instituicao_alvo' => $instituicaoAlvo,
-                'instituicao_id' => $instituicaoId
+                'instituicao_id' => $instituicaoId,
+                'recebe_alertas' => isset($dados['recebe_alertas']) ? 1 : 0
             ];
             
             if (!empty($dados['senha'])) {
-                $sql = "UPDATE usuarios SET instituicao_id = :instituicao_alvo, nome = :nome, email = :email, senha = :senha WHERE id = :id AND instituicao_id = :instituicao_id";
+                $sql = "UPDATE usuarios SET instituicao_id = :instituicao_alvo, nome = :nome, email = :email, recebe_alertas = :recebe_alertas, senha = :senha WHERE id = :id AND instituicao_id = :instituicao_id";
                 $params['senha'] = password_hash($dados['senha'], PASSWORD_DEFAULT);
             }
             
             $stmt = $this->db->prepare($sql);
             return $stmt->execute($params);
         } else {
-            $sql = "INSERT INTO usuarios (instituicao_id, nome, email, senha) VALUES (:instituicao_alvo, :nome, :email, :senha)";
+            // New users default to true for receives_alerts
+            $recebe_alertas = isset($dados['recebe_alertas']) ? 1 : 1; 
+            $sql = "INSERT INTO usuarios (instituicao_id, nome, email, senha, recebe_alertas) VALUES (:instituicao_alvo, :nome, :email, :senha, :recebe_alertas)";
             $stmt = $this->db->prepare($sql);
             return $stmt->execute([
                 'instituicao_alvo' => $instituicaoAlvo, 
                 'nome' => $dados['nome'], 
                 'email' => $dados['email'],
-                'senha' => password_hash($dados['senha'] ?? '123456', PASSWORD_DEFAULT)
+                'senha' => password_hash($dados['senha'] ?? '123456', PASSWORD_DEFAULT),
+                'recebe_alertas' => $recebe_alertas
             ]);
         }
     }

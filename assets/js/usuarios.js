@@ -47,6 +47,11 @@ const usuariosJS = {
             $('#usuario_id').val('');
             $('#modal-usuario-title').text('Novo Usuário');
             $('#usuario_senha').attr('required', true); // Obriga senha se for novo
+            
+            // Oculta e reseta o checkbox de alertas
+            $('#bloco-alertas').hide();
+            $('#usuario_recebe_alertas').prop('checked', true);
+            
             this.mostrarModal();
         });
     },
@@ -57,6 +62,11 @@ const usuariosJS = {
                 $('#usuario_nome').val(res.dados.nome);
                 $('#usuario_email').val(res.dados.email);
                 $('#usuario_senha').val('').removeAttr('required'); // Opcional ao editar
+                
+                // Exibe config de alertas recebida em buscar
+                $('#bloco-alertas').show();
+                $('#usuario_recebe_alertas').prop('checked', res.dados.recebe_alertas != 0);
+                
                 $('#modal-usuario-title').text('Editar Usuário');
                 usuariosJS.mostrarModal();
             });
