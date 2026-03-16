@@ -42,7 +42,7 @@
     </div>
 </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <!-- Custos de Vida Chart Area -->
     <div class="bg-white dark:bg-darkcard rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-darkborder flex flex-col items-center justify-center text-center min-h-[300px]">
         <div class="w-16 h-16 rounded-full bg-gray-100 dark:bg-[#121212] flex items-center justify-center text-gray-500 mb-4 shadow-inner">
@@ -51,6 +51,21 @@
         <h4 class="text-lg font-bold text-gray-800 dark:text-white mb-2">Seu Custo de Vida Essencial</h4>
         <p class="text-gray-500 dark:text-gray-400 max-w-sm mb-4">Rastreie o quanto da sua renda está comprometida apenas pelo custo base de sobrevivência (Soma das despesas com flag de conta fixa).</p>
         <div class="text-3xl font-black text-gray-800 dark:text-gray-200" id="dash-custovida">R$ 0,00</div>
+    </div>
+
+    <!-- Minhas Contas Table Area -->
+    <div class="bg-white dark:bg-darkcard rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-darkborder flex flex-col">
+        <div class="flex items-center justify-between mb-6">
+            <h4 class="text-lg font-bold text-gray-800 dark:text-white">Saldos Reais</h4>
+            <a href="?pagina=contas-listar" class="text-sm font-medium text-primary hover:text-blue-700 dark:hover:text-blue-400">Ver todas</a>
+        </div>
+        <div class="overflow-y-auto flex-1 pr-2 mt-auto mb-auto" style="max-height: 250px;">
+            <table class="w-full text-left border-collapse">
+                <tbody id="contas-table" class="divide-y divide-gray-100 dark:divide-darkborder">
+                    <!-- Javascript Data -->
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <!-- Quick Actions -->
@@ -91,47 +106,21 @@
     </div>
 </div>
 
-<script>
-// Simple script embedded only for dashboard loads
-$(document).ready(function() {
-    function carregarDashboard() {
-        $.ajax({
-            url: 'ajax.php?acao=despesas-dashboard',
-            method: 'GET',
-            success: function(res) {
-                if(res.sucesso) {
-                    $('#dash-entradas').text(res.entradas_formatado);
-                    $('#dash-saidas').text(res.saidas_formatado);
-                    $('#dash-custovida').text(res.custovida_formatado);
-                    
-                    const saldoElem = $('#dash-saldo');
-                    const saldoCard = $('#dash-saldo-card');
-                    const saldoBg = $('#dash-saldo-bg');
-                    const saldoIcon = $('#dash-saldo-icon');
-                    const saldoLabel = $('#dash-saldo-label');
-                    
-                    saldoElem.text(res.saldo_formatado);
-                    
-                    // Cleanup previous state classes
-                    saldoElem.removeClass('text-blue-600 dark:text-blue-500 text-emerald-600 dark:text-emerald-500 text-red-600 dark:text-red-500');
-                    saldoCard.removeClass('border-blue-100 dark:border-blue-900/30 border-emerald-100 dark:border-emerald-900/30 border-red-100 dark:border-red-900/30');
-                    saldoIcon.removeClass('bg-blue-50 dark:bg-blue-900/20 text-blue-500 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-500 bg-red-50 dark:bg-red-900/20 text-red-500');
-                    
-                    if (res.saldo >= 0) {
-                        saldoElem.addClass('text-emerald-600 dark:text-emerald-500');
-                        saldoCard.addClass('border-emerald-100 dark:border-emerald-900/30');
-                        saldoIcon.addClass('bg-emerald-50 dark:bg-emerald-900/20 text-emerald-500');
-                        saldoLabel.addClass('text-emerald-800 dark:text-emerald-400/80').removeClass('text-blue-800 dark:text-blue-400/80');
-                    } else {
-                        saldoElem.addClass('text-red-600 dark:text-red-500');
-                        saldoCard.addClass('border-red-100 dark:border-red-900/30');
-                        saldoIcon.addClass('bg-red-50 dark:bg-red-900/20 text-red-500');
-                        saldoLabel.addClass('text-red-800 dark:text-red-400/80').removeClass('text-blue-800 dark:text-blue-400/80');
-                    }
-                }
-            }
-        });
-    }
-    carregarDashboard();
-});
-</script>
+<!-- Chart Area -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+    <!-- Histórico -->
+    <div class="bg-white dark:bg-darkcard rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-darkborder">
+        <h4 class="text-lg font-bold text-gray-800 dark:text-white mb-4">Histórico (Últimos 12 meses)</h4>
+        <div class="relative w-full h-72 flex items-center justify-center">
+            <canvas id="chart-historico"></canvas>
+        </div>
+    </div>
+    <!-- Projeção -->
+    <div class="bg-white dark:bg-darkcard rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-darkborder">
+        <h4 class="text-lg font-bold text-gray-800 dark:text-white mb-4">Projeção (Próximos 12 meses)</h4>
+        <div class="relative w-full h-72 flex items-center justify-center">
+            <canvas id="chart-projecao"></canvas>
+        </div>
+    </div>
+</div>
+

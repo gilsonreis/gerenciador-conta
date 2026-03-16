@@ -18,10 +18,11 @@
             <input type="hidden" id="caixa_id" name="id">
             
             <div class="mb-4">
-                <label for="caixa_origem" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Origem da Receita</label>
-                <input type="text" id="caixa_origem" name="origem" required 
-                    class="w-full px-4 py-2.5 bg-white dark:bg-[#121212] border border-gray-300 dark:border-darkborder rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary text-gray-900 dark:text-white transition-colors"
-                    placeholder="Ex: Salário, Freelance, Venda">
+                <label for="caixa_conta_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Carteira de Destino</label>
+                <select id="caixa_conta_id" name="conta_id" required 
+                    class="w-full px-4 py-2.5 bg-white dark:bg-[#121212] border border-gray-300 dark:border-darkborder rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary text-gray-900 dark:text-white transition-colors">
+                    <option value="">Selecione a Conta...</option>
+                </select>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -32,9 +33,8 @@
                             <span class="text-gray-500 dark:text-gray-400">R$</span>
                         </div>
                         <input type="text" id="caixa_valor" name="valor" required 
-                            class="pl-10 w-full px-4 py-2.5 bg-white dark:bg-[#121212] border border-gray-300 dark:border-darkborder rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary text-gray-900 dark:text-white transition-colors"
-                            placeholder="0,00"
-                            oninput="this.value = this.value.replace(/[^0-9,.]/g, '')">
+                            class="moeda_brl pl-10 w-full px-4 py-2.5 bg-white dark:bg-[#121212] border border-gray-300 dark:border-darkborder rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-gray-900 dark:text-white transition-colors"
+                            placeholder="0,00">
                     </div>
                 </div>
                 

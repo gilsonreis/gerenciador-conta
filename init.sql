@@ -21,15 +21,25 @@ CREATE TABLE usuarios (
     CONSTRAINT fk_usuario_instituicao FOREIGN KEY (instituicao_id) REFERENCES instituicoes(id) ON DELETE CASCADE
 );
 
+CREATE TABLE contas (
+    id INT AUTO_INCREMENT PRIMARY KEY, 
+    instituicao_id INT NOT NULL, 
+    nome VARCHAR(100) NOT NULL, 
+    saldo_inicial DECIMAL(10, 2) DEFAULT 0.00, 
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
+    CONSTRAINT fk_conta_instituicao FOREIGN KEY (instituicao_id) REFERENCES instituicoes(id) ON DELETE CASCADE
+);
+
 CREATE TABLE caixa_entradas (
     id INT AUTO_INCREMENT PRIMARY KEY, 
     instituicao_id INT NOT NULL, 
     usuario_id INT NOT NULL, 
-    origem VARCHAR(255) NOT NULL, 
+    conta_id INT NOT NULL,
     valor DECIMAL(10, 2) NOT NULL, 
     data_entrada DATE NOT NULL, 
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
-    CONSTRAINT fk_caixa_instituicao FOREIGN KEY (instituicao_id) REFERENCES instituicoes(id) ON DELETE CASCADE
+    CONSTRAINT fk_caixa_instituicao FOREIGN KEY (instituicao_id) REFERENCES instituicoes(id) ON DELETE CASCADE,
+    CONSTRAINT fk_caixa_conta FOREIGN KEY (conta_id) REFERENCES contas(id) ON DELETE RESTRICT
 );
 
 CREATE TABLE lancamentos (
@@ -50,9 +60,12 @@ CREATE TABLE parcelas (
     numero_parcela INT DEFAULT 1, 
     total_parcelas INT DEFAULT 1, 
     valor DECIMAL(10, 2) NOT NULL, 
+    desconto DECIMAL(10, 2) DEFAULT 0.00,
+    conta_pagamento_id INT DEFAULT NULL,
     data_vencimento DATE NOT NULL, 
-    status ENUM('pendente', 'pago') DEFAULT 'pendente', 
-    CONSTRAINT fk_parcela_lancamento FOREIGN KEY (lancamento_id) REFERENCES lancamentos(id) ON DELETE CASCADE
+    data_pagamento DATE DEFAULT NULL,
+    CONSTRAINT fk_parcela_lancamento FOREIGN KEY (lancamento_id) REFERENCES lancamentos(id) ON DELETE CASCADE,
+    CONSTRAINT fk_parcela_conta FOREIGN KEY (conta_pagamento_id) REFERENCES contas(id) ON DELETE SET NULL
 );
 
 -- Seed Data

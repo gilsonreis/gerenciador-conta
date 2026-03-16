@@ -29,7 +29,14 @@ const despesasJS = {
         $('#mes-atual-label').text(this.formatarMesAno(this.mesAtual));
         $('#tabela-despesas').html('<tr><td colspan="6" class="p-8 text-center text-gray-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Carregando...</td></tr>');
         
-        $.get('ajax.php?acao=despesas-listar', { mes: this.mesAtual }, function(res) {
+        const categoriaId = $('#filtro-categoria').val();
+        const contaFixa = $('#filtro-conta-fixa').val();
+
+        $.get('ajax.php?acao=despesas-listar', { 
+            mes: this.mesAtual,
+            categoria_id: categoriaId,
+            conta_fixa: contaFixa
+        }, function(res) {
             $('#resumo-total-saidas').text(res.resumo.total_saidas_formatado);
             $('#resumo-custo-vida').text(res.resumo.custo_vida_formatado);
             
@@ -103,10 +110,13 @@ const despesasJS = {
     carregarCategorias: function(callback) {
         $.get('ajax.php?acao=categorias-listar', function(res) {
             let html = '<option value="">Selecione...</option>';
+            let htmlFiltro = '<option value="">Todas as Categorias</option>';
             res.dados.forEach(c => {
                 html += `<option value="${c.id}">${c.nome}</option>`;
+                htmlFiltro += `<option value="${c.id}">${c.nome}</option>`;
             });
             $('#despesa_categoria').html(html);
+            $('#filtro-categoria').html(htmlFiltro);
             if(callback) callback();
         });
     },
@@ -114,12 +124,18 @@ const despesasJS = {
     abrirModalCadastro: function() {
         this.carregarCategorias(() => {
             $('#form-despesa')[0].reset();
-            $('#parcela_id').val('');
-            $('#despesa_data').val(new Date().toISOString().substring(0, 10));
+            $('#lancamento_id').val('');
+            $('#despesa_data').val(new Date().toISOString().substring(0, 10)).prop('readonly', false);
+            $('#despesa_valor').prop('readonly', false);
             $('#modal-despesa-title').text('Nova Despesa');
             
-            // Exibir bloco de parcelamento
-            $('#bloco-parcelamento').show();
+            $('#bloco-valores').show();
+            $('#despesa_valor, #despesa_data').prop('required', true);
+            
+            $('#is_parcelada').prop('checked', false).prop('disabled', false).closest('label').show();
+            $('#bloco-parcelamento').hide();
+            $('#despesa_parcelas').val(1).prop('readonly', false);
+            $('#despesa_parcela_inicial').val(1).prop('readonly', false);
             $('#label-vencimento').text('Vencimento Inicial');
             
             this.mostrarModal();
@@ -127,68 +143,236 @@ const despesasJS = {
     },
 
     editar: function(id) {
+        const row = this.dadosOriginais.find(d => d.parcela_id == id);
         this.carregarCategorias(() => {
-            $.get('ajax.php?acao=despesas-buscar', {id: id}, function(res) {
-                const d = res.dados;
-                $('#parcela_id').val(d.parcela_id);
-                $('#despesa_descricao').val(d.descricao);
-                $('#despesa_categoria').val(d.categoria_id);
-                $('#despesa_conta_fixa').prop('checked', d.conta_fixa == 1);
-                $('#despesa_valor').val(parseFloat(d.valor).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}));
-                $('#despesa_data').val(d.data_vencimento);
-                $('#despesa_status').val(d.status);
+            $.get('ajax.php?acao=despesas-buscar', {lancamento_id: row.lancamento_id}, function(res) {
+                const l = res.lancamento;
+                const parcelas = res.parcelas || [];
                 
-                // Esconder parcelamento na edição (edita apenas 1 parcela por vez)
-                $('#bloco-parcelamento').hide();
-                $('#label-vencimento').text('Vencimento desta parcela (' + d.numero_parcela + '/' + d.total_parcelas + ')');
+                $('#lancamento_id').val(l.id);
+                $('#despesa_descricao').val(l.descricao);
+                $('#despesa_categoria').val(l.categoria_id);
+                $('#despesa_conta_fixa').prop('checked', l.conta_fixa == 1);
                 
-                $('#modal-despesa-title').text('Editar Parcela Corrente');
+                // Em Edição, exibir o bloco dos Valores populado mas 100% blindado contra edição local
+                $('#bloco-valores').show();
+                $('#despesa_valor').val(parcelas.length > 0 ? parcelas[0].valor : '').prop('readonly', true).prop('required', false);
+                $('#despesa_data').val(parcelas.length > 0 ? parcelas[0].data_vencimento.split(' ')[0] : '').prop('readonly', true).prop('required', false);
+                
+                if (parcelas.length > 1) {
+                    $('#is_parcelada').prop('checked', true).prop('disabled', true).closest('label').show();
+                    $('#bloco-parcelamento').show();
+                    // O valor total_parcelas pode ser inferido pelo tamanho da estrutura
+                    $('#despesa_parcelas').val(parcelas[0].total_parcelas).prop('readonly', true);
+                    $('#despesa_parcela_inicial').val(parcelas[0].numero_parcela).prop('readonly', true);
+                } else {
+                    $('#is_parcelada').prop('checked', false).prop('disabled', true).closest('label').show();
+                    $('#bloco-parcelamento').hide();
+                }
+                
+                $('#modal-despesa-title').text('Editar Lançamento Principal');
                 despesasJS.mostrarModal();
             });
         });
     },
 
     abrirDetalhes: function(id) {
-        // Find row in memory safely
         const row = this.dadosOriginais.find(d => d.parcela_id == id);
         if(!row) return;
 
-        $('#det-descricao').text(row.descricao);
-        $('#det-categoria').text(row.categoria_nome);
-        $('#det-valor').text(this.formatarMoeda(row.valor));
-        $('#det-vencimento').text(this.formatarDataBR(row.data_vencimento));
-        $('#det-parcela').text(`${row.numero_parcela} de ${row.total_parcelas}`);
-        
-        $('#det-fixa-badge').toggleClass('hidden flex', row.conta_fixa == 1).toggleClass('hidden', row.conta_fixa != 1);
-        
-        const isPago = row.status === 'pago';
-        $('#det-status').html(isPago 
-            ? '<span class="px-2 py-1 bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400 rounded text-xs font-bold">Pago</span>' 
-            : '<span class="px-2 py-1 bg-gray-100 text-gray-700 dark:bg-darkborder dark:text-gray-400 rounded text-xs font-bold border border-gray-200 dark:border-gray-700">Pendente</span>'
-        );
+        $.get('ajax.php?acao=despesas-buscar', {lancamento_id: row.lancamento_id}, function(res) {
+            const l = res.lancamento;
+            const parcelas = res.parcelas;
 
-        // Prepara botão de excluir a cadeia inteira no footer do detalhes
-        // Replace current action buttons to avoid stacking duplicates
-        const btnExcluirHtml = `<button type="button" onclick="despesasJS.excluirLancamentoTotal(${row.lancamento_id})" class="mr-auto px-4 py-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors font-medium flex items-center gap-2">
-            <i class="fa-solid fa-trash"></i> Excluir Cadeia (Todas parcelas)
-        </button>`;
-        
-        if($('#btn-excluir-detalhes').length === 0) {
-            $('#modal-detalhes-content .p-6 .mt-8').prepend(`<div id="btn-excluir-detalhes" class="flex-1">${btnExcluirHtml}</div>`);
-        } else {
-            $('#btn-excluir-detalhes').html(btnExcluirHtml);
-        }
+            $('#det-descricao').text(l.descricao);
+            $('#det-categoria').text(l.categoria_nome);
+            $('#det-fixa-badge').toggleClass('hidden flex', l.conta_fixa == 1).toggleClass('hidden', l.conta_fixa != 1);
 
-        $('#modal-detalhes-backdrop').removeClass('hidden');
-        $('#modal-detalhes').removeClass('hidden').addClass('flex');
-        setTimeout(() => {
-            $('#modal-detalhes-content').removeClass('scale-95 opacity-0');
-        }, 10);
+            let htmlTbody = '';
+            parcelas.forEach(p => {
+                const isPaga = p.data_pagamento !== null;
+                const statusBadge = isPaga 
+                    ? '<span class="px-2 py-1 bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400 rounded text-xs font-bold">Pago</span>'
+                    : '<span class="px-2 py-1 bg-gray-100 text-gray-700 dark:bg-darkborder dark:text-gray-400 border border-gray-200 dark:border-gray-700 rounded text-xs font-bold">Pendente</span>';
+                    
+                const btnPayHtml = `<button onclick="despesasJS.pagarParcelaDetalhe(${p.id}, ${l.id}, ${isPaga})" class="${isPaga ? 'text-emerald-500' : 'text-gray-400 hover:text-emerald-500'} transition-colors mt-0.5 text-lg" title="${isPaga ? 'Estornar Pagamento' : 'Registrar Pagamento'}"><i class="${isPaga ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle'}"></i></button>`;
+                
+                const btnEditHtml = `<button onclick="despesasJS.editarParcelaDetalhe(${p.id}, ${l.id}, '${p.valor}', '${p.data_vencimento}')" class="text-blue-500 hover:text-blue-700 transition-colors mt-1" title="Editar Parcela / Amortizar Original"><i class="fa-solid fa-pen-to-square"></i></button>`;
+
+                const detalheDesconto = p.desconto > 0 ? `<br><span class="text-xs text-green-500">(- ${despesasJS.formatarMoeda(p.desconto)})</span>` : '';
+                const valorFinal = parseFloat(p.valor) - parseFloat(p.desconto);
+
+                htmlTbody += `
+                    <tr class="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+                        <td class="p-4 text-gray-900 dark:text-gray-100 font-medium">${p.numero_parcela} / ${p.total_parcelas}</td>
+                        <td class="p-4 text-gray-500 dark:text-gray-400 text-sm whitespace-nowrap">${despesasJS.formatarDataBR(p.data_vencimento)} <br> <span class="text-xs ${isPaga ? 'text-emerald-600' : 'hidden'}">Pago: ${p.data_pagamento ? despesasJS.formatarDataBR(p.data_pagamento) : ''}</span></td>
+                        <td class="p-4 text-right text-red-500 font-bold whitespace-nowrap">${despesasJS.formatarMoeda(valorFinal)} ${detalheDesconto}</td>
+                        <td class="p-4 text-center">${statusBadge}</td>
+                        <td class="p-4 text-center flex items-center justify-center gap-3">${btnPayHtml} ${btnEditHtml}</td>
+                    </tr>
+                `;
+            });
+            $('#det-parcelas-tbody').html(htmlTbody);
+
+            // Action delete button config
+            const btnExcluirHtml = `<button type="button" onclick="despesasJS.excluirLancamentoTotal(${row.lancamento_id})" class="mr-auto px-4 py-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors font-medium flex items-center gap-2 text-sm">
+                <i class="fa-solid fa-trash"></i> Excluir Lançamento Completo
+            </button>`;
+            
+            if($('#btn-excluir-detalhes').length === 0) {
+                $('#det-actions-container').prepend(`<div id="btn-excluir-detalhes" class="flex-1">${btnExcluirHtml}</div>`);
+            } else {
+                $('#btn-excluir-detalhes').html(btnExcluirHtml);
+            }
+
+            $('#modal-detalhes-backdrop').removeClass('hidden');
+            $('#modal-detalhes').removeClass('hidden').addClass('flex');
+            setTimeout(() => {
+                $('#modal-detalhes-content').removeClass('scale-95 opacity-0');
+            }, 10);
+        });
     },
 
-    alternarStatus: function(id) {
-        $.post('ajax.php?acao=despesas-pagar', {id: id}, function() {
-            despesasJS.carregar(); // Recarrega para bater valores e ui
+    pagarParcelaDireto: function(parcelaId, lancamentoId) {
+        // Redireciona para o detalhe para usar a mesma modal logic
+        this.abrirDetalhes(parcelaId);
+    },
+    
+    pagarParcelaDetalhe: function(parcelaId, lancamentoId, isPaga) {
+        if (isPaga) {
+            Swal.fire({
+                title: 'Estornar Pagamento?',
+                text: "Isoladamente o desconto e data de baixa desta parcela serão desfeitos.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Sim, estornar!',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post('ajax.php?acao=parcelas-pagar', { id: parcelaId, estorno: 1 }, function(res) {
+                        despesasJS.abrirDetalhes(despesasJS.dadosOriginais.find(d => d.lancamento_id == lancamentoId)?.parcela_id || parcelaId);
+                        despesasJS.carregar();
+                    }, 'json');
+                }
+            });
+            return;
+        }
+
+        const dataHoje = new Date().toISOString().substring(0, 10);
+
+        $.get('ajax.php?acao=contas-listar', function(resContas) {
+            let optionsContas = '<option value="">Selecione a Conta...</option>';
+            resContas.dados.forEach(c => {
+                optionsContas += `<option value="${c.id}">${c.nome}</option>`;
+            });
+
+            Swal.fire({
+                title: 'Registrar Pagamento',
+                html: `
+                    <div class="text-left mt-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Data do Pagto</label>
+                        <input type="date" id="swal-pag-data" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-gray-900 mb-4" value="${dataHoje}">
+                        
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Carteira de Pagamento</label>
+                        <select id="swal-pag-conta" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-gray-900 mb-4">
+                            ${optionsContas}
+                        </select>
+
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Desconto Recebido (Amortização)</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><span class="text-gray-500">R$</span></div>
+                            <input type="text" id="swal-pag-desc" class="moeda_brl pl-10 w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-gray-900" value="0,00">
+                        </div>
+                    </div>
+                `,
+                didOpen: () => {
+                    $('.moeda_brl').mask('#.##0,00', {reverse: true});
+                },
+                showCancelButton: true,
+                confirmButtonColor: '#10b981',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Confirmar Pagamento',
+                cancelButtonText: 'Cancelar',
+                preConfirm: () => {
+                    const conta = document.getElementById('swal-pag-conta').value;
+                    if(!conta) {
+                        Swal.showValidationMessage('Selecione uma carteira de pagamento!');
+                        return false;
+                    }
+                    return {
+                        data_pagamento: document.getElementById('swal-pag-data').value,
+                        desconto: document.getElementById('swal-pag-desc').value,
+                        conta_pagamento_id: conta
+                    }
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post('ajax.php?acao=parcelas-pagar', {
+                        id: parcelaId,
+                        data_pagamento: result.value.data_pagamento,
+                        desconto: result.value.desconto,
+                        conta_pagamento_id: result.value.conta_pagamento_id
+                    }, function(res) {
+                        despesasJS.abrirDetalhes(despesasJS.dadosOriginais.find(d => d.lancamento_id == lancamentoId)?.parcela_id || parcelaId);
+                        despesasJS.carregar();
+                    }, 'json');
+                }
+            });
+        });
+    },
+
+    editarParcelaDetalhe: function(parcelaId, lancamentoId, valor_atual, data_atual) {
+        const valorParsed = parseFloat(valor_atual).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        
+        Swal.fire({
+            title: 'Gestão da Parcela',
+            html: `
+                <div class="text-left mt-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Novo Valor Original</label>
+                    <input type="text" id="swal-edit-valor" class="moeda_brl w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-gray-900 mb-4" value="${valorParsed}">
+                    
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Nova Data de Vencimento</label>
+                    <input type="date" id="swal-edit-data" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-gray-900" value="${data_atual}">
+                </div>
+            `,
+            didOpen: () => {
+                $('.moeda_brl').mask('#.##0,00', {reverse: true});
+            },
+            showCancelButton: true,
+            confirmButtonColor: '#0ea5e9',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Salvar Alteração',
+            cancelButtonText: 'Cancelar',
+            preConfirm: () => {
+                return {
+                    valor: document.getElementById('swal-edit-valor').value,
+                    data_vencimento: document.getElementById('swal-edit-data').value
+                }
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.post('ajax.php?acao=parcelas-salvar_individual', {
+                    id: parcelaId,
+                    valor: result.value.valor,
+                    data_vencimento: result.value.data_vencimento
+                }, function(res) {
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        title: res.mensagem,
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                    
+                    despesasJS.abrirDetalhes(despesasJS.dadosOriginais.find(d => d.lancamento_id == lancamentoId)?.parcela_id || parcelaId);
+                    despesasJS.carregar();
+                }, 'json').fail(function() {
+                    Swal.fire('Erro', 'Ocorreu um erro ao salvar a amortização.', 'error');
+                });
+            }
         });
     },
 
@@ -238,8 +422,23 @@ const despesasJS = {
 $(document).ready(function() {
     // Only load if table exists
     if($('#tabela-despesas').length) {
-        despesasJS.carregar();
+        despesasJS.carregarCategorias(() => {
+            despesasJS.carregar();
+        });
     }
+    
+    $('#is_parcelada').on('change', function() {
+        if ($(this).is(':checked')) {
+            $('#bloco-parcelamento').slideDown(200);
+            if(parseInt($('#despesa_parcelas').val()) === 1) {
+                $('#despesa_parcelas').val(2); // Provide friendly default if empty
+            }
+        } else {
+            $('#bloco-parcelamento').slideUp(200);
+            $('#despesa_parcelas').val(1);
+            $('#despesa_parcela_inicial').val(1);
+        }
+    });
     
     $('#form-despesa').on('submit', function(e) {
         e.preventDefault();

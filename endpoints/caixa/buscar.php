@@ -15,6 +15,7 @@ $repo = new CaixaRepository();
 $caixa = $repo->buscar(AuthHelper::getInstituicaoId(), $id);
 
 if ($caixa) {
+    $caixa['valor'] = number_format((float)$caixa['valor'], 2, ',', '.');
     echo json_encode(['sucesso' => true, 'dados' => $caixa]);
 } else {
     http_response_code(404);

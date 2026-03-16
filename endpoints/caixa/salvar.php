@@ -4,20 +4,22 @@ require_once __DIR__ . '/../../src/Repositories/CaixaRepository.php';
 
 AuthHelper::requireLogin();
 
-$origem = trim($_POST['origem'] ?? '');
-$valor = trim($_POST['valor'] ?? '');
+$contaId = filter_input(INPUT_POST, 'conta_id', FILTER_VALIDATE_INT);
+$valor_raw = trim($_POST['valor'] ?? '');
 $dataEntrada = trim($_POST['data_entrada'] ?? '');
 $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT) ?: null;
 
-if (empty($origem) || empty($valor) || empty($dataEntrada)) {
+if (!$contaId || empty($valor_raw) || empty($dataEntrada)) {
     http_response_code(400);
     echo json_encode(['erro' => 'Todos os campos são obrigatórios.']);
     exit;
 }
 
+$valor = (float)str_replace(',', '.', str_replace('.', '', $valor_raw));
+
 $dados = [
     'id' => $id,
-    'origem' => $origem,
+    'conta_id' => $contaId,
     'valor' => $valor,
     'data_entrada' => $dataEntrada
 ];

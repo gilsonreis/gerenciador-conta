@@ -34,6 +34,7 @@ const caixaJS = {
             if(res.dados.length === 0) {
                 html = '<tr><td colspan="4" class="p-8 text-center text-gray-500 dark:text-gray-400">Nenhuma entrada registrada neste mês.</td></tr>';
             } else {
+                caixaJS.dadosOriginais = res.dados;
                 res.dados.forEach(e => {
                     html += `
                     <tr class="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group">
@@ -42,7 +43,7 @@ const caixaJS = {
                         </td>
                         <td class="p-4 text-gray-900 dark:text-gray-100 font-medium">
                             <span class="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 px-2 py-1 rounded text-xs font-bold mr-2"><i class="fa-solid fa-arrow-trend-up"></i></span>
-                            ${e.origem}
+                            ${e.conta_nome}
                         </td>
                         <td class="p-4 text-right text-emerald-600 dark:text-emerald-400 font-bold whitespace-nowrap">${caixaJS.formatarMoeda(e.valor)}</td>
                         <td class="p-4 text-center">
@@ -55,21 +56,37 @@ const caixaJS = {
             $('#tabela-caixa').html(html);
         });
     },
+    carregarContas: function(callback) {
+        $.get('ajax.php?acao=contas-listar', function(res) {
+            let html = '<option value="">Selecione a Conta...</option>';
+            res.dados.forEach(c => {
+                html += `<option value="${c.id}">${c.nome}</option>`;
+            });
+            $('#caixa_conta_id').html(html);
+            if(callback) callback();
+        });
+    },
+
     abrirModalCadastro: function() {
-        $('#form-caixa')[0].reset();
-        $('#caixa_id').val('');
-        $('#caixa_data').val(new Date().toISOString().substring(0, 10)); // Default to today
-        $('#modal-caixa-title').text('Nova Entrada');
-        this.mostrarModal();
+        this.carregarContas(() => {
+            $('#form-caixa')[0].reset();
+            $('#caixa_id').val('');
+            $('#caixa_data').val(new Date().toISOString().substring(0, 10)); // Default to today
+            $('#modal-caixa-title').text('Nova Entrada');
+            this.mostrarModal();
+        });
     },
     editar: function(id) {
-        $.get('ajax.php?acao=caixa-buscar', {id: id}, function(res) {
-            $('#caixa_id').val(res.dados.id);
-            $('#caixa_origem').val(res.dados.origem);
-            $('#caixa_valor').val(parseFloat(res.dados.valor).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}));
-            $('#caixa_data').val(res.dados.data_entrada);
-            $('#modal-caixa-title').text('Editar Entrada');
-            caixaJS.mostrarModal();
+        const row = this.dadosOriginais.find(d => d.id == id);
+        this.carregarContas(() => {
+            $.get('ajax.php?acao=caixa-buscar', {id: id}, function(res) {
+                $('#caixa_id').val(res.dados.id);
+                $('#caixa_conta_id').val(res.dados.conta_id);
+                $('#caixa_valor').val(parseFloat(res.dados.valor).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+                $('#caixa_data').val(res.dados.data_entrada);
+                $('#modal-caixa-title').text('Editar Entrada');
+                caixaJS.mostrarModal();
+            });
         });
     },
     excluir: function(id) {

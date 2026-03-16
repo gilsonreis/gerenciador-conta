@@ -11,9 +11,13 @@ if (!preg_match('/^\d{4}-\d{2}$/', $mesAno)) {
     exit;
 }
 
+$categoriaId = filter_input(INPUT_GET, 'categoria_id', FILTER_VALIDATE_INT) ?: null;
+$contaFixa = filter_input(INPUT_GET, 'conta_fixa');
+$contaFixaValue = ($contaFixa === '0' || $contaFixa === '1') ? (int)$contaFixa : null;
+
 $repo = new LancamentoRepository();
-$despesas = $repo->listarPorMes(AuthHelper::getInstituicaoId(), $mesAno);
-$resumo = $repo->resumoMes(AuthHelper::getInstituicaoId(), $mesAno);
+$despesas = $repo->listarPorMes(AuthHelper::getInstituicaoId(), $mesAno, $categoriaId, $contaFixaValue);
+$resumo = $repo->resumoMes(AuthHelper::getInstituicaoId(), $mesAno, $categoriaId, $contaFixaValue);
 
 echo json_encode([
     'sucesso' => true,

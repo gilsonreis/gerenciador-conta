@@ -1,6 +1,7 @@
 $(document).ready(function() {
-    // Adicionar token CSRF ou configs padrão futuramente, se necessário
-    
+    // Inicialização global de máscaras
+    $('.moeda_brl').mask('#.##0,00', {reverse: true});
+
     // Interceptador global para requisicoes AJAX
     $.ajaxSetup({
         error: function(jqXHR, textStatus, errorThrown) {

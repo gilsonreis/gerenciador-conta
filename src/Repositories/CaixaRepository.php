@@ -11,14 +11,16 @@ class CaixaRepository {
     public function listarPorMes(int $instituicaoId, string $mesAno) {
         $sql = "
             SELECT 
-                id, 
-                origem, 
-                valor, 
-                data_entrada
-            FROM caixa_entradas
-            WHERE instituicao_id = :instituicao_id
-            AND DATE_FORMAT(data_entrada, '%Y-%m') = :mes_ano
-            ORDER BY data_entrada ASC
+                ce.id, 
+                ce.conta_id,
+                c.nome as conta_nome,
+                ce.valor, 
+                ce.data_entrada
+            FROM caixa_entradas ce
+            JOIN contas c ON ce.conta_id = c.id
+            WHERE ce.instituicao_id = :instituicao_id
+            AND DATE_FORMAT(ce.data_entrada, '%Y-%m') = :mes_ano
+            ORDER BY ce.data_entrada ASC
         ";
         $stmt = $this->db->prepare($sql);
         $stmt->execute(['instituicao_id' => $instituicaoId, 'mes_ano' => $mesAno]);
@@ -48,22 +50,22 @@ class CaixaRepository {
         $valor = (float)str_replace(',', '.', str_replace('.', '', $dados['valor']));
         
         if (!empty($dados['id'])) {
-            $sql = "UPDATE caixa_entradas SET origem = :origem, valor = :valor, data_entrada = :data_entrada WHERE id = :id AND instituicao_id = :instituicao_id";
+            $sql = "UPDATE caixa_entradas SET conta_id = :conta_id, valor = :valor, data_entrada = :data_entrada WHERE id = :id AND instituicao_id = :instituicao_id";
             $stmt = $this->db->prepare($sql);
             return $stmt->execute([
-                'origem' => $dados['origem'],
+                'conta_id' => $dados['conta_id'],
                 'valor' => $valor,
                 'data_entrada' => $dados['data_entrada'],
                 'id' => $dados['id'],
                 'instituicao_id' => $instituicaoId
             ]);
         } else {
-            $sql = "INSERT INTO caixa_entradas (instituicao_id, usuario_id, origem, valor, data_entrada) VALUES (:instituicao_id, :usuario_id, :origem, :valor, :data_entrada)";
+            $sql = "INSERT INTO caixa_entradas (instituicao_id, usuario_id, conta_id, valor, data_entrada) VALUES (:instituicao_id, :usuario_id, :conta_id, :valor, :data_entrada)";
             $stmt = $this->db->prepare($sql);
             return $stmt->execute([
                 'instituicao_id' => $instituicaoId,
                 'usuario_id' => $usuarioId,
-                'origem' => $dados['origem'],
+                'conta_id' => $dados['conta_id'],
                 'valor' => $valor,
                 'data_entrada' => $dados['data_entrada']
             ]);

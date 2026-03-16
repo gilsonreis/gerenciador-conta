@@ -62,6 +62,9 @@ if (strpos($pagina, '-') !== false) {
     <link rel="stylesheet" href="assets/css/style.css">
     <!-- Font Awesome API para icones (Free) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- jQuery CDN -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
 </head>
 <body class="bg-gray-100 dark:bg-darkbg text-gray-900 dark:text-gray-100 font-sans antialiased flex h-screen overflow-hidden">
     
@@ -81,6 +84,7 @@ if (strpos($pagina, '-') !== false) {
             
             <p class="px-4 pt-4 pb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Configurações</p>
             <a href="?pagina=instituicoes-listar" class="flex items-center gap-3 py-3 px-4 rounded-lg transition duration-200 hover:bg-gray-50 dark:hover:bg-white/5 <?= str_starts_with($pagina, 'instituicoes') ? 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-blue-400' : 'text-gray-600 dark:text-gray-300' ?>"><i class="fa-solid fa-building w-5 text-center"></i> Instituições</a>
+            <a href="?pagina=contas-listar" class="flex items-center gap-3 py-3 px-4 rounded-lg transition duration-200 hover:bg-gray-50 dark:hover:bg-white/5 <?= str_starts_with($pagina, 'contas') ? 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-blue-400' : 'text-gray-600 dark:text-gray-300' ?>"><i class="fa-solid fa-building-columns w-5 text-center"></i> Contas Bancárias</a>
             <a href="?pagina=categorias-listar" class="flex items-center gap-3 py-3 px-4 rounded-lg transition duration-200 hover:bg-gray-50 dark:hover:bg-white/5 <?= str_starts_with($pagina, 'categorias') ? 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-blue-400' : 'text-gray-600 dark:text-gray-300' ?>"><i class="fa-solid fa-tags w-5 text-center"></i> Categorias</a>
             <a href="?pagina=usuarios-listar" class="flex items-center gap-3 py-3 px-4 rounded-lg transition duration-200 hover:bg-gray-50 dark:hover:bg-white/5 <?= str_starts_with($pagina, 'usuarios') ? 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-blue-400' : 'text-gray-600 dark:text-gray-300' ?>"><i class="fa-solid fa-users w-5 text-center"></i> Usuários</a>
         </nav>
@@ -115,13 +119,14 @@ if (strpos($pagina, '-') !== false) {
                 <a href="?pagina=caixa-listar" class="block py-3 px-4 rounded-lg <?= str_starts_with($pagina, 'caixa') ? 'bg-primary/20 text-blue-400' : 'text-gray-300' ?>">Entradas (Caixa)</a>
                 <a href="?pagina=despesas-listar" class="block py-3 px-4 rounded-lg <?= str_starts_with($pagina, 'despesas') ? 'bg-primary/20 text-blue-400' : 'text-gray-300' ?>">Despesas</a>
                 <a href="?pagina=instituicoes-listar" class="block py-3 px-4 rounded-lg <?= str_starts_with($pagina, 'instituicoes') ? 'bg-primary/20 text-blue-400' : 'text-gray-300' ?>">Instituições</a>
+                <a href="?pagina=contas-listar" class="block py-3 px-4 rounded-lg <?= str_starts_with($pagina, 'contas') ? 'bg-primary/20 text-blue-400' : 'text-gray-300' ?>">Contas Bancárias</a>
                 <a href="?pagina=categorias-listar" class="block py-3 px-4 rounded-lg <?= str_starts_with($pagina, 'categorias') ? 'bg-primary/20 text-blue-400' : 'text-gray-300' ?>">Categorias</a>
                 <a href="?pagina=usuarios-listar" class="block py-3 px-4 rounded-lg <?= str_starts_with($pagina, 'usuarios') ? 'bg-primary/20 text-blue-400' : 'text-gray-300' ?>">Usuários</a>
             </nav>
         </div>
         <?php endif; ?>
         
-        <!-- View Content Area -->
+    <!-- View Content Area -->
         <div class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 dark:bg-darkbg p-4 md:p-8">
             <div id="app-content" class="max-w-7xl mx-auto h-full w-full">
                 <?php include $conteudo_view; ?>
@@ -129,10 +134,10 @@ if (strpos($pagina, '-') !== false) {
         </div>
     </main>
 
-    <!-- jQuery CDN -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <!-- SweetAlert2 para alertas bonitos -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <!-- Scripts da Aplicação -->
     <script src="assets/js/app.js"></script>

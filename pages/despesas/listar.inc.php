@@ -51,6 +51,27 @@
     </div>
 </div>
 
+<!-- Filtros Avançados -->
+<div class="flex flex-col sm:flex-row gap-4 mb-4">
+    <!-- Dropdown Categoria -->
+    <div class="w-full sm:w-1/3">
+        <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Categoria</label>
+        <select id="filtro-categoria" onchange="despesasJS.carregar()" class="w-full px-3 py-2 bg-white dark:bg-[#121212] border border-gray-300 dark:border-darkborder rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary text-gray-900 dark:text-gray-100">
+            <option value="">Todas as Categorias</option>
+        </select>
+    </div>
+    
+    <!-- Dropdown Conta Fixa -->
+    <div class="w-full sm:w-1/3">
+        <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Tipo de Despesa</label>
+        <select id="filtro-conta-fixa" onchange="despesasJS.carregar()" class="w-full px-3 py-2 bg-white dark:bg-[#121212] border border-gray-300 dark:border-darkborder rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary text-gray-900 dark:text-gray-100">
+            <option value="">Todas</option>
+            <option value="1">Contas Fixas</option>
+            <option value="0">Variáveis</option>
+        </select>
+    </div>
+</div>
+
 <!-- Filtros Rápidos -->
 <div class="flex gap-2 mb-4 overflow-x-auto pb-2 scrollbar-hide">
     <button onclick="despesasJS.filtrar('todas')" id="filtro-todas" class="px-4 py-1.5 rounded-full text-sm font-medium bg-gray-800 text-white dark:bg-white dark:text-gray-900 whitespace-nowrap transition-colors">Todas</button>

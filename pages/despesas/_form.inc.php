@@ -15,7 +15,7 @@
 
         <!-- Form -->
         <form id="form-despesa" class="p-6 overflow-y-auto">
-            <input type="hidden" id="parcela_id" name="id">
+            <input type="hidden" id="lancamento_id" name="lancamento_id">
             
             <div class="mb-4">
                 <label for="despesa_descricao" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Descrição</label>
@@ -44,36 +44,46 @@
                 </label>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                    <label for="despesa_valor" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Valor</label>
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <span class="text-gray-500 dark:text-gray-400">R$</span>
+            <div id="bloco-valores">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="despesa_valor" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Valor</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <span class="text-gray-500 dark:text-gray-400">R$</span>
+                            </div>
+                            <input type="text" id="despesa_valor" name="valor" required 
+                                class="moeda_brl pl-10 w-full px-4 py-2.5 bg-white dark:bg-[#121212] border border-gray-300 dark:border-darkborder rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-gray-900 dark:text-white transition-colors"
+                                placeholder="0,00">
                         </div>
-                        <input type="text" id="despesa_valor" name="valor" required 
-                            class="pl-10 w-full px-4 py-2.5 bg-white dark:bg-[#121212] border border-gray-300 dark:border-darkborder rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-gray-900 dark:text-white transition-colors"
-                            placeholder="0,00"
-                            oninput="this.value = this.value.replace(/[^0-9,.]/g, '')">
+                    </div>
+                    
+                    <div>
+                        <label for="despesa_data" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" id="label-vencimento">Vencimento Inicial</label>
+                        <input type="date" id="despesa_data" name="data_vencimento" required 
+                            class="w-full px-4 py-2.5 bg-white dark:bg-[#121212] border border-gray-300 dark:border-darkborder rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-gray-900 dark:text-white transition-colors [color-scheme:light] dark:[color-scheme:dark]">
                     </div>
                 </div>
-                
-                <div>
-                    <label for="despesa_data" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" id="label-vencimento">Vencimento Inicial</label>
-                    <input type="date" id="despesa_data" name="data_vencimento" required 
-                        class="w-full px-4 py-2.5 bg-white dark:bg-[#121212] border border-gray-300 dark:border-darkborder rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-gray-900 dark:text-white transition-colors [color-scheme:light] dark:[color-scheme:dark]">
-                </div>
-            </div>
 
-            <div id="bloco-parcelamento" class="mb-4">
-                <label for="despesa_parcelas" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Parcelamento</label>
-                <div class="flex items-center gap-3">
-                    <span class="text-sm text-gray-500">Em</span>
-                    <input type="number" id="despesa_parcelas" name="total_parcelas" min="1" max="120" value="1"
-                        class="w-24 text-center px-3 py-2 bg-white dark:bg-[#121212] border border-gray-300 dark:border-darkborder rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-gray-900 dark:text-white transition-colors">
-                    <span class="text-sm text-gray-500">vez(es)</span>
+                <div class="mb-5 border-t border-gray-100 dark:border-darkborder pt-5">
+                    <label class="flex items-center gap-2 cursor-pointer mb-4">
+                        <input type="checkbox" id="is_parcelada" class="w-5 h-5 text-primary bg-gray-100 dark:bg-[#121212] border-gray-300 dark:border-darkborder rounded focus:ring-primary focus:ring-2 transition-colors cursor-pointer">
+                        <span class="text-sm font-medium text-gray-800 dark:text-gray-200">Esta é uma conta parcelada?</span>
+                    </label>
+
+                    <div id="bloco-parcelamento" style="display: none;" class="grid grid-cols-2 gap-4 bg-gray-50 dark:bg-white/5 p-4 rounded-xl border border-gray-100 dark:border-darkborder">
+                        <div>
+                            <label for="despesa_parcelas" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Total de Parcelas</label>
+                            <input type="number" id="despesa_parcelas" name="total_parcelas" min="1" max="120" value="1"
+                                class="w-full px-3 py-2 bg-white dark:bg-[#121212] border border-gray-300 dark:border-darkborder rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-gray-900 dark:text-white transition-colors">
+                        </div>
+                        <div>
+                            <label for="despesa_parcela_inicial" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Iniciar na Parcela</label>
+                            <input type="number" id="despesa_parcela_inicial" name="parcela_inicial" min="1" max="120" value="1"
+                                class="w-full px-3 py-2 bg-white dark:bg-[#121212] border border-gray-300 dark:border-darkborder rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-gray-900 dark:text-white transition-colors">
+                        </div>
+                    </div>
                 </div>
-                <p class="text-xs text-gray-500 mt-2"><i class="fa-solid fa-circle-info mr-1"></i> Para pagamento à vista, mantenha 1.</p>
             </div>
 
             <div class="mb-4">
