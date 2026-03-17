@@ -53,9 +53,13 @@ class ContaRepository {
                 c.saldo_inicial,
                 COALESCE((SELECT SUM(valor) FROM caixa_entradas WHERE conta_id = c.id), 0) as total_entradas,
                 COALESCE((SELECT SUM(valor - desconto) FROM parcelas WHERE conta_pagamento_id = c.id AND data_pagamento IS NOT NULL), 0) as total_saidas,
+                COALESCE((SELECT SUM(valor) FROM transferencias WHERE conta_destino_id = c.id), 0) as total_transf_entrada,
+                COALESCE((SELECT SUM(valor) FROM transferencias WHERE conta_origem_id = c.id), 0) as total_transf_saida,
                 (c.saldo_inicial 
                  + COALESCE((SELECT SUM(valor) FROM caixa_entradas WHERE conta_id = c.id), 0) 
                  - COALESCE((SELECT SUM(valor - desconto) FROM parcelas WHERE conta_pagamento_id = c.id AND data_pagamento IS NOT NULL), 0)
+                 + COALESCE((SELECT SUM(valor) FROM transferencias WHERE conta_destino_id = c.id), 0)
+                 - COALESCE((SELECT SUM(valor) FROM transferencias WHERE conta_origem_id = c.id), 0)
                 ) as saldo_atual_real
             FROM contas c
             WHERE c.instituicao_id = :instituicao_id
