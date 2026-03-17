@@ -209,13 +209,10 @@ class LancamentoRepository {
         $params = ['id' => $lancamentoId];
 
         if (!empty($busca)) {
+            // Se for numero, busca exata. Se não, ignoramos por enquanto já que a tabela parcelas não tem descricao propria
             if (is_numeric($busca)) {
-                $where .= " AND (numero_parcela = :busca_num OR descricao LIKE :busca_text)";
+                $where .= " AND numero_parcela = :busca_num";
                 $params['busca_num'] = (int)$busca;
-                $params['busca_text'] = "%{$busca}%";
-            } else {
-                $where .= " AND descricao LIKE :busca_text";
-                $params['busca_text'] = "%{$busca}%";
             }
         }
 
@@ -228,7 +225,7 @@ class LancamentoRepository {
         // 2. Busca Paginada
         $offset = ($pagina - 1) * $itensPorPagina;
         $sql = "
-            SELECT id, numero_parcela, total_parcelas, valor, desconto, data_vencimento, data_pagamento, descricao
+            SELECT id, numero_parcela, total_parcelas, valor, desconto, data_vencimento, data_pagamento
             FROM parcelas
             " . $where . "
             ORDER BY data_vencimento ASC
