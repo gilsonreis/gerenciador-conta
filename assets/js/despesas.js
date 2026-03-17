@@ -166,6 +166,12 @@ const despesasJS = {
                 $('#despesa_descricao').val(l.descricao);
                 $('#categoria_id').val(l.categoria_id);
                 $('#despesa_conta_fixa').prop('checked', l.conta_fixa == 1);
+
+                // Define o status baseado na parcela clicada (id)
+                const parcelaAtiva = parcelas.find(p => p.id == id);
+                if (parcelaAtiva) {
+                    $('#despesa_status').val(parcelaAtiva.data_pagamento ? 'pago' : 'pendente');
+                }
                 
                 // Em Edição, exibir o bloco dos Valores populado mas 100% blindado contra edição local
                 $('#bloco-valores').show();
