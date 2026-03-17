@@ -196,24 +196,59 @@ const despesasJS = {
         });
     },
 
+    carregarContas: function(callback) {
+        $.get('ajax.php?acao=contas-listar', function(res) {
+            if (!res.dados) return;
+
+            let html = '<option value="">Selecione a conta...</option>';
+            res.dados.forEach(c => {
+                html += `<option value="${c.id}">${c.nome}</option>`;
+            });
+            $('#conta_pagamento_id').html(html);
+            if(callback) callback();
+        });
+    },
+
+    toggleContaPagamento: function() {
+        const status = $('#despesa_status').val();
+        const container = $('#container-conta-pagamento');
+        const select = $('#conta_pagamento_id');
+
+        if (status === 'pago') {
+            container.slideDown(200).removeClass('hidden');
+            select.prop('required', true);
+        } else {
+            container.slideUp(200, function() {
+                $(this).addClass('hidden');
+            });
+            select.prop('required', false).val('');
+        }
+    },
+
     abrirModalCadastro: function() {
         this.carregarCategorias(() => {
-            $('#form-despesa')[0].reset();
-            $('#lancamento_id').val('');
-            $('#despesa_data').val(new Date().toISOString().substring(0, 10)).prop('readonly', false);
-            $('#despesa_valor').prop('readonly', false);
-            $('#modal-despesa-title').text('Nova Despesa');
-            
-            $('#bloco-valores').show();
-            $('#despesa_valor, #despesa_data').prop('required', true);
-            
-            $('#is_parcelada').prop('checked', false).prop('disabled', false).closest('label').show();
-            $('#bloco-parcelamento').hide();
-            $('#despesa_parcelas').val(1).prop('readonly', false);
-            $('#despesa_parcela_inicial').val(1).prop('readonly', false);
-            $('#label-vencimento').text('Vencimento Inicial');
-            
-            this.mostrarModal();
+            this.carregarContas(() => {
+                $('#form-despesa')[0].reset();
+                $('#lancamento_id').val('');
+                $('#despesa_data').val(new Date().toISOString().substring(0, 10)).prop('readonly', false);
+                $('#despesa_valor').prop('readonly', false);
+                $('#modal-despesa-title').text('Nova Despesa');
+                
+                $('#bloco-valores').show();
+                $('#despesa_valor, #despesa_data').prop('required', true);
+                
+                $('#is_parcelada').prop('checked', false).prop('disabled', false).closest('label').show();
+                $('#bloco-parcelamento').hide();
+                $('#despesa_parcelas').val(1).prop('readonly', false);
+                $('#despesa_parcela_inicial').val(1).prop('readonly', false);
+                $('#label-vencimento').text('Vencimento Inicial');
+                
+                // Reseta status e conta
+                $('#despesa_status').val('pendente');
+                this.toggleContaPagamento();
+
+                this.mostrarModal();
+            });
         });
     },
 
@@ -234,6 +269,10 @@ const despesasJS = {
                 if (parcelaAtiva) {
                     $('#despesa_status').val(parcelaAtiva.data_pagamento ? 'pago' : 'pendente');
                 }
+                
+                // Ocultar conta no editar (não suportado troca rápida aqui)
+                $('#container-conta-pagamento').hide().addClass('hidden');
+                $('#conta_pagamento_id').prop('required', false);
                 
                 // Em Edição, exibir o bloco dos Valores populado mas 100% blindado contra edição local
                 $('#bloco-valores').show();
