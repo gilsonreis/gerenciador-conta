@@ -8,7 +8,31 @@ class LancamentoRepository {
         $this->db = Database::getConnection();
     }
 
-    public function listarPorMes(int $instituicaoId, string $mesAno, ?int $categoriaId = null, ?int $contaFixa = null) {
+    public function listarPorMes(int $instituicaoId, string $mesAno, ?int $categoriaId = null, ?int $contaFixa = null, int $pagina = 1, int $itensPorPagina = 20) {
+        $where = "
+            WHERE l.instituicao_id = :instituicao_id
+            AND DATE_FORMAT(p.data_vencimento, '%Y-%m') = :mes_ano
+        ";
+        
+        $params = ['instituicao_id' => $instituicaoId, 'mes_ano' => $mesAno];
+        
+        if ($categoriaId !== null) {
+            $where .= " AND l.categoria_id = :cat_id";
+            $params['cat_id'] = $categoriaId;
+        }
+        if ($contaFixa !== null) {
+            $where .= " AND l.conta_fixa = :fixa";
+            $params['fixa'] = $contaFixa;
+        }
+
+        // 1. Query de Contagem Total
+        $sqlCount = "SELECT COUNT(*) as total FROM parcelas p JOIN lancamentos l ON p.lancamento_id = l.id " . $where;
+        $stmtCount = $this->db->prepare($sqlCount);
+        $stmtCount->execute($params);
+        $totalRegistros = (int)$stmtCount->fetchColumn();
+
+        // 2. Query Principal com Paginação
+        $offset = ($pagina - 1) * $itensPorPagina;
         $sql = "
             SELECT 
                 p.id as parcela_id,
@@ -27,26 +51,24 @@ class LancamentoRepository {
             FROM parcelas p
             JOIN lancamentos l ON p.lancamento_id = l.id
             JOIN categorias c ON l.categoria_id = c.id
-            WHERE l.instituicao_id = :instituicao_id
-            AND DATE_FORMAT(p.data_vencimento, '%Y-%m') = :mes_ano
+            " . $where . "
+            ORDER BY p.data_vencimento ASC
+            LIMIT :limit OFFSET :offset
         ";
         
-        $params = ['instituicao_id' => $instituicaoId, 'mes_ano' => $mesAno];
-        
-        if ($categoriaId !== null) {
-            $sql .= " AND l.categoria_id = :cat_id";
-            $params['cat_id'] = $categoriaId;
-        }
-        if ($contaFixa !== null) {
-            $sql .= " AND l.conta_fixa = :fixa";
-            $params['fixa'] = $contaFixa;
-        }
-
-        $sql .= " ORDER BY p.data_vencimento ASC";
-        
         $stmt = $this->db->prepare($sql);
-        $stmt->execute($params);
-        return $stmt->fetchAll();
+        foreach ($params as $key => $val) {
+            $stmt->bindValue($key, $val);
+        }
+        $stmt->bindValue(':limit', $itensPorPagina, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        
+        $stmt->execute();
+        
+        return [
+            'dados' => $stmt->fetchAll(),
+            'total' => $totalRegistros
+        ];
     }
 
     public function resumoMes(int $instituicaoId, string $mesAno, ?int $categoriaId = null, ?int $contaFixa = null) {
@@ -101,16 +123,22 @@ class LancamentoRepository {
             $dataBase = new DateTime($dados['data_vencimento']);
 
             // Assume insert creates as "Pending" (data_pagamento NULL) by default.
-            $sqlParcela = "INSERT INTO parcelas (lancamento_id, numero_parcela, total_parcelas, valor, data_vencimento) VALUES (:lanc, :num, :total, :val, :venc)";
+            $sqlParcela = "INSERT INTO parcelas (lancamento_id, numero_parcela, total_parcelas, valor, data_vencimento, data_pagamento) VALUES (:lanc, :num, :total, :val, :venc, :pgto)";
             $stmtParc = $this->db->prepare($sqlParcela);
 
+            $status = $dados['status'] ?? 'pendente';
+
             for ($i = $parcelaInicial; $i <= $totalParcelas; $i++) {
+                $vencimento = $dataBase->format('Y-m-d');
+                $dataPagamento = ($status === 'pago') ? $vencimento : null;
+
                 $stmtParc->execute([
                     'lanc' => $lancamentoId,
                     'num' => $i,
                     'total' => $totalParcelas,
                     'val' => $valorParcela,
-                    'venc' => $dataBase->format('Y-m-d')
+                    'venc' => $vencimento,
+                    'pgto' => $dataPagamento
                 ]);
 
                 // Incrementa 1 mes pra proxima iteração

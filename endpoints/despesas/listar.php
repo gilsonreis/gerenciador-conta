@@ -15,13 +15,25 @@ $categoriaId = filter_input(INPUT_GET, 'categoria_id', FILTER_VALIDATE_INT) ?: n
 $contaFixa = filter_input(INPUT_GET, 'conta_fixa');
 $contaFixaValue = ($contaFixa === '0' || $contaFixa === '1') ? (int)$contaFixa : null;
 
+$itensPorPagina = 20;
+$paginaAtual = filter_input(INPUT_GET, 'p', FILTER_VALIDATE_INT) ?: 1;
+if ($paginaAtual < 1) $paginaAtual = 1;
+
 $repo = new LancamentoRepository();
-$despesas = $repo->listarPorMes(AuthHelper::getInstituicaoId(), $mesAno, $categoriaId, $contaFixaValue);
+$resultado = $repo->listarPorMes(AuthHelper::getInstituicaoId(), $mesAno, $categoriaId, $contaFixaValue, $paginaAtual, $itensPorPagina);
 $resumo = $repo->resumoMes(AuthHelper::getInstituicaoId(), $mesAno, $categoriaId, $contaFixaValue);
+
+$totalPaginas = ceil($resultado['total'] / $itensPorPagina);
 
 echo json_encode([
     'sucesso' => true,
-    'dados' => $despesas,
+    'dados' => $resultado['dados'],
+    'paginacao' => [
+        'pagina_atual' => $paginaAtual,
+        'total_paginas' => $totalPaginas,
+        'total_registros' => $resultado['total'],
+        'itens_por_pagina' => $itensPorPagina
+    ],
     'resumo' => [
         'total_saidas' => (float)($resumo['total_saidas'] ?? 0),
         'total_saidas_formatado' => 'R$ ' . number_format((float)($resumo['total_saidas'] ?? 0), 2, ',', '.'),
