@@ -101,16 +101,22 @@ class LancamentoRepository {
             $dataBase = new DateTime($dados['data_vencimento']);
 
             // Assume insert creates as "Pending" (data_pagamento NULL) by default.
-            $sqlParcela = "INSERT INTO parcelas (lancamento_id, numero_parcela, total_parcelas, valor, data_vencimento) VALUES (:lanc, :num, :total, :val, :venc)";
+            $sqlParcela = "INSERT INTO parcelas (lancamento_id, numero_parcela, total_parcelas, valor, data_vencimento, data_pagamento) VALUES (:lanc, :num, :total, :val, :venc, :pgto)";
             $stmtParc = $this->db->prepare($sqlParcela);
 
+            $status = $dados['status'] ?? 'pendente';
+
             for ($i = $parcelaInicial; $i <= $totalParcelas; $i++) {
+                $vencimento = $dataBase->format('Y-m-d');
+                $dataPagamento = ($status === 'pago') ? $vencimento : null;
+
                 $stmtParc->execute([
                     'lanc' => $lancamentoId,
                     'num' => $i,
                     'total' => $totalParcelas,
                     'val' => $valorParcela,
-                    'venc' => $dataBase->format('Y-m-d')
+                    'venc' => $vencimento,
+                    'pgto' => $dataPagamento
                 ]);
 
                 // Incrementa 1 mes pra proxima iteração

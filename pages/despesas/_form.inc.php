@@ -79,12 +79,12 @@
                     <div id="bloco-parcelamento" style="display: none;" class="grid grid-cols-2 gap-4 bg-gray-50 dark:bg-white/5 p-4 rounded-xl border border-gray-100 dark:border-darkborder">
                         <div>
                             <label for="despesa_parcelas" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Total de Parcelas</label>
-                            <input type="number" id="despesa_parcelas" name="total_parcelas" min="1" max="120" value="1"
+                            <input type="number" id="despesa_parcelas" name="total_parcelas" min="1" max="480" value="1"
                                 class="w-full px-3 py-2 bg-white dark:bg-[#121212] border border-gray-300 dark:border-darkborder rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-gray-900 dark:text-white transition-colors">
                         </div>
                         <div>
                             <label for="despesa_parcela_inicial" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Iniciar na Parcela</label>
-                            <input type="number" id="despesa_parcela_inicial" name="parcela_inicial" min="1" max="120" value="1"
+                            <input type="number" id="despesa_parcela_inicial" name="parcela_inicial" min="1" max="480" value="1"
                                 class="w-full px-3 py-2 bg-white dark:bg-[#121212] border border-gray-300 dark:border-darkborder rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-gray-900 dark:text-white transition-colors">
                         </div>
                     </div>
