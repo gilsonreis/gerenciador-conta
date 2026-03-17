@@ -80,25 +80,22 @@ $(document).ready(function() {
     });
 
     // --- Lógica de Cadastro Dinâmico de Categoria (AJAX) ---
-    const modalCatBackdrop = $('#modal-nova-categoria-backdrop');
-    const modalCat = $('#modal-nova-categoria');
-    const inputCat = $('#input-nova-categoria');
-
     const fecharModalCat = () => {
-        modalCat.addClass('hidden');
-        modalCatBackdrop.addClass('hidden');
-        inputCat.val('');
+        $('#modal-nova-categoria').addClass('hidden');
+        $('#modal-nova-categoria-backdrop').addClass('hidden');
+        $('#input-nova-categoria').val('');
     };
 
     $(document).on('click', '#btn-nova-categoria', function() {
-        modalCatBackdrop.removeClass('hidden');
-        modalCat.removeClass('hidden');
-        inputCat.focus();
+        $('#modal-nova-categoria-backdrop').removeClass('hidden');
+        $('#modal-nova-categoria').removeClass('hidden');
+        $('#input-nova-categoria').focus();
     });
 
     $(document).on('click', '#btn-cancelar-categoria', fecharModalCat);
 
     $(document).on('click', '#btn-salvar-categoria', function() {
+        const inputCat = $('#input-nova-categoria');
         const nome = inputCat.val().trim();
         const btn = $(this);
 
@@ -115,9 +112,13 @@ $(document).ready(function() {
 
         $.post('ajax/salvar_categoria.php', { nome: nome }, function(res) {
             if (res.sucesso) {
-                // Adicionar nova option no select e selecionar
                 const newOption = new Option(res.nome, res.id, true, true);
-                $('#categoria_id').append(newOption).trigger('change');
+                
+                // Tenta atualizar tanto o ID novo quanto o antigo por segurança
+                const selects = $('#categoria_id, #despesa_categoria');
+                if (selects.length > 0) {
+                    selects.append(newOption).trigger('change');
+                }
                 
                 fecharModalCat();
                 
