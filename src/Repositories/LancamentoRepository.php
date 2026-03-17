@@ -129,16 +129,24 @@ class LancamentoRepository {
             $valorParcela = (float)str_replace(',', '.', str_replace('.', '', $dados['valor']));
             
             $dataBase = new DateTime($dados['data_vencimento']);
-
-            // Assume insert creates as "Pending" (data_pagamento NULL) by default.
-            $sqlParcela = "INSERT INTO parcelas (lancamento_id, numero_parcela, total_parcelas, valor, data_vencimento, data_pagamento) VALUES (:lanc, :num, :total, :val, :venc, :pgto)";
-            $stmtParc = $this->db->prepare($sqlParcela);
-
             $status = $dados['status'] ?? 'pendente';
+            $contaPagamentoId = !empty($dados['conta_pagamento_id']) ? $dados['conta_pagamento_id'] : null;
+
+            $sqlParcela = "
+                INSERT INTO parcelas 
+                (lancamento_id, numero_parcela, total_parcelas, valor, data_vencimento, data_pagamento, conta_pagamento_id) 
+                VALUES 
+                (:lanc, :num, :total, :val, :venc, :pgto, :conta)
+            ";
+            $stmtParc = $this->db->prepare($sqlParcela);
 
             for ($i = $parcelaInicial; $i <= $totalParcelas; $i++) {
                 $vencimento = $dataBase->format('Y-m-d');
-                $dataPagamento = ($status === 'pago') ? $vencimento : null;
+                
+                // Regra: Apenas a primeira parcela gerada pode ser quitada no ato da criação
+                $isPrimeira = ($i == $parcelaInicial);
+                $dataPagamento = ($status === 'pago' && $isPrimeira) ? $vencimento : null;
+                $contaIdFinal = ($status === 'pago' && $isPrimeira) ? $contaPagamentoId : null;
 
                 $stmtParc->execute([
                     'lanc' => $lancamentoId,
@@ -146,7 +154,8 @@ class LancamentoRepository {
                     'total' => $totalParcelas,
                     'val' => $valorParcela,
                     'venc' => $vencimento,
-                    'pgto' => $dataPagamento
+                    'pgto' => $dataPagamento,
+                    'conta' => $contaIdFinal
                 ]);
 
                 // Incrementa 1 mes pra proxima iteração
