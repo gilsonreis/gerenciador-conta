@@ -120,13 +120,15 @@ const despesasJS = {
 
     carregarCategorias: function(callback) {
         $.get('ajax.php?acao=categorias-listar', function(res) {
+            if (!res.dados) return;
+
             let html = '<option value="">Selecione...</option>';
             let htmlFiltro = '<option value="">Todas as Categorias</option>';
             res.dados.forEach(c => {
                 html += `<option value="${c.id}">${c.nome}</option>`;
                 htmlFiltro += `<option value="${c.id}">${c.nome}</option>`;
             });
-            $('#categoria_id').html(html);
+            $('#categoria_id, #despesa_categoria').html(html);
             $('#filtro-categoria').html(htmlFiltro);
             if(callback) callback();
         });
