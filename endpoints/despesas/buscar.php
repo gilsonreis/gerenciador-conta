@@ -16,12 +16,25 @@ if (!$lancamentoId && !$parcelaId) {
 $repo = new LancamentoRepository();
 
 if ($lancamentoId) {
+    $busca = filter_input(INPUT_GET, 'busca_parcela', FILTER_SANITIZE_SPECIAL_CHARS) ?: '';
+    $pagina = filter_input(INPUT_GET, 'p', FILTER_VALIDATE_INT) ?: 1;
+    $itensPorPagina = 12;
+
     $dados = $repo->buscarLancamentoEParcelas(AuthHelper::getInstituicaoId(), $lancamentoId);
+    
     if ($dados) {
+        $paginado = $repo->listarParcelasPai($lancamentoId, $busca, $pagina, $itensPorPagina);
+        
         echo json_encode([
             'sucesso' => true, 
             'lancamento' => $dados['lancamento'], 
-            'parcelas' => $dados['parcelas']
+            'parcelas' => $paginado['parcelas'],
+            'paginacao' => [
+                'total' => $paginado['total'],
+                'pagina' => $paginado['pagina'],
+                'total_paginas' => $paginado['total_paginas'],
+                'itens_por_pagina' => $itensPorPagina
+            ]
         ]);
     } else {
         http_response_code(404);
