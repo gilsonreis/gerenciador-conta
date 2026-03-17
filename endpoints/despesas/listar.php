@@ -14,14 +14,15 @@ if (!preg_match('/^\d{4}-\d{2}$/', $mesAno)) {
 $categoriaId = filter_input(INPUT_GET, 'categoria_id', FILTER_VALIDATE_INT) ?: null;
 $contaFixa = filter_input(INPUT_GET, 'conta_fixa');
 $contaFixaValue = ($contaFixa === '0' || $contaFixa === '1') ? (int)$contaFixa : null;
+$busca = filter_input(INPUT_GET, 'busca_descricao', FILTER_SANITIZE_SPECIAL_CHARS) ?: '';
 
 $itensPorPagina = 20;
 $paginaAtual = filter_input(INPUT_GET, 'p', FILTER_VALIDATE_INT) ?: 1;
 if ($paginaAtual < 1) $paginaAtual = 1;
 
 $repo = new LancamentoRepository();
-$resultado = $repo->listarPorMes(AuthHelper::getInstituicaoId(), $mesAno, $categoriaId, $contaFixaValue, $paginaAtual, $itensPorPagina);
-$resumo = $repo->resumoMes(AuthHelper::getInstituicaoId(), $mesAno, $categoriaId, $contaFixaValue);
+$resultado = $repo->listarPorMes(AuthHelper::getInstituicaoId(), $mesAno, $categoriaId, $contaFixaValue, $paginaAtual, $itensPorPagina, $busca);
+$resumo = $repo->resumoMes(AuthHelper::getInstituicaoId(), $mesAno, $categoriaId, $contaFixaValue, $busca);
 
 $totalPaginas = ceil($resultado['total'] / $itensPorPagina);
 

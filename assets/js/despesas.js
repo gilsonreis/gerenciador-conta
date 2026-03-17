@@ -38,11 +38,13 @@ const despesasJS = {
         
         const categoriaId = $('#filtro-categoria').val();
         const contaFixa = $('#filtro-conta-fixa').val();
+        const busca = $('#filtro-busca-descricao').val();
 
         $.get('ajax.php?acao=despesas-listar', { 
             mes: this.mesAtual,
             categoria_id: categoriaId,
             conta_fixa: contaFixa,
+            busca_descricao: busca,
             p: this.paginaAtual
         }, (res) => {
             $('#resumo-total-saidas').text(res.resumo.total_saidas_formatado);
