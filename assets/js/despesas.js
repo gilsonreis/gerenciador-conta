@@ -126,7 +126,7 @@ const despesasJS = {
                 html += `<option value="${c.id}">${c.nome}</option>`;
                 htmlFiltro += `<option value="${c.id}">${c.nome}</option>`;
             });
-            $('#despesa_categoria').html(html);
+            $('#categoria_id').html(html);
             $('#filtro-categoria').html(htmlFiltro);
             if(callback) callback();
         });
@@ -162,7 +162,7 @@ const despesasJS = {
                 
                 $('#lancamento_id').val(l.id);
                 $('#despesa_descricao').val(l.descricao);
-                $('#despesa_categoria').val(l.categoria_id);
+                $('#categoria_id').val(l.categoria_id);
                 $('#despesa_conta_fixa').prop('checked', l.conta_fixa == 1);
                 
                 // Em Edição, exibir o bloco dos Valores populado mas 100% blindado contra edição local

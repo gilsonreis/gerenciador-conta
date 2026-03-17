@@ -25,12 +25,17 @@
             </div>
 
             <div class="mb-4">
-                <label for="despesa_categoria" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Categoria</label>
-                <select id="despesa_categoria" name="categoria_id" required
-                    class="w-full px-4 py-2.5 bg-white dark:bg-[#121212] border border-gray-300 dark:border-darkborder rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-gray-900 dark:text-white transition-colors">
-                    <option value="">Selecione...</option>
-                    <!-- Populate via JS -->
-                </select>
+                <label for="categoria_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Categoria</label>
+                <div class="flex items-center gap-2">
+                    <select id="categoria_id" name="categoria_id" required
+                        class="flex-1 px-4 py-2.5 bg-white dark:bg-[#121212] border border-gray-300 dark:border-darkborder rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-gray-900 dark:text-white transition-colors">
+                        <option value="">Selecione...</option>
+                        <!-- Populate via JS -->
+                    </select>
+                    <button type="button" id="btn-nova-categoria" class="p-2.5 bg-gray-100 dark:bg-white/5 border border-gray-300 dark:border-darkborder rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/10 transition-colors" title="Nova Categoria">
+                        <i class="fa-solid fa-plus text-sm"></i>
+                    </button>
+                </div>
             </div>
 
             <div class="mb-5">
@@ -105,5 +110,29 @@
                 </button>
             </div>
         </form>
+    </div>
+</div>
+
+<!-- Modal Nova Categoria (Mini-Modal via AJAX) -->
+<div id="modal-nova-categoria-backdrop" class="fixed inset-0 bg-black/40 hidden z-[60] transition-opacity"></div>
+<div id="modal-nova-categoria" class="fixed inset-0 hidden z-[70] flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-darkcard rounded-xl shadow-2xl w-full max-w-xs transform transition-all border border-gray-100 dark:border-darkborder overflow-hidden">
+        <div class="px-5 py-3 border-b border-gray-100 dark:border-darkborder bg-gray-50 dark:bg-white/5 font-bold text-gray-800 dark:text-white text-sm">
+            Nova Categoria
+        </div>
+        <div class="p-5">
+            <input type="text" id="input-nova-categoria" 
+                class="w-full px-3 py-2 bg-white dark:bg-[#121212] border border-gray-300 dark:border-darkborder rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-gray-900 dark:text-white transition-colors text-sm"
+                placeholder="Ex: Assinaturas, Lazer...">
+            
+            <div class="mt-5 flex justify-end gap-2">
+                <button type="button" id="btn-cancelar-categoria" class="px-3 py-1.5 text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 font-medium">
+                    Cancelar
+                </button>
+                <button type="button" id="btn-salvar-categoria" class="px-4 py-1.5 bg-primary hover:bg-blue-600 text-white rounded-lg transition-colors font-medium text-xs shadow-sm">
+                    Salvar
+                </button>
+            </div>
+        </div>
     </div>
 </div>
