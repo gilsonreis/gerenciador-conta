@@ -53,7 +53,7 @@
                     <input type="text" id="det-busca-parcela" 
                         onkeyup="if(event.key === 'Enter') despesasJS.pesquisarParcelas()" 
                         class="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-[#121212] border border-gray-200 dark:border-darkborder rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary text-gray-900 dark:text-white transition-colors"
-                        placeholder="Número da parcela ou descrição...">
+                        placeholder="Número da parcela...">
                 </div>
             </div>
 

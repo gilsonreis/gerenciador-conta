@@ -8,7 +8,7 @@ class LancamentoRepository {
         $this->db = Database::getConnection();
     }
 
-    public function listarPorMes(int $instituicaoId, string $mesAno, ?int $categoriaId = null, ?int $contaFixa = null, int $pagina = 1, int $itensPorPagina = 20) {
+    public function listarPorMes(int $instituicaoId, string $mesAno, ?int $categoriaId = null, ?int $contaFixa = null, int $pagina = 1, int $itensPorPagina = 20, string $busca = '') {
         $where = "
             WHERE l.instituicao_id = :instituicao_id
             AND DATE_FORMAT(p.data_vencimento, '%Y-%m') = :mes_ano
@@ -23,6 +23,10 @@ class LancamentoRepository {
         if ($contaFixa !== null) {
             $where .= " AND l.conta_fixa = :fixa";
             $params['fixa'] = $contaFixa;
+        }
+        if (!empty($busca)) {
+            $where .= " AND l.descricao LIKE :busca";
+            $params['busca'] = "%{$busca}%";
         }
 
         // 1. Query de Contagem Total
@@ -71,7 +75,7 @@ class LancamentoRepository {
         ];
     }
 
-    public function resumoMes(int $instituicaoId, string $mesAno, ?int $categoriaId = null, ?int $contaFixa = null) {
+    public function resumoMes(int $instituicaoId, string $mesAno, ?int $categoriaId = null, ?int $contaFixa = null, string $busca = '') {
         $sql = "
             SELECT 
                 SUM(CASE WHEN p.data_pagamento IS NOT NULL THEN p.valor - p.desconto ELSE 0 END) as total_saidas,
@@ -91,6 +95,10 @@ class LancamentoRepository {
         if ($contaFixa !== null) {
             $sql .= " AND l.conta_fixa = :fixa";
             $params['fixa'] = $contaFixa;
+        }
+        if (!empty($busca)) {
+            $sql .= " AND l.descricao LIKE :busca";
+            $params['busca'] = "%{$busca}%";
         }
 
         $stmt = $this->db->prepare($sql);

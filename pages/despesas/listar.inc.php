@@ -54,17 +54,39 @@
 <!-- Filtros Avançados -->
 <div class="flex flex-col sm:flex-row gap-4 mb-4">
     <!-- Dropdown Categoria -->
-    <div class="w-full sm:w-1/3">
+    <div class="w-full sm:w-1/4">
         <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Categoria</label>
-        <select id="filtro-categoria" onchange="despesasJS.carregar(1)" class="w-full px-3 py-2 bg-white dark:bg-[#121212] border border-gray-300 dark:border-darkborder rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary text-gray-900 dark:text-gray-100">
+        <select id="filtro-categoria" onchange="despesasJS.carregar(1)" class="w-full px-3 py-2 bg-white dark:bg-[#121212] border border-gray-300 dark:border-darkborder rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary text-gray-900 dark:text-gray-100 transition-all">
             <option value="">Todas as Categorias</option>
         </select>
     </div>
+
+    <!-- Busca por Descrição -->
+    <div class="w-full sm:w-2/4">
+        <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Buscar por Descrição</label>
+        <div class="relative flex gap-2">
+            <div class="relative flex-1">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i class="fa-solid fa-magnifying-glass text-gray-400"></i>
+                </div>
+                <input type="text" id="filtro-busca-descricao" 
+                    onkeyup="if(event.key === 'Enter') despesasJS.carregar(1)"
+                    class="w-full pl-10 pr-3 py-2 bg-white dark:bg-[#121212] border border-gray-300 dark:border-darkborder rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary text-gray-900 dark:text-gray-100 transition-all" 
+                    placeholder="Ex: Aluguel, Supermercado...">
+            </div>
+            <button onclick="despesasJS.carregar(1)" class="px-4 py-2 bg-primary hover:bg-blue-600 text-white rounded-lg text-sm font-medium transition-colors shadow-sm">
+                Buscar
+            </button>
+            <button onclick="$('#filtro-busca-descricao').val(''); despesasJS.carregar(1)" class="px-3 py-2 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 text-gray-500 rounded-lg text-sm transition-colors" title="Limpar Busca">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+    </div>
     
     <!-- Dropdown Conta Fixa -->
-    <div class="w-full sm:w-1/3">
+    <div class="w-full sm:w-1/4">
         <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Tipo de Despesa</label>
-        <select id="filtro-conta-fixa" onchange="despesasJS.carregar(1)" class="w-full px-3 py-2 bg-white dark:bg-[#121212] border border-gray-300 dark:border-darkborder rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary text-gray-900 dark:text-gray-100">
+        <select id="filtro-conta-fixa" onchange="despesasJS.carregar(1)" class="w-full px-3 py-2 bg-white dark:bg-[#121212] border border-gray-300 dark:border-darkborder rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary text-gray-900 dark:text-gray-100 transition-all">
             <option value="">Todas</option>
             <option value="1">Contas Fixas</option>
             <option value="0">Variáveis</option>
