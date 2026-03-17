@@ -79,4 +79,62 @@ $(document).ready(function() {
         }
     });
 
+    // --- Lógica de Cadastro Dinâmico de Categoria (AJAX) ---
+    const modalCatBackdrop = $('#modal-nova-categoria-backdrop');
+    const modalCat = $('#modal-nova-categoria');
+    const inputCat = $('#input-nova-categoria');
+
+    const fecharModalCat = () => {
+        modalCat.addClass('hidden');
+        modalCatBackdrop.addClass('hidden');
+        inputCat.val('');
+    };
+
+    $(document).on('click', '#btn-nova-categoria', function() {
+        modalCatBackdrop.removeClass('hidden');
+        modalCat.removeClass('hidden');
+        inputCat.focus();
+    });
+
+    $(document).on('click', '#btn-cancelar-categoria', fecharModalCat);
+
+    $(document).on('click', '#btn-salvar-categoria', function() {
+        const nome = inputCat.val().trim();
+        const btn = $(this);
+
+        if (!nome) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Atenção',
+                text: 'Informe o nome da categoria.'
+            });
+            return;
+        }
+
+        btn.prop('disabled', true).text('Salvando...');
+
+        $.post('ajax/salvar_categoria.php', { nome: nome }, function(res) {
+            if (res.sucesso) {
+                // Adicionar nova option no select e selecionar
+                const newOption = new Option(res.nome, res.id, true, true);
+                $('#categoria_id').append(newOption).trigger('change');
+                
+                fecharModalCat();
+                
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'Categoria cadastrada!',
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+            } else {
+                Swal.fire('Erro', res.erro || 'Erro ao salvar categoria.', 'error');
+            }
+        }, 'json').always(() => {
+            btn.prop('disabled', false).text('Salvar');
+        });
+    });
+
 });
