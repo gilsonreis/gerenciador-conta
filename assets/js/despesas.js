@@ -2,11 +2,13 @@ const despesasJS = {
     mesAtual: new Date().toISOString().substring(0, 7),
     dadosOriginais: [], // Para filtragem no frontend
     filtroAtual: 'todas',
+    paginaAtual: 1,
     
     mudarMes: function(offset) {
         let [ano, mes] = this.mesAtual.split('-');
         let data = new Date(ano, mes - 1 + offset, 1);
         this.mesAtual = data.toISOString().substring(0, 7);
+        this.paginaAtual = 1; // Reset pagina ao mudar mes
         this.carregar();
     },
 
@@ -25,7 +27,9 @@ const despesasJS = {
         return parseFloat(valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     },
 
-    carregar: function() {
+    carregar: function(page = null) {
+        if (page !== null) this.paginaAtual = page;
+        
         $('#mes-atual-label').text(this.formatarMesAno(this.mesAtual));
         $('#tabela-despesas').html('<tr><td colspan="6" class="p-8 text-center text-gray-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Carregando...</td></tr>');
         
@@ -35,18 +39,71 @@ const despesasJS = {
         $.get('ajax.php?acao=despesas-listar', { 
             mes: this.mesAtual,
             categoria_id: categoriaId,
-            conta_fixa: contaFixa
-        }, function(res) {
+            conta_fixa: contaFixa,
+            p: this.paginaAtual
+        }, (res) => {
             $('#resumo-total-saidas').text(res.resumo.total_saidas_formatado);
             $('#resumo-custo-vida').text(res.resumo.custo_vida_formatado);
             
-            despesasJS.dadosOriginais = res.dados;
-            despesasJS.renderizarTabela();
+            this.dadosOriginais = res.dados;
+            this.renderizarTabela();
+            this.renderizarPaginacao(res.paginacao);
         });
+    },
+
+    mudarPagina: function(p) {
+        this.paginaAtual = p;
+        this.carregar();
+    },
+
+    renderizarPaginacao: function(p) {
+        if (!p || p.total_paginas <= 1) {
+            $('#paginacao-despesas').html('');
+            return;
+        }
+
+        let html = `
+        <div class="flex items-center justify-between border-t border-gray-100 dark:border-darkborder px-4 py-3 sm:px-6 mt-4">
+            <div class="flex flex-1 justify-between sm:hidden">
+                <button onclick="despesasJS.mudarPagina(${p.pagina_atual - 1})" ${p.pagina_atual === 1 ? 'disabled' : ''} class="relative inline-flex items-center rounded-md border border-gray-300 dark:border-darkborder bg-white dark:bg-darkcard px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 disabled:opacity-50">Anterior</button>
+                <button onclick="despesasJS.mudarPagina(${p.pagina_atual + 1})" ${p.pagina_atual === p.total_paginas ? 'disabled' : ''} class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 dark:border-darkborder bg-white dark:bg-darkcard px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 disabled:opacity-50">Próximo</button>
+            </div>
+            <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+                <div>
+                    <p class="text-sm text-gray-700 dark:text-gray-400">
+                        Mostrando <span class="font-medium">${(p.pagina_atual - 1) * p.itens_por_pagina + 1}</span> a <span class="font-medium">${Math.min(p.pagina_atual * p.itens_por_pagina, p.total_registros)}</span> de <span class="font-medium">${p.total_registros}</span> resultados
+                    </p>
+                </div>
+                <div>
+                    <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+                        <button onclick="despesasJS.mudarPagina(${p.pagina_atual - 1})" ${p.pagina_atual === 1 ? 'disabled' : ''} class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 dark:ring-darkborder hover:bg-gray-50 dark:hover:bg-white/5 focus:z-20 focus:outline-offset-0 disabled:opacity-50">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+        `;
+
+        for (let i = 1; i <= p.total_paginas; i++) {
+            const activeClass = i === p.pagina_atual 
+                ? 'z-10 bg-primary text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary' 
+                : 'text-gray-900 dark:text-gray-300 ring-1 ring-inset ring-gray-300 dark:ring-darkborder hover:bg-gray-50 dark:hover:bg-white/5 focus:z-20 focus:outline-offset-0';
+            
+            html += `<button onclick="despesasJS.mudarPagina(${i})" class="relative inline-flex items-center px-4 py-2 text-sm font-semibold ${activeClass}">${i}</button>`;
+        }
+
+        html += `
+                        <button onclick="despesasJS.mudarPagina(${p.pagina_atual + 1})" ${p.pagina_atual === p.total_paginas ? 'disabled' : ''} class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 dark:ring-darkborder hover:bg-gray-50 dark:hover:bg-white/5 focus:z-20 focus:outline-offset-0 disabled:opacity-50">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </nav>
+                </div>
+            </div>
+        </div>`;
+
+        $('#paginacao-despesas').html(html);
     },
 
     filtrar: function(status) {
         this.filtroAtual = status;
+        this.paginaAtual = 1; // Reset pagina ao mudar filtro rápido
         
         // Atualiza UI dos bots
         $('#filtro-todas, #filtro-pendentes, #filtro-pagas').removeClass('bg-gray-800 text-white dark:bg-white dark:text-gray-900').addClass('bg-gray-200 text-gray-600 dark:bg-darkborder dark:text-gray-400');

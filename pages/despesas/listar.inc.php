@@ -56,7 +56,7 @@
     <!-- Dropdown Categoria -->
     <div class="w-full sm:w-1/3">
         <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Categoria</label>
-        <select id="filtro-categoria" onchange="despesasJS.carregar()" class="w-full px-3 py-2 bg-white dark:bg-[#121212] border border-gray-300 dark:border-darkborder rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary text-gray-900 dark:text-gray-100">
+        <select id="filtro-categoria" onchange="despesasJS.carregar(1)" class="w-full px-3 py-2 bg-white dark:bg-[#121212] border border-gray-300 dark:border-darkborder rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary text-gray-900 dark:text-gray-100">
             <option value="">Todas as Categorias</option>
         </select>
     </div>
@@ -64,7 +64,7 @@
     <!-- Dropdown Conta Fixa -->
     <div class="w-full sm:w-1/3">
         <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Tipo de Despesa</label>
-        <select id="filtro-conta-fixa" onchange="despesasJS.carregar()" class="w-full px-3 py-2 bg-white dark:bg-[#121212] border border-gray-300 dark:border-darkborder rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary text-gray-900 dark:text-gray-100">
+        <select id="filtro-conta-fixa" onchange="despesasJS.carregar(1)" class="w-full px-3 py-2 bg-white dark:bg-[#121212] border border-gray-300 dark:border-darkborder rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary text-gray-900 dark:text-gray-100">
             <option value="">Todas</option>
             <option value="1">Contas Fixas</option>
             <option value="0">Variáveis</option>
@@ -100,6 +100,9 @@
             </tbody>
         </table>
     </div>
+    
+    <!-- Paginação -->
+    <div id="paginacao-despesas"></div>
 </div>
 
 <?php 
