@@ -204,6 +204,54 @@ class LancamentoRepository {
         return ['lancamento' => $lancamento, 'parcelas' => $parcelas];
     }
 
+    public function listarParcelasPai(int $lancamentoId, string $busca = '', int $pagina = 1, int $itensPorPagina = 12) {
+        $where = "WHERE lancamento_id = :id";
+        $params = ['id' => $lancamentoId];
+
+        if (!empty($busca)) {
+            if (is_numeric($busca)) {
+                $where .= " AND (numero_parcela = :busca_num OR descricao LIKE :busca_text)";
+                $params['busca_num'] = (int)$busca;
+                $params['busca_text'] = "%{$busca}%";
+            } else {
+                $where .= " AND descricao LIKE :busca_text";
+                $params['busca_text'] = "%{$busca}%";
+            }
+        }
+
+        // 1. Contagem Total
+        $sqlCount = "SELECT COUNT(*) FROM parcelas " . $where;
+        $stmtCount = $this->db->prepare($sqlCount);
+        $stmtCount->execute($params);
+        $totalRegistros = (int)$stmtCount->fetchColumn();
+
+        // 2. Busca Paginada
+        $offset = ($pagina - 1) * $itensPorPagina;
+        $sql = "
+            SELECT id, numero_parcela, total_parcelas, valor, desconto, data_vencimento, data_pagamento, descricao
+            FROM parcelas
+            " . $where . "
+            ORDER BY data_vencimento ASC
+            LIMIT :limit OFFSET :offset
+        ";
+        
+        $stmt = $this->db->prepare($sql);
+        foreach ($params as $key => $val) {
+            $stmt->bindValue($key, $val);
+        }
+        $stmt->bindValue(':limit', $itensPorPagina, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        
+        $stmt->execute();
+        
+        return [
+            'parcelas' => $stmt->fetchAll(),
+            'total' => $totalRegistros,
+            'pagina' => $pagina,
+            'total_paginas' => ceil($totalRegistros / $itensPorPagina)
+        ];
+    }
+
     public function atualizarPai(int $instituicaoId, int $lancamentoId, array $dados) {
         $sql = "UPDATE lancamentos SET descricao = :desc, categoria_id = :cat, conta_fixa = :fixa WHERE id = :id AND instituicao_id = :inst";
         $stmt = $this->db->prepare($sql);

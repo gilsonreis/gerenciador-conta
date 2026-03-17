@@ -3,6 +3,9 @@ const despesasJS = {
     dadosOriginais: [], // Para filtragem no frontend
     filtroAtual: 'todas',
     paginaAtual: 1,
+    lancamentoAtivoNoModal: null,
+    paginaParcelaAtual: 1,
+    buscaParcelaAtiva: '',
     
     mudarMes: function(offset) {
         let [ano, mes] = this.mesAtual.split('-');
@@ -260,7 +263,30 @@ const despesasJS = {
         const row = this.dadosOriginais.find(d => d.parcela_id == id);
         if(!row) return;
 
-        $.get('ajax.php?acao=despesas-buscar', {lancamento_id: row.lancamento_id}, function(res) {
+        this.lancamentoAtivoNoModal = row.lancamento_id;
+        this.paginaParcelaAtual = 1;
+        this.buscaParcelaAtiva = '';
+        $('#det-busca-parcela').val('');
+
+        this.carregarParcelas();
+
+        $('#modal-detalhes-backdrop').removeClass('hidden');
+        $('#modal-detalhes').removeClass('hidden').addClass('flex');
+        setTimeout(() => {
+            $('#modal-detalhes-content').removeClass('scale-95 opacity-0');
+        }, 10);
+    },
+
+    carregarParcelas: function() {
+        if(!this.lancamentoAtivoNoModal) return;
+
+        $('#det-parcelas-tbody').html('<tr><td colspan="5" class="p-8 text-center text-gray-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Carregando...</td></tr>');
+
+        $.get('ajax.php?acao=despesas-buscar', {
+            lancamento_id: this.lancamentoAtivoNoModal,
+            busca_parcela: this.buscaParcelaAtiva,
+            p: this.paginaParcelaAtual
+        }, (res) => {
             const l = res.lancamento;
             const parcelas = res.parcelas;
 
@@ -269,33 +295,38 @@ const despesasJS = {
             $('#det-fixa-badge').toggleClass('hidden flex', l.conta_fixa == 1).toggleClass('hidden', l.conta_fixa != 1);
 
             let htmlTbody = '';
-            parcelas.forEach(p => {
-                const isPaga = p.data_pagamento !== null;
-                const statusBadge = isPaga 
-                    ? '<span class="px-2 py-1 bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400 rounded text-xs font-bold">Pago</span>'
-                    : '<span class="px-2 py-1 bg-gray-100 text-gray-700 dark:bg-darkborder dark:text-gray-400 border border-gray-200 dark:border-gray-700 rounded text-xs font-bold">Pendente</span>';
+            if (parcelas.length === 0) {
+                htmlTbody = '<tr><td colspan="5" class="p-8 text-center text-gray-500 dark:text-gray-400">Nenhuma parcela encontrada para esta busca.</td></tr>';
+            } else {
+                parcelas.forEach(p => {
+                    const isPaga = p.data_pagamento !== null;
+                    const statusBadge = isPaga 
+                        ? '<span class="px-2 py-1 bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400 rounded text-xs font-bold">Pago</span>'
+                        : '<span class="px-2 py-1 bg-gray-100 text-gray-700 dark:bg-darkborder dark:text-gray-400 border border-gray-200 dark:border-gray-700 rounded text-xs font-bold">Pendente</span>';
+                        
+                    const btnPayHtml = `<button onclick="despesasJS.pagarParcelaDetalhe(${p.id}, ${l.id}, ${isPaga})" class="${isPaga ? 'text-emerald-500' : 'text-gray-400 hover:text-emerald-500'} transition-colors mt-0.5 text-lg" title="${isPaga ? 'Estornar Pagamento' : 'Registrar Pagamento'}"><i class="${isPaga ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle'}"></i></button>`;
                     
-                const btnPayHtml = `<button onclick="despesasJS.pagarParcelaDetalhe(${p.id}, ${l.id}, ${isPaga})" class="${isPaga ? 'text-emerald-500' : 'text-gray-400 hover:text-emerald-500'} transition-colors mt-0.5 text-lg" title="${isPaga ? 'Estornar Pagamento' : 'Registrar Pagamento'}"><i class="${isPaga ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle'}"></i></button>`;
-                
-                const btnEditHtml = `<button onclick="despesasJS.editarParcelaDetalhe(${p.id}, ${l.id}, '${p.valor}', '${p.data_vencimento}')" class="text-blue-500 hover:text-blue-700 transition-colors mt-1" title="Editar Parcela / Amortizar Original"><i class="fa-solid fa-pen-to-square"></i></button>`;
+                    const btnEditHtml = `<button onclick="despesasJS.editarParcelaDetalhe(${p.id}, ${l.id}, '${p.valor}', '${p.data_vencimento}')" class="text-blue-500 hover:text-blue-700 transition-colors mt-1" title="Editar Parcela / Amortizar Original"><i class="fa-solid fa-pen-to-square"></i></button>`;
 
-                const detalheDesconto = p.desconto > 0 ? `<br><span class="text-xs text-green-500">(- <span class="valor-sensivel">${despesasJS.formatarMoeda(p.desconto)}</span>)</span>` : '';
-                const valorFinal = parseFloat(p.valor) - parseFloat(p.desconto);
+                    const detalheDesconto = p.desconto > 0 ? `<br><span class="text-xs text-green-500">(- <span class="valor-sensivel">${despesasJS.formatarMoeda(p.desconto)}</span>)</span>` : '';
+                    const valorFinal = parseFloat(p.valor) - parseFloat(p.desconto);
 
-                htmlTbody += `
-                    <tr class="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
-                        <td class="p-4 text-gray-900 dark:text-gray-100 font-medium">${p.numero_parcela} / ${p.total_parcelas}</td>
-                        <td class="p-4 text-gray-500 dark:text-gray-400 text-sm whitespace-nowrap">${despesasJS.formatarDataBR(p.data_vencimento)} <br> <span class="text-xs ${isPaga ? 'text-emerald-600' : 'hidden'}">Pago: ${p.data_pagamento ? despesasJS.formatarDataBR(p.data_pagamento) : ''}</span></td>
-                        <td class="p-4 text-right text-red-500 font-bold whitespace-nowrap"><span class="valor-sensivel">${despesasJS.formatarMoeda(valorFinal)}</span> ${detalheDesconto}</td>
-                        <td class="p-4 text-center">${statusBadge}</td>
-                        <td class="p-4 text-center flex items-center justify-center gap-3">${btnPayHtml} ${btnEditHtml}</td>
-                    </tr>
-                `;
-            });
+                    htmlTbody += `
+                        <tr class="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+                            <td class="p-4 text-gray-900 dark:text-gray-100 font-medium">${p.numero_parcela} / ${p.total_parcelas}</td>
+                            <td class="p-4 text-gray-500 dark:text-gray-400 text-sm whitespace-nowrap">${despesasJS.formatarDataBR(p.data_vencimento)} <br> <span class="text-xs ${isPaga ? 'text-emerald-600' : 'hidden'}">Pago: ${p.data_pagamento ? despesasJS.formatarDataBR(p.data_pagamento) : ''}</span></td>
+                            <td class="p-4 text-right text-red-500 font-bold whitespace-nowrap"><span class="valor-sensivel">${despesasJS.formatarMoeda(valorFinal)}</span> ${detalheDesconto}</td>
+                            <td class="p-4 text-center">${statusBadge}</td>
+                            <td class="p-4 text-center flex items-center justify-center gap-3">${btnPayHtml} ${btnEditHtml}</td>
+                        </tr>
+                    `;
+                });
+            }
             $('#det-parcelas-tbody').html(htmlTbody);
+            this.renderizarPaginacaoParcelas(res.paginacao);
 
             // Action delete button config
-            const btnExcluirHtml = `<button type="button" onclick="despesasJS.excluirLancamentoTotal(${row.lancamento_id})" class="mr-auto px-4 py-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors font-medium flex items-center gap-2 text-sm">
+            const btnExcluirHtml = `<button type="button" onclick="despesasJS.excluirLancamentoTotal(${l.id})" class="mr-auto px-4 py-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors font-medium flex items-center gap-2 text-sm">
                 <i class="fa-solid fa-trash"></i> Excluir Lançamento Completo
             </button>`;
             
@@ -304,13 +335,68 @@ const despesasJS = {
             } else {
                 $('#btn-excluir-detalhes').html(btnExcluirHtml);
             }
-
-            $('#modal-detalhes-backdrop').removeClass('hidden');
-            $('#modal-detalhes').removeClass('hidden').addClass('flex');
-            setTimeout(() => {
-                $('#modal-detalhes-content').removeClass('scale-95 opacity-0');
-            }, 10);
         });
+    },
+
+    pesquisarParcelas: function() {
+        this.buscaParcelaAtiva = $('#det-busca-parcela').val();
+        this.paginaParcelaAtual = 1;
+        this.carregarParcelas();
+    },
+
+    mudarPaginaParcela: function(p) {
+        this.paginaParcelaAtual = p;
+        this.carregarParcelas();
+    },
+
+    renderizarPaginacaoParcelas: function(p) {
+        if (!p || p.total_paginas <= 1) {
+            $('#det-paginacao-parcelas').html('');
+            return;
+        }
+
+        let html = `
+        <div class="flex items-center justify-between px-2">
+            <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                <div>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                        Total: <span class="font-medium">${p.total}</span> parcelas
+                    </p>
+                </div>
+                <div>
+                    <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+                        <button onclick="despesasJS.mudarPaginaParcela(${p.pagina - 1})" ${p.pagina === 1 ? 'disabled' : ''} class="relative inline-flex items-center rounded-l-md px-2 py-1.5 text-gray-400 ring-1 ring-inset ring-gray-300 dark:ring-darkborder hover:bg-gray-50 dark:hover:bg-white/5 disabled:opacity-50">
+                            <i class="fa-solid fa-chevron-left text-xs"></i>
+                        </button>
+        `;
+
+        // Lógica simplificada de números de página para o modal
+        for (let i = 1; i <= p.total_paginas; i++) {
+            if (p.total_paginas > 7) {
+                // Mostrar apenas alguns se houver muitos
+                if (i !== 1 && i !== p.total_paginas && Math.abs(i - p.pagina) > 1) {
+                    if (i === 2 || i === p.total_paginas - 1) html += '<span class="px-2 text-gray-400">...</span>';
+                    continue;
+                }
+            }
+
+            const activeClass = i === p.pagina 
+                ? 'z-10 bg-primary/10 text-primary border-primary' 
+                : 'text-gray-500 dark:text-gray-400 border-gray-300 dark:border-darkborder hover:bg-gray-50 dark:hover:bg-white/5';
+            
+            html += `<button onclick="despesasJS.mudarPaginaParcela(${i})" class="relative inline-flex items-center px-3 py-1 text-xs font-semibold border ${activeClass}">${i}</button>`;
+        }
+
+        html += `
+                        <button onclick="despesasJS.mudarPaginaParcela(${p.pagina + 1})" ${p.pagina === p.total_paginas ? 'disabled' : ''} class="relative inline-flex items-center rounded-r-md px-2 py-1.5 text-gray-400 ring-1 ring-inset ring-gray-300 dark:ring-darkborder hover:bg-gray-50 dark:hover:bg-white/5 disabled:opacity-50">
+                            <i class="fa-solid fa-chevron-right text-xs"></i>
+                        </button>
+                    </nav>
+                </div>
+            </div>
+        </div>`;
+
+        $('#det-paginacao-parcelas').html(html);
     },
 
     pagarParcelaDireto: function(parcelaId, lancamentoId) {
@@ -403,7 +489,7 @@ const despesasJS = {
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.post('ajax.php?acao=parcelas-pagar', { id: parcelaId, estorno: 1 }, function(res) {
-                        despesasJS.abrirDetalhes(despesasJS.dadosOriginais.find(d => d.lancamento_id == lancamentoId)?.parcela_id || parcelaId);
+                        despesasJS.carregarParcelas();
                         despesasJS.carregar();
                     }, 'json');
                 }
@@ -466,7 +552,7 @@ const despesasJS = {
                         desconto: result.value.desconto,
                         conta_pagamento_id: result.value.conta_pagamento_id
                     }, function(res) {
-                        despesasJS.abrirDetalhes(despesasJS.dadosOriginais.find(d => d.lancamento_id == lancamentoId)?.parcela_id || parcelaId);
+                        despesasJS.carregarParcelas();
                         despesasJS.carregar();
                     }, 'json');
                 }
@@ -518,8 +604,8 @@ const despesasJS = {
                         timer: 2000
                     });
                     
-                    despesasJS.abrirDetalhes(despesasJS.dadosOriginais.find(d => d.lancamento_id == lancamentoId)?.parcela_id || parcelaId);
-                    despesasJS.carregar();
+                        despesasJS.carregarParcelas();
+                        despesasJS.carregar();
                 }, 'json').fail(function() {
                     Swal.fire('Erro', 'Ocorreu um erro ao salvar a amortização.', 'error');
                 });
