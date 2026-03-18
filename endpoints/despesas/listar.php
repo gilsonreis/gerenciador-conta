@@ -16,7 +16,7 @@ $contaFixa = filter_input(INPUT_GET, 'conta_fixa');
 $contaFixaValue = ($contaFixa === '0' || $contaFixa === '1') ? (int)$contaFixa : null;
 $busca = filter_input(INPUT_GET, 'busca_descricao', FILTER_SANITIZE_SPECIAL_CHARS) ?: '';
 
-$itensPorPagina = 20;
+$itensPorPagina = 10;
 $paginaAtual = filter_input(INPUT_GET, 'p', FILTER_VALIDATE_INT) ?: 1;
 if ($paginaAtual < 1) $paginaAtual = 1;
 
