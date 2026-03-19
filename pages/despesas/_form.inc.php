@@ -24,6 +24,30 @@
                     placeholder="Ex: Conta de Luz, Supermercado">
             </div>
 
+            <?php if ($role === 'super_admin'): ?>
+            <!-- Contexto Multi-Tenant: visível apenas para super_admin -->
+            <div class="mb-4 p-3 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800/40 rounded-lg">
+                <p class="text-xs font-semibold text-purple-700 dark:text-purple-400 uppercase tracking-wider mb-3 flex items-center gap-1"><i class="fa-solid fa-crown text-[10px]"></i> Contexto da Despesa</p>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label for="despesa_instituicao_id" class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Instituição</label>
+                        <select id="despesa_instituicao_id" name="instituicao_id"
+                            class="w-full px-3 py-2 bg-white dark:bg-[#121212] border border-gray-300 dark:border-darkborder rounded-lg text-sm focus:ring-2 focus:ring-primary text-gray-900 dark:text-white"
+                            onchange="despesasJS.carregarUsuariosDaInstituicao(this.value)">
+                            <option value="">Selecione...</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="despesa_usuario_id" class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Usuário Responsável</label>
+                        <select id="despesa_usuario_id" name="usuario_id"
+                            class="w-full px-3 py-2 bg-white dark:bg-[#121212] border border-gray-300 dark:border-darkborder rounded-lg text-sm focus:ring-2 focus:ring-primary text-gray-900 dark:text-white">
+                            <option value="">Selecione a instituição</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <?php endif; ?>
+
             <div class="mb-4">
                 <label for="categoria_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Categoria</label>
                 <div class="flex items-center gap-2">

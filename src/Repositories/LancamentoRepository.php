@@ -52,11 +52,15 @@ class LancamentoRepository {
                 p.desconto,
                 p.data_vencimento,
                 p.data_pagamento,
+                inst.nome as instituicao_nome,
+                u.nome as usuario_nome,
                 (SELECT COUNT(*) FROM parcelas WHERE lancamento_id = l.id) as qtd_total_parcelas,
                 (SELECT COUNT(*) FROM parcelas WHERE lancamento_id = l.id AND data_pagamento IS NOT NULL) as qtd_parcelas_pagas
             FROM parcelas p
             JOIN lancamentos l ON p.lancamento_id = l.id
             JOIN categorias c ON l.categoria_id = c.id
+            LEFT JOIN instituicoes inst ON l.instituicao_id = inst.id
+            LEFT JOIN usuarios u ON l.usuario_id = u.id
             " . $where . "
             ORDER BY p.data_vencimento ASC
             LIMIT :limit OFFSET :offset

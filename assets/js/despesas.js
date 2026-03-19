@@ -1,8 +1,9 @@
 const despesasJS = {
     mesAtual: new Date().toISOString().substring(0, 7),
-    dadosOriginais: [], // Para filtragem no frontend
+    dadosOriginais: [],
     filtroAtual: 'todas',
     paginaAtual: 1,
+    isSuperAdmin: false,  // Populado pelo endpoint: exibe coluna Contexto
     lancamentoAtivoNoModal: null,
     paginaParcelaAtual: 1,
     buscaParcelaAtiva: '',
@@ -49,7 +50,8 @@ const despesasJS = {
         }, (res) => {
             $('#resumo-total-saidas').text(res.resumo.total_saidas_formatado);
             $('#resumo-custo-vida').text(res.resumo.custo_vida_formatado);
-            
+
+            this.isSuperAdmin = res.is_super_admin === true;
             this.dadosOriginais = res.dados;
             this.renderizarTabela();
             this.renderizarPaginacao(res.paginacao);
@@ -126,9 +128,10 @@ const despesasJS = {
             dadosFiltrados = this.dadosOriginais.filter(d => d.qtd_parcelas_pagas == d.qtd_total_parcelas);
         }
 
+        const colspan = this.isSuperAdmin ? 8 : 7;
         let html = '';
         if(dadosFiltrados.length === 0) {
-            html = `<tr><td colspan="6" class="p-8 text-center text-gray-500 dark:text-gray-400">Nenhuma despesa ${this.filtroAtual === 'todas' ? 'encontrada' : this.filtroAtual} para este mês.</td></tr>`;
+            html = `<tr><td colspan="${colspan}" class="p-8 text-center text-gray-500 dark:text-gray-400">Nenhuma despesa ${this.filtroAtual === 'todas' ? 'encontrada' : this.filtroAtual} para este mês.</td></tr>`;
         } else {
             dadosFiltrados.forEach(d => {
                 const isTotalPago = parseInt(d.qtd_parcelas_pagas) === parseInt(d.qtd_total_parcelas);
@@ -154,6 +157,11 @@ const despesasJS = {
                     <td class="p-4 text-gray-500 dark:text-gray-400 text-sm whitespace-nowrap">
                         ${despesasJS.formatarDataBR(d.data_vencimento)}
                     </td>
+                    ${this.isSuperAdmin ? `
+                    <td class="p-4">
+                        <div class="text-sm font-medium text-white">${d.instituicao_nome || '-'}</div>
+                        <div class="text-xs text-gray-400">${d.usuario_nome || '-'}</div>
+                    </td>` : ''}
                     <td class="p-4 text-gray-900 dark:text-gray-100 font-medium">
                         <div class="flex items-center gap-2">
                             ${d.descricao}
@@ -231,6 +239,26 @@ const despesasJS = {
         }
     },
 
+    // ── Multi-tenant: carrega listas de Instituição e Usuário para o super_admin ──
+    carregarInstituicoes: function() {
+        $.get('ajax.php?acao=instituicoes-listar', (res) => {
+            const sel = $('#despesa_instituicao_id');
+            if (!sel.length) return;
+            sel.html('<option value="">Selecione...</option>');
+            (res.dados || res).forEach(i => sel.append(`<option value="${i.id}">${i.nome}</option>`));
+        });
+    },
+
+    carregarUsuariosDaInstituicao: function(instId) {
+        const sel = $('#despesa_usuario_id');
+        if (!sel.length) return;
+        if (!instId) { sel.html('<option value="">Selecione a instituição</option>'); return; }
+        $.get('ajax.php?acao=usuarios-listar', { instituicao_id: instId }, (res) => {
+            sel.html('<option value="">Selecione...</option>');
+            (res.dados || res).forEach(u => sel.append(`<option value="${u.id}">${u.nome}</option>`));
+        });
+    },
+
     abrirModalCadastro: function() {
         this.carregarCategorias(() => {
             this.carregarContas(() => {
@@ -239,16 +267,16 @@ const despesasJS = {
                 $('#despesa_data').val(new Date().toISOString().substring(0, 10)).prop('readonly', false);
                 $('#despesa_valor').prop('readonly', false);
                 $('#modal-despesa-title').text('Nova Despesa');
-                
+
                 $('#bloco-valores').show();
                 $('#despesa_valor, #despesa_data').prop('required', true);
-                
+
                 $('#is_parcelada').prop('checked', false).prop('disabled', false).closest('label').show();
                 $('#bloco-parcelamento').hide();
                 $('#despesa_parcelas').val(1).prop('readonly', false);
                 $('#despesa_parcela_inicial').val(1).prop('readonly', false);
                 $('#label-vencimento').text('Vencimento Inicial');
-                
+
                 // Reseta status e conta
                 $('#despesa_status').val('pendente');
                 // Reseta campo de data de pagamento
@@ -256,6 +284,12 @@ const despesasJS = {
                 $('#data-pagamento-hint').removeClass('hidden');
                 $('#data-pagamento-locked-hint').addClass('hidden');
                 this.toggleContaPagamento();
+
+                // Super admin: carrega instituições e limpa usuário
+                if (window.userRole === 'super_admin') {
+                    this.carregarInstituicoes();
+                    $('#despesa_usuario_id').html('<option value="">Selecione a instituição</option>');
+                }
 
                 this.mostrarModal();
             });

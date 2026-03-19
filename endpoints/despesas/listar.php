@@ -4,6 +4,8 @@ require_once __DIR__ . '/../../src/Repositories/LancamentoRepository.php';
 
 AuthHelper::requireLogin();
 
+$isSuperAdmin = AuthHelper::getInstituicaoId() === 0;
+
 $mesAno = $_GET['mes'] ?? date('Y-m');
 if (!preg_match('/^\d{4}-\d{2}$/', $mesAno)) {
     http_response_code(400);
@@ -27,18 +29,19 @@ $resumo = $repo->resumoMes(AuthHelper::getInstituicaoId(), $mesAno, $categoriaId
 $totalPaginas = ceil($resultado['total'] / $itensPorPagina);
 
 echo json_encode([
-    'sucesso' => true,
-    'dados' => $resultado['dados'],
+    'sucesso'        => true,
+    'dados'          => $resultado['dados'],
+    'is_super_admin' => $isSuperAdmin,
     'paginacao' => [
-        'pagina_atual' => $paginaAtual,
-        'total_paginas' => $totalPaginas,
-        'total_registros' => $resultado['total'],
+        'pagina_atual'     => $paginaAtual,
+        'total_paginas'    => $totalPaginas,
+        'total_registros'  => $resultado['total'],
         'itens_por_pagina' => $itensPorPagina
     ],
     'resumo' => [
-        'total_saidas' => (float)($resumo['total_saidas'] ?? 0),
+        'total_saidas'           => (float)($resumo['total_saidas'] ?? 0),
         'total_saidas_formatado' => 'R$ ' . number_format((float)($resumo['total_saidas'] ?? 0), 2, ',', '.'),
-        'custo_vida' => (float)($resumo['custo_vida'] ?? 0),
-        'custo_vida_formatado' => 'R$ ' . number_format((float)($resumo['custo_vida'] ?? 0), 2, ',', '.')
+        'custo_vida'             => (float)($resumo['custo_vida'] ?? 0),
+        'custo_vida_formatado'   => 'R$ ' . number_format((float)($resumo['custo_vida'] ?? 0), 2, ',', '.')
     ]
 ]);

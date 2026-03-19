@@ -109,6 +109,9 @@
                 <tr class="bg-gray-50 dark:bg-white/5 border-b border-gray-100 dark:border-darkborder text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider">
                     <th class="p-4 font-semibold w-12 text-center">St</th>
                     <th class="p-4 font-semibold">Vencimento</th>
+                    <?php if ($role === 'super_admin'): ?>
+                    <th class="p-4 font-semibold">Contexto</th>
+                    <?php endif; ?>
                     <th class="p-4 font-semibold">Descrição</th>
                     <th class="p-4 font-semibold">Categoria</th>
                     <th class="p-4 font-semibold text-center">Status</th>
@@ -118,7 +121,7 @@
             </thead>
             <tbody id="tabela-despesas" class="divide-y divide-gray-100 dark:divide-darkborder">
                 <!-- Preenchido via AJAX -->
-                <tr><td colspan="6" class="p-8 text-center text-gray-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Carregando suas finanças...</td></tr>
+                <tr><td colspan="<?= $role === 'super_admin' ? 8 : 7 ?>" class="p-8 text-center text-gray-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Carregando suas finanças...</td></tr>
             </tbody>
         </table>
     </div>
