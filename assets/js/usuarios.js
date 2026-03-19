@@ -3,9 +3,18 @@ const usuariosJS = {
         $.get('ajax.php?acao=usuarios-listar', function(res) {
             let html = '';
             if(res.dados.length === 0) {
-                html = '<tr><td colspan="3" class="p-8 text-center text-gray-500 dark:text-gray-400">Nenhum usuário cadastrado.</td></tr>';
+                html = '<tr><td colspan="5" class="p-8 text-center text-gray-500 dark:text-gray-400">Nenhum usuário cadastrado.</td></tr>';
             } else {
+                // Mapa de badges por role
+                const roleBadge = {
+                    'super_admin': '<span class="inline-flex items-center gap-1 bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 px-2 py-0.5 rounded-full text-xs font-semibold"><i class="fa-solid fa-crown text-[10px]"></i> Super Admin</span>',
+                    'admin':       '<span class="inline-flex items-center gap-1 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 px-2 py-0.5 rounded-full text-xs font-semibold"><i class="fa-solid fa-shield-halved text-[10px]"></i> Admin</span>',
+                    'manager':     '<span class="inline-flex items-center gap-1 bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 px-2 py-0.5 rounded-full text-xs font-semibold"><i class="fa-solid fa-user-tie text-[10px]"></i> Gestor</span>',
+                    'reader':      '<span class="inline-flex items-center gap-1 bg-gray-100 text-gray-600 dark:bg-white/5 dark:text-gray-400 px-2 py-0.5 rounded-full text-xs font-semibold"><i class="fa-solid fa-eye text-[10px]"></i> Leitor</span>',
+                };
+
                 res.dados.forEach(u => {
+                    const badge = roleBadge[u.role] || roleBadge['admin'];
                     html += `
                     <tr class="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group">
                         <td class="p-4 text-gray-900 dark:text-gray-100 font-medium">
@@ -14,10 +23,11 @@ const usuariosJS = {
                                 <span>${u.nome}</span>
                             </div>
                         </td>
-                        <td class="p-4 text-gray-500 dark:text-gray-400 text-sm">
+                        <td class="p-4 text-gray-500 dark:text-gray-400 text-sm hidden md:table-cell">
                             <span class="bg-indigo-100 text-indigo-700 dark:bg-white/5 dark:text-indigo-400 px-2 py-1 rounded text-xs font-medium"><i class="fa-solid fa-building mr-1"></i> ${u.instituicao_nome || 'N/A'}</span>
                         </td>
                         <td class="p-4 text-gray-500 dark:text-gray-400">${u.email}</td>
+                        <td class="p-4">${badge}</td>
                         <td class="p-4 text-center">
                             <button onclick="usuariosJS.editar(${u.id})" class="text-blue-500 opacity-0 group-hover:opacity-100 hover:bg-blue-50 dark:hover:bg-blue-900/20 p-2 rounded-lg transition-all" title="Editar"><i class="fa-solid fa-pen"></i></button>
                             <button onclick="usuariosJS.excluir(${u.id})" class="text-red-500 opacity-0 group-hover:opacity-100 hover:bg-red-50 dark:hover:bg-red-900/20 p-2 rounded-lg transition-all ml-1" title="Excluir"><i class="fa-solid fa-trash"></i></button>
@@ -42,18 +52,22 @@ const usuariosJS = {
         });
     },
     abrirModalCadastro: function() {
-        this.carregarInstituicoes(null, () => {
+        const abrirModal = () => {
             $('#form-usuario')[0].reset();
             $('#usuario_id').val('');
             $('#modal-usuario-title').text('Novo Usuário');
-            $('#usuario_senha').attr('required', true); // Obriga senha se for novo
-            
-            // Oculta e reseta o checkbox de alertas
+            $('#usuario_senha').attr('required', true);
             $('#bloco-alertas').hide();
             $('#usuario_recebe_alertas').prop('checked', true);
-            
             this.mostrarModal();
-        });
+        };
+
+        // Só carrega lista de instituições se o select existir (super_admin)
+        if ($('#usuario_instituicao').length && $('#usuario_instituicao').is('select')) {
+            this.carregarInstituicoes(null, abrirModal);
+        } else {
+            abrirModal();
+        }
     },
     editar: function(id) {
         $.get('ajax.php?acao=usuarios-buscar', {id: id}, function(res) {

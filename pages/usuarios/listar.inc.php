@@ -17,14 +17,15 @@
             <thead>
                 <tr class="bg-gray-50 dark:bg-white/5 border-b border-gray-100 dark:border-darkborder text-gray-500 dark:text-gray-400 text-sm uppercase tracking-wider">
                     <th class="p-4 font-semibold">Nome</th>
-                    <th class="p-4 font-semibold">Instituição</th>
+                    <th class="p-4 font-semibold hidden md:table-cell">Instituição</th>
                     <th class="p-4 font-semibold">E-mail</th>
+                    <th class="p-4 font-semibold">Perfil</th>
                     <th class="p-4 font-semibold w-32 text-center">Ações</th>
                 </tr>
             </thead>
             <tbody id="tabela-usuarios" class="divide-y divide-gray-100 dark:divide-darkborder">
                 <!-- Preenchido via AJAX -->
-                <tr><td colspan="4" class="p-8 text-center text-gray-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Carregando...</td></tr>
+                                <tr><td colspan="5" class="p-8 text-center text-gray-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Carregando...</td></tr>
             </tbody>
         </table>
     </div>
