@@ -9,12 +9,17 @@ class AuthHelper {
     }
 
     /**
-     * Retorna 0 para super_admin (sem filtro de instituição = vê tudo).
-     * Os repositórios tratam inst=0 como "sem filtro".
+     * Retorna 0 quando:
+     *   - role = 'super_admin' (verificação via role), OU
+     *   - instituicao_id da sessão é NULL/0 (super_admin com campo nullable no BD)
+     * Repositórios tratam inst=0 como "sem filtro" → acesso total.
      */
     public static function getInstituicaoId(): int {
-        if (self::getRole() === 'super_admin') return 0;
-        return $_SESSION['instituicao_id'] ?? 0;
+        // Super admin por role
+        if (!empty($_SESSION['usuario_role']) && $_SESSION['usuario_role'] === 'super_admin') return 0;
+        // Super admin por NULL no campo (após migration)
+        if (!isset($_SESSION['instituicao_id']) || $_SESSION['instituicao_id'] === null) return 0;
+        return (int)$_SESSION['instituicao_id'];
     }
 
     /**
@@ -30,7 +35,8 @@ class AuthHelper {
     }
 
     public static function getRole(): string {
-        return $_SESSION['usuario_role'] ?? 'reader';
+        // Usa !empty para tratar null e string vazia como 'admin' (usuários sem migration)
+        return !empty($_SESSION['usuario_role']) ? $_SESSION['usuario_role'] : 'admin';
     }
 
     public static function isSuperAdmin(): bool {

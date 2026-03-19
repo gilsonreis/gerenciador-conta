@@ -10,8 +10,13 @@ $db            = Database::getConnection();
 
 // ── GET: retorna dados do perfil ────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    $stmt = $db->prepare("SELECT id, nome, email, recebe_alertas FROM usuarios WHERE id = :id AND instituicao_id = :inst");
-    $stmt->execute(['id' => $usuarioId, 'inst' => $instituicaoId]);
+    if ($instituicaoId === 0) {
+        $stmt = $db->prepare("SELECT id, nome, email, recebe_alertas FROM usuarios WHERE id = :id");
+        $stmt->execute(['id' => $usuarioId]);
+    } else {
+        $stmt = $db->prepare("SELECT id, nome, email, recebe_alertas FROM usuarios WHERE id = :id AND instituicao_id = :inst");
+        $stmt->execute(['id' => $usuarioId, 'inst' => $instituicaoId]);
+    }
     $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$usuario) {
