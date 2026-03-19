@@ -4,12 +4,19 @@
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-    <!-- Card 1: Capital Disponível -->
+    <!-- Card 1: Capital Disponível (Composição Matemática) -->
     <div class="bg-white dark:bg-darkcard rounded-2xl p-6 shadow-sm border border-blue-100 dark:border-blue-900/30">
         <div class="flex justify-between items-start mb-4">
-            <div>
-                <p class="text-sm font-medium text-blue-800 dark:text-blue-400/80 uppercase tracking-wider mb-1">Capital Disponível</p>
-                <h3 class="text-3xl font-bold text-blue-600 dark:text-blue-500 valor-sensivel" id="dash-capital-disponivel">R$ 0,00</h3>
+            <div class="space-y-1">
+                <div class="text-sm text-gray-400 dark:text-gray-500 font-medium">
+                    Saldo Atual: <span id="dash-saldo-base" class="valor-sensivel">R$ 0,00</span>
+                </div>
+                <div class="text-sm text-gray-400 dark:text-gray-500 font-medium">
+                    + Entradas do Mês: <span id="dash-entradas-mes-card" class="valor-sensivel">R$ 0,00</span>
+                </div>
+                <hr class="my-2 border-gray-100 dark:border-darkborder">
+                <div class="text-[10px] text-gray-400 dark:text-gray-500 uppercase font-bold tracking-widest mb-1">Total Disponível</div>
+                <h3 class="text-3xl font-bold text-blue-600 dark:text-blue-500 valor-sensivel" id="dash-total-disponivel">R$ 0,00</h3>
             </div>
             <div class="p-3 bg-blue-50 dark:bg-blue-900/20 text-blue-500 rounded-xl">
                 <i class="fa-solid fa-vault text-xl"></i>
