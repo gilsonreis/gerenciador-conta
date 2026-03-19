@@ -8,7 +8,7 @@ AuthHelper::requireLogin();
 
 $mesAno = $_GET['mes'] ?? date('Y-m');
 
-// 1. Saldo Atual (Dinheiro Real hoje)
+// 1. Saldo Atual (Dinheiro Real hoje em todas as contas)
 $repoConta = new ContaRepository();
 $saldosContas = $repoConta->saldos(AuthHelper::getInstituicaoId());
 $saldoAtualReais = 0;
@@ -16,31 +16,19 @@ foreach ($saldosContas as $c) {
     $saldoAtualReais += (float)$c['saldo_atual_real'];
 }
 
-// 2. Entradas do Mês (Pagas e Pendentes)
-$repoCaixa = new CaixaRepository();
-$resumoEntradas = $repoCaixa->resumoMes(AuthHelper::getInstituicaoId(), $mesAno);
-$entradasReceber = $resumoEntradas['total_pendente'];
-
-// 3. Total em Caixa Projetado (Saldo Atual + Entradas a Receber)
-$totalCaixa = $saldoAtualReais + $entradasReceber;
-
-// 4. Saídas do Mês (Total: Pagas + Pendentes)
+// 2. Saídas do Mês (Total: Pagas + Pendentes)
 $repoLancamento = new LancamentoRepository();
 $resumoDespesas = $repoLancamento->resumoMes(AuthHelper::getInstituicaoId(), $mesAno);
 $saidasMes = (float)($resumoDespesas['total_saidas'] ?? 0);
 $custoVida = (float)($resumoDespesas['custo_vida'] ?? 0);
 
-// 5. Projeção de Sobra no Fim do Mês
-$projecaoSobra = $totalCaixa - $saidasMes;
+// 3. Projeção de Sobra (Saldo Atual - Total de Saídas do Mês)
+$projecaoSobra = $saldoAtualReais - $saidasMes;
 
 echo json_encode([
     'sucesso' => true,
     'saldo_atual' => $saldoAtualReais,
     'saldo_atual_formatado' => 'R$ ' . number_format($saldoAtualReais, 2, ',', '.'),
-    'entradas_receber' => $entradasReceber,
-    'entradas_receber_formatado' => 'R$ ' . number_format($entradasReceber, 2, ',', '.'),
-    'total_caixa' => $totalCaixa,
-    'total_caixa_formatado' => 'R$ ' . number_format($totalCaixa, 2, ',', '.'),
     'saidas_mes' => $saidasMes,
     'saidas_mes_formatado' => 'R$ ' . number_format($saidasMes, 2, ',', '.'),
     'projecao_sobra' => $projecaoSobra,

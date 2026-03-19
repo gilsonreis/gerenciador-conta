@@ -11,9 +11,7 @@ const homeJS = {
             method: 'GET',
             success: function(res) {
                 if(res.sucesso) {
-                    $('#dash-saldo-atual').text(res.saldo_atual_formatado);
-                    $('#dash-entradas-receber').text(res.entradas_receber_formatado);
-                    $('#dash-total-caixa').text(res.total_caixa_formatado);
+                    $('#dash-capital-disponivel').text(res.saldo_atual_formatado);
                     $('#dash-saidas-mes').text(res.saidas_mes_formatado);
                     $('#dash-custovida').text(res.custovida_formatado);
                     
@@ -45,7 +43,6 @@ const homeJS = {
                         projLabel.addClass('text-red-800 dark:text-red-400/80');
                         projBg.addClass('bg-red-50 dark:bg-red-900/10');
                     } else {
-                        // Neutro (0)
                         projElem.addClass('text-gray-600 dark:text-gray-500');
                         projCard.addClass('border-gray-100 dark:border-darkborder');
                         projIcon.addClass('bg-gray-50 dark:bg-gray-900/20 text-gray-500');
