@@ -87,19 +87,26 @@ $role = $_SESSION['usuario_role'] ?? 'reader';
             <h1 class="text-xl font-bold bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent"><i class="fa-solid fa-wallet mr-2"></i>Controle Familiar</h1>
             <div class="flex justify-between items-center mt-2">
                 <button type="button" onclick="perfilJS.abrir()"
-                    class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-blue-400 transition-colors group min-w-0"
+                    class="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-blue-400 transition-colors min-w-0"
                     title="Editar meu perfil">
                     <i class="fa-solid fa-circle-user text-base shrink-0"></i>
                     <span id="sidebar-usuario-nome" class="truncate"><?= htmlspecialchars($_SESSION['usuario_nome'] ?? 'Usuário') ?></span>
-                    <i class="fa-solid fa-pen-to-square text-[11px] opacity-0 group-hover:opacity-100 transition-opacity shrink-0"></i>
                 </button>
-                <button type="button" class="btn-toggle-privacidade text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors shrink-0" title="Alternar Modo Privacidade">
-                    <i class="fa-regular fa-eye text-lg"></i>
+                <button type="button" onclick="perfilJS.abrir()"
+                    class="text-gray-400 hover:text-primary dark:hover:text-blue-400 transition-colors shrink-0 p-1"
+                    title="Configurações do perfil">
+                    <i class="fa-solid fa-gear text-base"></i>
                 </button>
             </div>
         </div>
         <nav class="flex-1 px-4 space-y-1 overflow-y-auto">
-            <a href="?pagina=home-index" class="flex items-center gap-3 py-3 px-4 rounded-lg transition duration-200 hover:bg-gray-50 dark:hover:bg-white/5 <?= str_starts_with($pagina, 'home') ? 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-blue-400' : 'text-gray-600 dark:text-gray-300' ?>"><i class="fa-solid fa-house w-5 text-center"></i> Dashboard</a>
+            <a href="?pagina=home-index" class="flex items-center gap-3 py-3 px-4 rounded-lg transition duration-200 hover:bg-gray-50 dark:hover:bg-white/5 <?= str_starts_with($pagina, 'home') ? 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-blue-400' : 'text-gray-600 dark:text-gray-300' ?>">
+                <i class="fa-solid fa-house w-5 text-center"></i>
+                <span class="flex-1">Dashboard</span>
+                <button type="button" class="btn-toggle-privacidade text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors" title="Alternar Modo Privacidade" onclick="event.preventDefault()">
+                    <i class="fa-regular fa-eye text-sm"></i>
+                </button>
+            </a>
             
             <p class="px-4 pt-4 pb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Lançamentos</p>
             <a href="?pagina=caixa-listar" class="flex items-center gap-3 py-3 px-4 rounded-lg transition duration-200 hover:bg-gray-50 dark:hover:bg-white/5 <?= str_starts_with($pagina, 'caixa') ? 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-blue-400' : 'text-gray-600 dark:text-gray-300' ?>"><i class="fa-solid fa-arrow-trend-up text-emerald-500 w-5 text-center"></i> Entradas</a>
