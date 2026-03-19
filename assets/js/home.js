@@ -11,11 +11,13 @@ const homeJS = {
             method: 'GET',
             success: function(res) {
                 if(res.sucesso) {
-                    $('#dash-capital').text(res.capital_disponivel_formatado);
-                    $('#dash-saidas').text(res.saidas_formatado);
+                    $('#dash-saldo-atual').text(res.saldo_atual_formatado);
+                    $('#dash-entradas-receber').text(res.entradas_receber_formatado);
+                    $('#dash-total-caixa').text(res.total_caixa_formatado);
+                    $('#dash-saidas-mes').text(res.saidas_mes_formatado);
                     $('#dash-custovida').text(res.custovida_formatado);
                     
-                    const projElem = $('#dash-projecao');
+                    const projElem = $('#dash-projecao-sobra');
                     const projCard = $('#dash-projecao-card');
                     const projBg = $('#dash-projecao-bg');
                     const projIcon = $('#dash-projecao-icon');
@@ -24,24 +26,31 @@ const homeJS = {
                     projElem.text(res.projecao_sobra_formatado);
                     
                     // Cleanup previous state classes
-                    projElem.removeClass('text-emerald-600 dark:text-emerald-500 text-red-600 dark:text-red-500');
-                    projCard.removeClass('border-emerald-100 dark:border-emerald-900/30 border-red-100 dark:border-red-900/30');
-                    projIcon.removeClass('bg-emerald-50 dark:bg-emerald-900/20 text-emerald-500 bg-red-50 dark:bg-red-900/20 text-red-500');
-                    projLabel.removeClass('text-emerald-800 dark:text-emerald-400/80 text-red-800 dark:text-red-400/80');
-                    projBg.removeClass('bg-emerald-50 dark:bg-emerald-900/10 bg-red-50 dark:bg-red-900/10');
+                    projElem.removeClass('text-emerald-600 dark:text-emerald-500 text-red-600 dark:text-red-500 text-gray-600 dark:text-gray-500');
+                    projCard.removeClass('border-emerald-100 dark:border-emerald-900/30 border-red-100 dark:border-red-900/30 border-gray-100 dark:border-darkborder');
+                    projIcon.removeClass('bg-emerald-50 dark:bg-emerald-900/20 text-emerald-500 bg-red-50 dark:bg-red-900/20 text-red-500 bg-gray-50 dark:bg-gray-900/20 text-gray-500');
+                    projLabel.removeClass('text-emerald-800 dark:text-emerald-400/80 text-red-800 dark:text-red-400/80 text-gray-800 dark:text-gray-400');
+                    projBg.removeClass('bg-emerald-50 dark:bg-emerald-900/10 bg-red-50 dark:bg-red-900/10 bg-gray-50 dark:bg-gray-900/10');
                     
-                    if (res.projecao_sobra >= 0) {
+                    if (res.projecao_sobra > 0) {
                         projElem.addClass('text-emerald-600 dark:text-emerald-500');
                         projCard.addClass('border-emerald-100 dark:border-emerald-900/30');
                         projIcon.addClass('bg-emerald-50 dark:bg-emerald-900/20 text-emerald-500');
                         projLabel.addClass('text-emerald-800 dark:text-emerald-400/80');
                         projBg.addClass('bg-emerald-50 dark:bg-emerald-900/10');
-                    } else {
+                    } else if (res.projecao_sobra < 0) {
                         projElem.addClass('text-red-600 dark:text-red-500');
                         projCard.addClass('border-red-100 dark:border-red-900/30');
                         projIcon.addClass('bg-red-50 dark:bg-red-900/20 text-red-500');
                         projLabel.addClass('text-red-800 dark:text-red-400/80');
                         projBg.addClass('bg-red-50 dark:bg-red-900/10');
+                    } else {
+                        // Neutro (0)
+                        projElem.addClass('text-gray-600 dark:text-gray-500');
+                        projCard.addClass('border-gray-100 dark:border-darkborder');
+                        projIcon.addClass('bg-gray-50 dark:bg-gray-900/20 text-gray-500');
+                        projLabel.addClass('text-gray-800 dark:text-gray-400');
+                        projBg.addClass('bg-gray-50 dark:bg-gray-900/10');
                     }
                 }
             }

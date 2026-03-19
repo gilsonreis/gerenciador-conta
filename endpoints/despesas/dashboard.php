@@ -8,38 +8,42 @@ AuthHelper::requireLogin();
 
 $mesAno = $_GET['mes'] ?? date('Y-m');
 
-// 1. Soma dos Saldos Reais de todas as contas (Poder de Fogo Atual)
+// 1. Saldo Atual (Dinheiro Real hoje)
 $repoConta = new ContaRepository();
 $saldosContas = $repoConta->saldos(AuthHelper::getInstituicaoId());
-$somaSaldosReais = 0;
+$saldoAtualReais = 0;
 foreach ($saldosContas as $c) {
-    $somaSaldosReais += (float)($c['saldo_atual_real'] ?? 0);
+    $saldoAtualReais += (float)$c['saldo_atual_real'];
 }
 
-// 2. Entradas do Mês
+// 2. Entradas do Mês (Pagas e Pendentes)
 $repoCaixa = new CaixaRepository();
-$entradasMes = (float)$repoCaixa->resumoMes(AuthHelper::getInstituicaoId(), $mesAno);
+$resumoEntradas = $repoCaixa->resumoMes(AuthHelper::getInstituicaoId(), $mesAno);
+$entradasReceber = $resumoEntradas['total_pendente'];
 
-// 3. Capital Disponível (Saldo nas Contas + Entradas do Mês)
-$capitalDisponivel = $somaSaldosReais + $entradasMes;
+// 3. Total em Caixa Projetado (Saldo Atual + Entradas a Receber)
+$totalCaixa = $saldoAtualReais + $entradasReceber;
 
-// 4. Saídas do Mês (Previstas/Pagas)
+// 4. Saídas do Mês (Total: Pagas + Pendentes)
 $repoLancamento = new LancamentoRepository();
 $resumoDespesas = $repoLancamento->resumoMes(AuthHelper::getInstituicaoId(), $mesAno);
 $saidasMes = (float)($resumoDespesas['total_saidas'] ?? 0);
 $custoVida = (float)($resumoDespesas['custo_vida'] ?? 0);
 
-// 5. Projeção de Sobra (Capital - Saídas)
-$projecaoSobra = $capitalDisponivel - $saidasMes;
+// 5. Projeção de Sobra no Fim do Mês
+$projecaoSobra = $totalCaixa - $saidasMes;
 
 echo json_encode([
     'sucesso' => true,
-    'capital_disponivel' => $capitalDisponivel,
-    'capital_disponivel_formatado' => 'R$ ' . number_format($capitalDisponivel, 2, ',', '.'),
-    'saidas' => $saidasMes,
-    'saidas_formatado' => 'R$ ' . number_format($saidasMes, 2, ',', '.'),
+    'saldo_atual' => $saldoAtualReais,
+    'saldo_atual_formatado' => 'R$ ' . number_format($saldoAtualReais, 2, ',', '.'),
+    'entradas_receber' => $entradasReceber,
+    'entradas_receber_formatado' => 'R$ ' . number_format($entradasReceber, 2, ',', '.'),
+    'total_caixa' => $totalCaixa,
+    'total_caixa_formatado' => 'R$ ' . number_format($totalCaixa, 2, ',', '.'),
+    'saidas_mes' => $saidasMes,
+    'saidas_mes_formatado' => 'R$ ' . number_format($saidasMes, 2, ',', '.'),
     'projecao_sobra' => $projecaoSobra,
     'projecao_sobra_formatado' => 'R$ ' . number_format($projecaoSobra, 2, ',', '.'),
-    'custovida' => $custoVida,
     'custovida_formatado' => 'R$ ' . number_format($custoVida, 2, ',', '.')
 ]);

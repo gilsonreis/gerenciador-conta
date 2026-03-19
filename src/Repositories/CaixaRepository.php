@@ -30,14 +30,20 @@ class CaixaRepository {
 
     public function resumoMes(int $instituicaoId, string $mesAno) {
         $sql = "
-            SELECT SUM(valor) as total_entradas
+            SELECT 
+                SUM(CASE WHEN status = 'confirmado' THEN valor ELSE 0 END) as total_recebido,
+                SUM(CASE WHEN status = 'pendente' THEN valor ELSE 0 END) as total_pendente
             FROM caixa_entradas
             WHERE instituicao_id = :instituicao_id
             AND DATE_FORMAT(data_entrada, '%Y-%m') = :mes_ano
         ";
         $stmt = $this->db->prepare($sql);
         $stmt->execute(['instituicao_id' => $instituicaoId, 'mes_ano' => $mesAno]);
-        return $stmt->fetch()['total_entradas'] ?? 0;
+        $row = $stmt->fetch();
+        return [
+            'total_recebido' => (float)($row['total_recebido'] ?? 0),
+            'total_pendente' => (float)($row['total_pendente'] ?? 0)
+        ];
     }
 
     public function buscar(int $instituicaoId, int $id) {
@@ -49,20 +55,22 @@ class CaixaRepository {
 
     public function salvar(int $instituicaoId, int $usuarioId, array $dados) {
         $valor = (float)str_replace(',', '.', str_replace('.', '', $dados['valor']));
+        $status = $dados['status'] ?? 'confirmado';
         
         if (!empty($dados['id'])) {
-            $sql = "UPDATE caixa_entradas SET conta_id = :conta_id, descricao = :descricao, valor = :valor, data_entrada = :data_entrada WHERE id = :id AND instituicao_id = :instituicao_id";
+            $sql = "UPDATE caixa_entradas SET conta_id = :conta_id, descricao = :descricao, valor = :valor, data_entrada = :data_entrada, status = :status WHERE id = :id AND instituicao_id = :instituicao_id";
             $stmt = $this->db->prepare($sql);
             return $stmt->execute([
                 'conta_id' => $dados['conta_id'],
                 'descricao' => $dados['descricao'] ?? null,
                 'valor' => $valor,
                 'data_entrada' => $dados['data_entrada'],
+                'status' => $status,
                 'id' => $dados['id'],
                 'instituicao_id' => $instituicaoId
             ]);
         } else {
-            $sql = "INSERT INTO caixa_entradas (instituicao_id, usuario_id, conta_id, descricao, valor, data_entrada) VALUES (:instituicao_id, :usuario_id, :conta_id, :descricao, :valor, :data_entrada)";
+            $sql = "INSERT INTO caixa_entradas (instituicao_id, usuario_id, conta_id, descricao, valor, data_entrada, status) VALUES (:instituicao_id, :usuario_id, :conta_id, :descricao, :valor, :data_entrada, :status)";
             $stmt = $this->db->prepare($sql);
             return $stmt->execute([
                 'instituicao_id' => $instituicaoId,
@@ -70,7 +78,8 @@ class CaixaRepository {
                 'conta_id' => $dados['conta_id'],
                 'descricao' => $dados['descricao'] ?? null,
                 'valor' => $valor,
-                'data_entrada' => $dados['data_entrada']
+                'data_entrada' => $dados['data_entrada'],
+                'status' => $status
             ]);
         }
     }

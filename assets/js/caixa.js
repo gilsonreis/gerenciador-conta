@@ -39,13 +39,23 @@ const caixaJS = {
                     const descInfo = e.descricao ? `<div class="text-sm font-medium text-gray-900 dark:text-gray-100">${e.descricao}</div>` : '';
                     const walletBadge = `<span class="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 px-2 py-0.5 rounded text-xs font-bold ${e.descricao ? 'mt-1 inline-block' : 'mr-2'}"><i class="fa-solid fa-arrow-trend-up"></i> ${e.conta_nome}</span>`;
                     
+                    let statusBadge = '';
+                    if (e.status === 'pendente') {
+                        statusBadge = '<span class="bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 px-2 py-0.5 rounded text-[10px] font-bold ml-2 uppercase tracking-tighter">Pendente</span>';
+                    } else {
+                        statusBadge = '<span class="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 px-2 py-0.5 rounded text-[10px] font-bold ml-2 uppercase tracking-tighter">Confirmado</span>';
+                    }
+
                     html += `
                     <tr class="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group">
                         <td class="p-4 text-gray-500 dark:text-gray-400 text-sm whitespace-nowrap">
                             <i class="fa-regular fa-calendar text-gray-400 mr-2"></i> ${caixaJS.formatarDataBR(e.data_entrada)}
                         </td>
                         <td class="p-4">
-                            ${descInfo}
+                            <div class="flex items-center">
+                                ${descInfo}
+                                ${statusBadge}
+                            </div>
                             ${walletBadge}
                         </td>
                         <td class="p-4 text-right text-emerald-600 dark:text-emerald-400 font-bold whitespace-nowrap"><span class="valor-sensivel">${caixaJS.formatarMoeda(e.valor)}</span></td>
@@ -75,6 +85,7 @@ const caixaJS = {
             $('#form-caixa')[0].reset();
             $('#caixa_id').val('');
             $('#caixa_descricao').val('');
+            $('#caixa_status').val('confirmado');
             $('#caixa_data').val(new Date().toISOString().substring(0, 10)); // Default to today
             $('#modal-caixa-title').text('Nova Entrada');
             this.mostrarModal();
@@ -88,6 +99,7 @@ const caixaJS = {
                 $('#caixa_conta_id').val(res.dados.conta_id);
                 $('#caixa_descricao').val(res.dados.descricao || '');
                 $('#caixa_valor').val(parseFloat(res.dados.valor).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+                $('#caixa_status').val(res.dados.status || 'confirmado');
                 $('#caixa_data').val(res.dados.data_entrada);
                 $('#modal-caixa-title').text('Editar Entrada');
                 caixaJS.mostrarModal();
