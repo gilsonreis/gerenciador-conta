@@ -13,7 +13,7 @@ $repoConta = new ContaRepository();
 $saldosContas = $repoConta->saldos(AuthHelper::getInstituicaoId());
 $somaSaldosReais = 0;
 foreach ($saldosContas as $c) {
-    $somaSaldosReais += (float)$c['saldo_atual_real'];
+    $somaSaldosReais += (float)($c['saldo_atual_real'] ?? 0);
 }
 
 // 2. Entradas do Mês
