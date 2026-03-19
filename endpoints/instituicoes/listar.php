@@ -5,7 +5,9 @@ require_once __DIR__ . '/../../src/Repositories/InstituicaoRepository.php';
 AuthHelper::requireLogin();
 $repo = new InstituicaoRepository();
 
-// Pass the logged in user ID to ensure they only list the institution they belong to
-$instituicoes = $repo->listar(AuthHelper::getUsuarioId());
+// Super admin (inst=0): lista todas as instituições passando userId=0.
+// Demais usuários: filtra pela instituição do usuário logado.
+$userId = AuthHelper::getInstituicaoId() === 0 ? 0 : AuthHelper::getUsuarioId();
+$instituicoes = $repo->listar($userId);
 
 echo json_encode(['sucesso' => true, 'dados' => $instituicoes]);

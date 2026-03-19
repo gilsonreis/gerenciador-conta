@@ -66,6 +66,7 @@ class ContaRepository {
      *             (cron/salvar_snapshots.php), onde o saldo acumulado real é necessário.
      */
     public function saldos(int $instituicaoId) {
+        $instWhere = $instituicaoId === 0 ? '' : 'WHERE c.instituicao_id = :instituicao_id';
         $sql = "
             SELECT 
                 c.id,
@@ -82,10 +83,11 @@ class ContaRepository {
                  - COALESCE((SELECT SUM(valor) FROM transferencias WHERE conta_origem_id = c.id), 0)
                 ) as saldo_atual_real
             FROM contas c
-            WHERE c.instituicao_id = :instituicao_id
+            $instWhere
         ";
         $stmt = $this->db->prepare($sql);
-        $stmt->execute(['instituicao_id' => $instituicaoId]);
+        $params = $instituicaoId === 0 ? [] : ['instituicao_id' => $instituicaoId];
+        $stmt->execute($params);
         return $stmt->fetchAll();
     }
 

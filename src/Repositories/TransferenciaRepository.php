@@ -28,6 +28,7 @@ class TransferenciaRepository {
     }
 
     public function listar(int $instituicaoId, int $limit = 50) {
+        $instWhere = $instituicaoId === 0 ? '' : 'WHERE t.instituicao_id = :inst';
         $sql = "
             SELECT 
                 t.*,
@@ -36,12 +37,14 @@ class TransferenciaRepository {
             FROM transferencias t
             JOIN contas co ON t.conta_origem_id = co.id
             JOIN contas cd ON t.conta_destino_id = cd.id
-            WHERE t.instituicao_id = :inst
+            $instWhere
             ORDER BY t.data_transferencia DESC, t.id DESC
             LIMIT :limit
         ";
         $stmt = $this->db->prepare($sql);
-        $stmt->bindParam(':inst', $instituicaoId, PDO::PARAM_INT);
+        if ($instituicaoId !== 0) {
+            $stmt->bindParam(':inst', $instituicaoId, PDO::PARAM_INT);
+        }
         $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll();

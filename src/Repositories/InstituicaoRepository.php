@@ -9,6 +9,12 @@ class InstituicaoRepository {
     }
 
     public function listar($usuarioId) {
+        // super_admin (usuarioId=0): retorna todas as instituições sem filtro de usuário
+        if ($usuarioId === 0) {
+            $stmt = $this->db->prepare("SELECT id, nome FROM instituicoes ORDER BY nome ASC");
+            $stmt->execute();
+            return $stmt->fetchAll();
+        }
         $stmt = $this->db->prepare("
             SELECT i.id, i.nome 
             FROM instituicoes i
@@ -21,6 +27,12 @@ class InstituicaoRepository {
     }
 
     public function buscar($usuarioId, $id) {
+        // super_admin: busca sem filtro de usuário
+        if ($usuarioId === 0) {
+            $stmt = $this->db->prepare("SELECT id, nome FROM instituicoes WHERE id = ?");
+            $stmt->execute([$id]);
+            return $stmt->fetch();
+        }
         $stmt = $this->db->prepare("
             SELECT i.id, i.nome 
             FROM instituicoes i
