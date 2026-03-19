@@ -241,7 +241,7 @@ const homeJS = {
                 }
             }
         });
-    }
+    },
     carregarVencimentos: function() {
         $.ajax({
             url: 'ajax.php?acao=despesas-proximos_vencimentos',
@@ -297,8 +297,8 @@ const homeJS = {
                 tbody.html(html);
             }
         });
-    },
-
+    }
+};
 
 $(document).ready(function() {
     homeJS.init();
