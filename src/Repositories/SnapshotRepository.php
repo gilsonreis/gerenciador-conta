@@ -38,7 +38,7 @@ class SnapshotRepository {
             SELECT SUM(ss.valor_abertura) as total_abertura
             FROM snapshots_saldos ss
             JOIN contas c ON ss.conta_id = c.id
-            WHERE c.instituicao_id = :instituicao_id
+            WHERE (:instituicao_id = 0 OR c.instituicao_id = :instituicao_id)
             AND ss.mes_referencia = :mes_referencia
         ";
         $stmt = $this->db->prepare($sql);
@@ -64,7 +64,7 @@ class SnapshotRepository {
             SELECT ss.id, c.nome as conta_nome, ss.valor_abertura, ss.mes_referencia, ss.criado_em
             FROM snapshots_saldos ss
             JOIN contas c ON ss.conta_id = c.id
-            WHERE c.instituicao_id = :instituicao_id
+            WHERE (:instituicao_id = 0 OR c.instituicao_id = :instituicao_id)
             AND ss.mes_referencia = :mes_referencia
             ORDER BY c.nome
         ";

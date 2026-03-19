@@ -19,7 +19,7 @@ class CaixaRepository {
                 ce.data_entrada
             FROM caixa_entradas ce
             JOIN contas c ON ce.conta_id = c.id
-            WHERE ce.instituicao_id = :instituicao_id
+            WHERE (:instituicao_id = 0 OR ce.instituicao_id = :instituicao_id)
             AND DATE_FORMAT(ce.data_entrada, '%Y-%m') = :mes_ano
             ORDER BY ce.data_entrada ASC
         ";
@@ -32,7 +32,7 @@ class CaixaRepository {
         $sql = "
             SELECT SUM(valor) as total_entradas
             FROM caixa_entradas
-            WHERE instituicao_id = :instituicao_id
+            WHERE (:instituicao_id = 0 OR instituicao_id = :instituicao_id)
             AND DATE_FORMAT(data_entrada, '%Y-%m') = :mes_ano
         ";
         $stmt = $this->db->prepare($sql);

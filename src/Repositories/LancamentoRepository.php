@@ -10,7 +10,7 @@ class LancamentoRepository {
 
     public function listarPorMes(int $instituicaoId, string $mesAno, ?int $categoriaId = null, ?int $contaFixa = null, int $pagina = 1, int $itensPorPagina = 20, string $busca = '') {
         $where = "
-            WHERE l.instituicao_id = :instituicao_id
+            WHERE (:instituicao_id = 0 OR l.instituicao_id = :instituicao_id)
             AND DATE_FORMAT(p.data_vencimento, '%Y-%m') = :mes_ano
         ";
         
@@ -82,7 +82,7 @@ class LancamentoRepository {
                 SUM(CASE WHEN l.conta_fixa = 1 THEN p.valor - p.desconto ELSE 0 END) as custo_vida
             FROM parcelas p
             JOIN lancamentos l ON p.lancamento_id = l.id
-            WHERE l.instituicao_id = :instituicao_id
+            WHERE (:instituicao_id = 0 OR l.instituicao_id = :instituicao_id)
             AND DATE_FORMAT(p.data_vencimento, '%Y-%m') = :mes_ano
         ";
 

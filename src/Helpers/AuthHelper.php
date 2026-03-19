@@ -8,7 +8,20 @@ class AuthHelper {
         }
     }
 
+    /**
+     * Retorna 0 para super_admin (sem filtro de instituição = vê tudo).
+     * Os repositórios tratam inst=0 como "sem filtro".
+     */
     public static function getInstituicaoId(): int {
+        if (self::getRole() === 'super_admin') return 0;
+        return $_SESSION['instituicao_id'] ?? 0;
+    }
+
+    /**
+     * Sempre retorna o instituicao_id real da sessão,
+     * usado em operações de escrita onde super_admin age dentro da sua própria instituição.
+     */
+    public static function getInstituicaoIdReal(): int {
         return $_SESSION['instituicao_id'] ?? 0;
     }
 

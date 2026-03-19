@@ -12,7 +12,7 @@ class UsuarioRepository {
         $sql = "SELECT u.id, u.nome, u.email, u.role, u.recebe_alertas, i.nome as instituicao_nome 
                 FROM usuarios u 
                 LEFT JOIN instituicoes i ON u.instituicao_id = i.id 
-                WHERE u.instituicao_id = :instituicao_id 
+                WHERE (:instituicao_id = 0 OR u.instituicao_id = :instituicao_id) 
                 ORDER BY u.nome ASC";
         $stmt = $this->db->prepare($sql);
         $stmt->execute(['instituicao_id' => $instituicaoId]);
