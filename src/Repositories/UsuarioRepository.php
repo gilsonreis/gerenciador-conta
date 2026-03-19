@@ -9,7 +9,7 @@ class UsuarioRepository {
     }
 
     public function listar(int $instituicaoId) {
-        $sql = "SELECT u.id, u.nome, u.email, i.nome as instituicao_nome 
+        $sql = "SELECT u.id, u.nome, u.email, u.role, u.recebe_alertas, i.nome as instituicao_nome 
                 FROM usuarios u 
                 LEFT JOIN instituicoes i ON u.instituicao_id = i.id 
                 WHERE u.instituicao_id = :instituicao_id 
@@ -70,7 +70,7 @@ class UsuarioRepository {
     }
 
     public function autenticar(string $email, string $senha) {
-        $sql = "SELECT id, instituicao_id, nome, senha FROM usuarios WHERE email = :email";
+        $sql = "SELECT id, instituicao_id, nome, senha, role FROM usuarios WHERE email = :email";
         $stmt = $this->db->prepare($sql);
         $stmt->execute(['email' => $email]);
         $usuario = $stmt->fetch();
