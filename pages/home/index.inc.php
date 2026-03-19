@@ -4,23 +4,35 @@
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <!-- Card 1: Capital Disponível (Matemático) -->
     <div class="bg-white dark:bg-darkcard rounded-2xl p-6 shadow-sm border border-blue-100 dark:border-blue-900/30">
-        <div class="flex justify-between items-start mb-4">
-            <div>
-                <p class="text-sm font-medium text-blue-800 dark:text-blue-400/80 uppercase tracking-wider mb-1">Capital Disponível</p>
-                <h3 class="text-3xl font-bold text-blue-600 dark:text-blue-500 valor-sensivel" id="dash-capital">R$ 0,00</h3>
+        <div class="flex justify-between items-start mb-2">
+            <p class="text-xs font-semibold text-blue-800/60 dark:text-blue-400/50 uppercase tracking-wider">Capital Disponível</p>
+            <i class="fa-solid fa-vault text-blue-500/50"></i>
+        </div>
+        <div class="space-y-1">
+            <div class="flex justify-between text-sm text-gray-500 dark:text-gray-400">
+                <span>Saldo Atual:</span>
+                <span id="dash-saldo-atual" class="font-mono valor-sensivel">R$ 0,00</span>
             </div>
-            <div class="p-3 bg-blue-50 dark:bg-blue-900/20 text-blue-500 rounded-xl">
-                <i class="fa-solid fa-vault text-xl"></i>
+            <div class="flex justify-between text-sm text-gray-500 dark:text-gray-400">
+                <span>+ Entradas a Receber:</span>
+                <span id="dash-entradas-receber" class="font-mono valor-sensivel">R$ 0,00</span>
+            </div>
+            <hr class="border-gray-100 dark:border-darkborder my-2">
+            <div class="pt-1">
+                <p class="text-xs text-blue-500 font-medium mb-0.5">Total Disponível:</p>
+                <h3 class="text-3xl font-black text-blue-600 dark:text-blue-400 valor-sensivel" id="dash-total-caixa">R$ 0,00</h3>
             </div>
         </div>
     </div>
     
+    <!-- Card 2: Saídas do Mês -->
     <div class="bg-white dark:bg-darkcard rounded-2xl p-6 shadow-sm border border-red-100 dark:border-red-900/30">
         <div class="flex justify-between items-start mb-4">
             <div>
-                <p class="text-sm font-medium text-red-800 dark:text-red-400/80 uppercase tracking-wider mb-1">Saídas Previstas</p>
-                <h3 class="text-3xl font-bold text-red-600 dark:text-red-500 valor-sensivel" id="dash-saidas">R$ 0,00</h3>
+                <p class="text-sm font-medium text-red-800 dark:text-red-400/80 uppercase tracking-wider mb-1">Saídas do Mês</p>
+                <h3 class="text-3xl font-bold text-red-600 dark:text-red-500 valor-sensivel" id="dash-saidas-mes">R$ 0,00</h3>
             </div>
             <div class="p-3 bg-red-50 dark:bg-red-900/20 text-red-500 rounded-xl">
                 <i class="fa-solid fa-arrow-trend-down text-xl"></i>
@@ -28,14 +40,15 @@
         </div>
     </div>
     
-    <div class="bg-white dark:bg-darkcard rounded-2xl p-6 shadow-sm border border-emerald-100 dark:border-emerald-900/30 relative overflow-hidden" id="dash-projecao-card">
-        <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-emerald-50 dark:bg-emerald-900/10 rounded-full blur-3xl z-0 pointer-events-none transition-colors duration-500" id="dash-projecao-bg"></div>
+    <!-- Card 3: Projeção de Sobra -->
+    <div class="bg-white dark:bg-darkcard rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-darkborder relative overflow-hidden" id="dash-projecao-card">
+        <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-gray-50 dark:bg-gray-900/10 rounded-full blur-3xl z-0 pointer-events-none transition-colors duration-500" id="dash-projecao-bg"></div>
         <div class="flex justify-between items-start mb-4 relative z-10">
             <div>
-                <p class="text-sm font-medium text-emerald-800 dark:text-emerald-400/80 uppercase tracking-wider mb-1" id="dash-projecao-label">Projeção de Sobra</p>
-                <h3 class="text-3xl font-bold text-emerald-600 dark:text-emerald-500 transition-colors duration-500 valor-sensivel" id="dash-projecao">R$ 0,00</h3>
+                <p class="text-sm font-medium text-gray-800 dark:text-gray-400 uppercase tracking-wider mb-1" id="dash-projecao-label">Fim do Mês / Sobra</p>
+                <h3 class="text-3xl font-bold text-gray-600 dark:text-gray-500 transition-colors duration-500 valor-sensivel" id="dash-projecao-sobra">R$ 0,00</h3>
             </div>
-            <div class="p-3 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-500 rounded-xl transition-colors duration-500" id="dash-projecao-icon">
+            <div class="p-3 bg-gray-50 dark:bg-gray-900/20 text-gray-500 rounded-xl transition-colors duration-500" id="dash-projecao-icon">
                 <i class="fa-solid fa-piggy-bank text-xl"></i>
             </div>
         </div>

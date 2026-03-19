@@ -78,8 +78,8 @@ class LancamentoRepository {
     public function resumoMes(int $instituicaoId, string $mesAno, ?int $categoriaId = null, ?int $contaFixa = null, string $busca = '') {
         $sql = "
             SELECT 
-                SUM(CASE WHEN p.data_pagamento IS NOT NULL THEN p.valor - p.desconto ELSE 0 END) as total_saidas,
-                SUM(CASE WHEN l.conta_fixa = 1 AND p.data_pagamento IS NOT NULL THEN p.valor - p.desconto ELSE 0 END) as custo_vida
+                SUM(p.valor - p.desconto) as total_saidas,
+                SUM(CASE WHEN l.conta_fixa = 1 THEN p.valor - p.desconto ELSE 0 END) as custo_vida
             FROM parcelas p
             JOIN lancamentos l ON p.lancamento_id = l.id
             WHERE l.instituicao_id = :instituicao_id

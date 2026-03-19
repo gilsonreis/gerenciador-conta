@@ -15,11 +15,15 @@ $repo = new CaixaRepository();
 $entradas = $repo->listarPorMes(AuthHelper::getInstituicaoId(), $mesAno);
 $resumo = $repo->resumoMes(AuthHelper::getInstituicaoId(), $mesAno);
 
+$total = (float)$resumo['total_recebido'] + (float)$resumo['total_pendente'];
+
 echo json_encode([
     'sucesso' => true, 
     'dados' => $entradas, 
     'resumo' => [
-        'total_entradas' => (float)$resumo,
-        'total_entradas_formatado' => 'R$ ' . number_format((float)$resumo, 2, ',', '.')
+        'total_confirmado' => $resumo['total_recebido'],
+        'total_pendente' => $resumo['total_pendente'],
+        'total_entradas' => $total,
+        'total_entradas_formatado' => 'R$ ' . number_format($total, 2, ',', '.')
     ]
 ]);

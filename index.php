@@ -164,13 +164,13 @@ if (strpos($pagina, '-') !== false) {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <!-- Scripts da Aplicação -->
-    <script src="assets/js/app.js"></script>
+    <script src="assets/js/app.js?v=<?= time() ?>"></script>
     <?php if ($pagina === 'auth-login'): ?>
-        <script src="assets/js/auth.js"></script>
+        <script src="assets/js/auth.js?v=<?= time() ?>"></script>
     <?php else: ?>
         <?php 
         if (isset($diretorio) && file_exists(__DIR__ . "/assets/js/{$diretorio}.js")) {
-            echo "<script src=\"assets/js/{$diretorio}.js\"></script>";
+            echo "<script src=\"assets/js/{$diretorio}.js?v=" . time() . "\"></script>";
         }
         ?>
     <?php endif; ?>
