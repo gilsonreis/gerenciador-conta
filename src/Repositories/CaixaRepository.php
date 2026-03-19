@@ -9,6 +9,7 @@ class CaixaRepository {
     }
 
     public function listarPorMes(int $instituicaoId, string $mesAno) {
+        $instWhere = $instituicaoId === 0 ? '' : 'AND ce.instituicao_id = :instituicao_id';
         $sql = "
             SELECT 
                 ce.id, 
@@ -19,24 +20,29 @@ class CaixaRepository {
                 ce.data_entrada
             FROM caixa_entradas ce
             JOIN contas c ON ce.conta_id = c.id
-            WHERE (:instituicao_id = 0 OR ce.instituicao_id = :instituicao_id)
-            AND DATE_FORMAT(ce.data_entrada, '%Y-%m') = :mes_ano
+            WHERE DATE_FORMAT(ce.data_entrada, '%Y-%m') = :mes_ano
+            $instWhere
             ORDER BY ce.data_entrada ASC
         ";
+        $params = ['mes_ano' => $mesAno];
+        if ($instituicaoId !== 0) $params['instituicao_id'] = $instituicaoId;
         $stmt = $this->db->prepare($sql);
-        $stmt->execute(['instituicao_id' => $instituicaoId, 'mes_ano' => $mesAno]);
+        $stmt->execute($params);
         return $stmt->fetchAll();
     }
 
     public function resumoMes(int $instituicaoId, string $mesAno) {
+        $instWhere = $instituicaoId === 0 ? '' : 'AND instituicao_id = :instituicao_id';
         $sql = "
             SELECT SUM(valor) as total_entradas
             FROM caixa_entradas
-            WHERE (:instituicao_id = 0 OR instituicao_id = :instituicao_id)
-            AND DATE_FORMAT(data_entrada, '%Y-%m') = :mes_ano
+            WHERE DATE_FORMAT(data_entrada, '%Y-%m') = :mes_ano
+            $instWhere
         ";
+        $params = ['mes_ano' => $mesAno];
+        if ($instituicaoId !== 0) $params['instituicao_id'] = $instituicaoId;
         $stmt = $this->db->prepare($sql);
-        $stmt->execute(['instituicao_id' => $instituicaoId, 'mes_ano' => $mesAno]);
+        $stmt->execute($params);
         return (float)($stmt->fetch()['total_entradas'] ?? 0);
     }
 

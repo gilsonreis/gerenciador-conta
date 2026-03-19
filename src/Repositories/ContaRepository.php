@@ -9,16 +9,28 @@ class ContaRepository {
     }
 
     public function listar(int $instituicaoId) {
-        $sql = "SELECT * FROM contas WHERE (:instituicao_id = 0 OR instituicao_id = :instituicao_id) ORDER BY nome ASC";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute(['instituicao_id' => $instituicaoId]);
+        if ($instituicaoId === 0) {
+            $sql = "SELECT * FROM contas ORDER BY nome ASC";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute();
+        } else {
+            $sql = "SELECT * FROM contas WHERE instituicao_id = :instituicao_id ORDER BY nome ASC";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['instituicao_id' => $instituicaoId]);
+        }
         return $stmt->fetchAll();
     }
 
     public function buscar(int $instituicaoId, int $id) {
-        $sql = "SELECT id, nome, saldo_inicial FROM contas WHERE id = :id AND (:instituicao_id = 0 OR instituicao_id = :instituicao_id)";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute(['id' => $id, 'instituicao_id' => $instituicaoId]);
+        if ($instituicaoId === 0) {
+            $sql = "SELECT id, nome, saldo_inicial FROM contas WHERE id = :id";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['id' => $id]);
+        } else {
+            $sql = "SELECT id, nome, saldo_inicial FROM contas WHERE id = :id AND instituicao_id = :instituicao_id";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['id' => $id, 'instituicao_id' => $instituicaoId]);
+        }
         return $stmt->fetch();
     }
 

@@ -9,12 +9,14 @@ class LancamentoRepository {
     }
 
     public function listarPorMes(int $instituicaoId, string $mesAno, ?int $categoriaId = null, ?int $contaFixa = null, int $pagina = 1, int $itensPorPagina = 20, string $busca = '') {
+        $instWhere = $instituicaoId === 0 ? '' : 'AND l.instituicao_id = :instituicao_id';
         $where = "
-            WHERE (:instituicao_id = 0 OR l.instituicao_id = :instituicao_id)
-            AND DATE_FORMAT(p.data_vencimento, '%Y-%m') = :mes_ano
+            WHERE DATE_FORMAT(p.data_vencimento, '%Y-%m') = :mes_ano
+            $instWhere
         ";
-        
-        $params = ['instituicao_id' => $instituicaoId, 'mes_ano' => $mesAno];
+
+        $params = ['mes_ano' => $mesAno];
+        if ($instituicaoId !== 0) $params['instituicao_id'] = $instituicaoId;
         
         if ($categoriaId !== null) {
             $where .= " AND l.categoria_id = :cat_id";
@@ -76,17 +78,19 @@ class LancamentoRepository {
     }
 
     public function resumoMes(int $instituicaoId, string $mesAno, ?int $categoriaId = null, ?int $contaFixa = null, string $busca = '') {
+        $instWhere = $instituicaoId === 0 ? '' : 'AND l.instituicao_id = :instituicao_id';
         $sql = "
             SELECT 
                 SUM(p.valor - p.desconto) as total_saidas,
                 SUM(CASE WHEN l.conta_fixa = 1 THEN p.valor - p.desconto ELSE 0 END) as custo_vida
             FROM parcelas p
             JOIN lancamentos l ON p.lancamento_id = l.id
-            WHERE (:instituicao_id = 0 OR l.instituicao_id = :instituicao_id)
-            AND DATE_FORMAT(p.data_vencimento, '%Y-%m') = :mes_ano
+            WHERE DATE_FORMAT(p.data_vencimento, '%Y-%m') = :mes_ano
+            $instWhere
         ";
 
-        $params = ['instituicao_id' => $instituicaoId, 'mes_ano' => $mesAno];
+        $params = ['mes_ano' => $mesAno];
+        if ($instituicaoId !== 0) $params['instituicao_id'] = $instituicaoId;
         
         if ($categoriaId !== null) {
             $sql .= " AND l.categoria_id = :cat_id";

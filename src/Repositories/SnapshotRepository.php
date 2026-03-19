@@ -31,25 +31,25 @@ class SnapshotRepository {
      * Se não houver snapshot, retorna null (para ativar o fallback no dashboard).
      */
     public function somaAberturaMes(int $instituicaoId, string $mesAno): ?float {
-        // mes_referencia é sempre o dia 01 do mês
         $mesReferencia = $mesAno . '-01';
+        $instWhere = $instituicaoId === 0 ? '' : 'AND c.instituicao_id = :instituicao_id';
 
         $sql = "
             SELECT SUM(ss.valor_abertura) as total_abertura
             FROM snapshots_saldos ss
             JOIN contas c ON ss.conta_id = c.id
-            WHERE (:instituicao_id = 0 OR c.instituicao_id = :instituicao_id)
-            AND ss.mes_referencia = :mes_referencia
+            WHERE ss.mes_referencia = :mes_referencia
+            $instWhere
         ";
+        $params = ['mes_referencia' => $mesReferencia];
+        if ($instituicaoId !== 0) $params['instituicao_id'] = $instituicaoId;
+
         $stmt = $this->db->prepare($sql);
-        $stmt->execute([
-            'instituicao_id' => $instituicaoId,
-            'mes_referencia' => $mesReferencia,
-        ]);
+        $stmt->execute($params);
         $row = $stmt->fetch();
 
         if ($row === false || $row['total_abertura'] === null) {
-            return null; // Nenhum snapshot encontrado para este mês
+            return null;
         }
 
         return (float)$row['total_abertura'];
@@ -60,19 +60,19 @@ class SnapshotRepository {
      */
     public function listarPorMes(int $instituicaoId, string $mesAno): array {
         $mesReferencia = $mesAno . '-01';
+        $instWhere = $instituicaoId === 0 ? '' : 'AND c.instituicao_id = :instituicao_id';
         $sql = "
             SELECT ss.id, c.nome as conta_nome, ss.valor_abertura, ss.mes_referencia, ss.criado_em
             FROM snapshots_saldos ss
             JOIN contas c ON ss.conta_id = c.id
-            WHERE (:instituicao_id = 0 OR c.instituicao_id = :instituicao_id)
-            AND ss.mes_referencia = :mes_referencia
+            WHERE ss.mes_referencia = :mes_referencia
+            $instWhere
             ORDER BY c.nome
         ";
+        $params = ['mes_referencia' => $mesReferencia];
+        if ($instituicaoId !== 0) $params['instituicao_id'] = $instituicaoId;
         $stmt = $this->db->prepare($sql);
-        $stmt->execute([
-            'instituicao_id' => $instituicaoId,
-            'mes_referencia' => $mesReferencia,
-        ]);
+        $stmt->execute($params);
         return $stmt->fetchAll();
     }
 }
