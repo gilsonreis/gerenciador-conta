@@ -1,8 +1,14 @@
 <?php
 require_once __DIR__ . '/../../src/Helpers/AuthHelper.php';
 require_once __DIR__ . '/../../src/Repositories/UsuarioRepository.php';
+require_once __DIR__ . '/../../src/Services/AclService.php';
 
 AuthHelper::requireLogin();
+AclService::check('usuarios');
+
+// Regra RBAC: admin não pode escolher a instituição do novo usuário
+// A instituição é sempre a do próprio admin logado
+$instituicaoId = AuthHelper::getInstituicaoId();
 
 $nome = trim($_POST['nome'] ?? '');
 $email = trim($_POST['email'] ?? '');

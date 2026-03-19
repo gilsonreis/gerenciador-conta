@@ -1,8 +1,10 @@
 <?php
 require_once __DIR__ . '/../../src/Helpers/AuthHelper.php';
 require_once __DIR__ . '/../../src/Repositories/LancamentoRepository.php';
+require_once __DIR__ . '/../../src/Services/AclService.php';
 
 AuthHelper::requireLogin();
+AclService::check('write');
 
 // Observação: Excluímos pelo lancamento_id pois apagaremos toda a cadeia dessa despesa
 $lancamento_id = filter_input(INPUT_POST, 'lancamento_id', FILTER_VALIDATE_INT);

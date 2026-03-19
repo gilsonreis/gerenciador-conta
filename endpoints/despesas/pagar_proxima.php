@@ -1,8 +1,10 @@
 <?php
 require_once __DIR__ . '/../../src/Helpers/AuthHelper.php';
 require_once __DIR__ . '/../../src/Repositories/ParcelaRepository.php';
+require_once __DIR__ . '/../../src/Services/AclService.php';
 
 AuthHelper::requireLogin();
+AclService::check('write');
 
 $lancamentoId = filter_input(INPUT_POST, 'lancamento_id', FILTER_VALIDATE_INT);
 $dataPagamento = filter_input(INPUT_POST, 'data_pagamento', FILTER_SANITIZE_SPECIAL_CHARS);

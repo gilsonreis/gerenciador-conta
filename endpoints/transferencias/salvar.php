@@ -2,8 +2,10 @@
 require_once __DIR__ . '/../../src/Helpers/AuthHelper.php';
 require_once __DIR__ . '/../../src/Repositories/TransferenciaRepository.php';
 require_once __DIR__ . '/../../src/Services/BalanceService.php';
+require_once __DIR__ . '/../../src/Services/AclService.php';
 
 AuthHelper::requireLogin();
+AclService::check('transferencias');
 
 $repo   = new TransferenciaRepository();
 $dados  = $_POST;

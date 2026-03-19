@@ -1,8 +1,10 @@
 <?php
 require_once __DIR__ . '/../../src/Helpers/AuthHelper.php';
 require_once __DIR__ . '/../../src/Repositories/TransferenciaRepository.php';
+require_once __DIR__ . '/../../src/Services/AclService.php';
 
 AuthHelper::requireLogin();
+AclService::check('transferencias');
 
 $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
 

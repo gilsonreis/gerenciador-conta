@@ -33,6 +33,9 @@ if (strpos($pagina, '-') !== false) {
         $conteudo_view = $fullFilePath;
     }
 }
+
+// RBAC: disponibiliza role para as views
+$role = $_SESSION['usuario_role'] ?? 'reader';
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR" class="dark">
@@ -99,9 +102,13 @@ if (strpos($pagina, '-') !== false) {
             <p class="px-4 pt-4 pb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Configurações</p>
             <a href="?pagina=instituicoes-listar" class="flex items-center gap-3 py-3 px-4 rounded-lg transition duration-200 hover:bg-gray-50 dark:hover:bg-white/5 <?= str_starts_with($pagina, 'instituicoes') ? 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-blue-400' : 'text-gray-600 dark:text-gray-300' ?>"><i class="fa-solid fa-building w-5 text-center"></i> Instituições</a>
             <a href="?pagina=contas-listar" class="flex items-center gap-3 py-3 px-4 rounded-lg transition duration-200 hover:bg-gray-50 dark:hover:bg-white/5 <?= $pagina === 'contas-listar' ? 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-blue-400' : 'text-gray-600 dark:text-gray-300' ?>"><i class="fa-solid fa-building-columns w-5 text-center"></i> Contas Bancárias</a>
+            <?php if ($role !== 'manager' && $role !== 'reader'): ?>
             <a href="?pagina=contas-transferencias" class="flex items-center gap-3 py-3 px-4 rounded-lg transition duration-200 hover:bg-gray-50 dark:hover:bg-white/5 <?= $pagina === 'contas-transferencias' ? 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-blue-400' : 'text-gray-600 dark:text-gray-300' ?>"><i class="fa-solid fa-money-bill-transfer w-5 text-center"></i> Transferências</a>
+            <?php endif; ?>
             <a href="?pagina=categorias-listar" class="flex items-center gap-3 py-3 px-4 rounded-lg transition duration-200 hover:bg-gray-50 dark:hover:bg-white/5 <?= str_starts_with($pagina, 'categorias') ? 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-blue-400' : 'text-gray-600 dark:text-gray-300' ?>"><i class="fa-solid fa-tags w-5 text-center"></i> Categorias</a>
+            <?php if ($role !== 'manager' && $role !== 'reader'): ?>
             <a href="?pagina=usuarios-listar" class="flex items-center gap-3 py-3 px-4 rounded-lg transition duration-200 hover:bg-gray-50 dark:hover:bg-white/5 <?= str_starts_with($pagina, 'usuarios') ? 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-blue-400' : 'text-gray-600 dark:text-gray-300' ?>"><i class="fa-solid fa-users w-5 text-center"></i> Usuários</a>
+            <?php endif; ?>
             
             <p class="px-4 pt-4 pb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Análise</p>
             <a href="?pagina=relatorios-index" class="flex items-center gap-3 py-3 px-4 rounded-lg transition duration-200 hover:bg-gray-50 dark:hover:bg-white/5 <?= str_starts_with($pagina, 'relatorios') ? 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-blue-400' : 'text-gray-600 dark:text-gray-300' ?>"><i class="fa-solid fa-chart-pie w-5 text-center"></i> Relatórios</a>
@@ -165,6 +172,13 @@ if (strpos($pagina, '-') !== false) {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <!-- Scripts da Aplicação -->
+    <script>
+        // RBAC: role disponibilizado para os scripts de cada página
+        window.userRole = '<?= htmlspecialchars($role) ?>';
+        window.canWrite = !['reader'].includes(window.userRole);
+        window.canTransfer = !['reader', 'manager'].includes(window.userRole);
+        window.canManageUsers = !['reader', 'manager'].includes(window.userRole);
+    </script>
     <script src="assets/js/app.js?v=<?= time() ?>"></script>
     <?php if ($pagina === 'auth-login'): ?>
         <script src="assets/js/auth.js?v=<?= time() ?>"></script>

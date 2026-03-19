@@ -15,10 +15,11 @@ $repo = new UsuarioRepository();
 $usuario = $repo->autenticar($email, $senha);
 
 if ($usuario) {
-    $_SESSION['usuario_id'] = $usuario['id'];
+    $_SESSION['usuario_id']     = $usuario['id'];
     $_SESSION['instituicao_id'] = $usuario['instituicao_id'];
-    $_SESSION['usuario_nome'] = $usuario['nome'];
-    
+    $_SESSION['usuario_nome']   = $usuario['nome'];
+    $_SESSION['usuario_role']   = $usuario['role'] ?? 'admin'; // fallback seguro
+
     echo json_encode(['sucesso' => true]);
 } else {
     http_response_code(401);

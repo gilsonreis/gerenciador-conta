@@ -2,8 +2,10 @@
 require_once __DIR__ . '/../../src/Helpers/AuthHelper.php';
 require_once __DIR__ . '/../../src/Repositories/LancamentoRepository.php';
 require_once __DIR__ . '/../../src/Repositories/ParcelaRepository.php';
+require_once __DIR__ . '/../../src/Services/AclService.php';
 
 AuthHelper::requireLogin();
+AclService::check('write');
 
 $lancamentoId = filter_input(INPUT_POST, 'lancamento_id', FILTER_VALIDATE_INT);
 $dados = $_POST;

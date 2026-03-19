@@ -1,8 +1,10 @@
 <?php
 require_once __DIR__ . '/../../src/Helpers/AuthHelper.php';
 require_once __DIR__ . '/../../src/Repositories/CaixaRepository.php';
+require_once __DIR__ . '/../../src/Services/AclService.php';
 
 AuthHelper::requireLogin();
+AclService::check('write');
 
 $contaId = filter_input(INPUT_POST, 'conta_id', FILTER_VALIDATE_INT);
 $valor_raw = trim($_POST['valor'] ?? '');

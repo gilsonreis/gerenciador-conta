@@ -1,8 +1,10 @@
 <?php
 require_once __DIR__ . '/../../src/Helpers/AuthHelper.php';
 require_once __DIR__ . '/../../src/Repositories/ParcelaRepository.php';
+require_once __DIR__ . '/../../src/Services/AclService.php';
 
 AuthHelper::requireLogin();
+AclService::check('write');
 
 $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
 $isEstorno = filter_input(INPUT_POST, 'estorno', FILTER_VALIDATE_INT);

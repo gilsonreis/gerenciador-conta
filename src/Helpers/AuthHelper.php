@@ -15,4 +15,12 @@ class AuthHelper {
     public static function getUsuarioId(): int {
         return $_SESSION['usuario_id'] ?? 0;
     }
+
+    public static function getRole(): string {
+        return $_SESSION['usuario_role'] ?? 'reader';
+    }
+
+    public static function isSuperAdmin(): bool {
+        return self::getRole() === 'super_admin';
+    }
 }
