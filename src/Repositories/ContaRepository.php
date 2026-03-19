@@ -45,6 +45,14 @@ class ContaRepository {
         }
     }
 
+    /**
+     * @deprecated Usa soma histórica acumulada desde o início dos tempos.
+     *             Não use em endpoints de listagem ou validações.
+     *             Cada consumidor deve usar: BalanceService::getSaldosInstituicao()
+     *
+     *             Este método é mantido exclusivamente para o cron de snapshots
+     *             (cron/salvar_snapshots.php), onde o saldo acumulado real é necessário.
+     */
     public function saldos(int $instituicaoId) {
         $sql = "
             SELECT 

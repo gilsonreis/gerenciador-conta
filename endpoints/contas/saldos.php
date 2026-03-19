@@ -1,15 +1,12 @@
 <?php
 require_once __DIR__ . '/../../src/Helpers/AuthHelper.php';
-require_once __DIR__ . '/../../src/Repositories/ContaRepository.php';
+require_once __DIR__ . '/../../src/Services/BalanceService.php';
 
 AuthHelper::requireLogin();
 
-$repo = new ContaRepository();
-$saldos = $repo->saldos(AuthHelper::getInstituicaoId());
+$mesAno = $_GET['mes'] ?? date('Y-m');
 
-// Formatando para BRL
-foreach ($saldos as &$conta) {
-    $conta['saldo_atual_formatado'] = 'R$ ' . number_format((float)$conta['saldo_atual_real'], 2, ',', '.');
-}
+$service = new BalanceService();
+$saldos  = $service->getSaldosInstituicao(AuthHelper::getInstituicaoId(), $mesAno);
 
 echo json_encode(['sucesso' => true, 'dados' => $saldos]);
