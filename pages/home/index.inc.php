@@ -4,25 +4,15 @@
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-    <!-- Card 1: Capital Disponível (Matemático) -->
+    <!-- Card 1: Capital Disponível -->
     <div class="bg-white dark:bg-darkcard rounded-2xl p-6 shadow-sm border border-blue-100 dark:border-blue-900/30">
-        <div class="flex justify-between items-start mb-2">
-            <p class="text-xs font-semibold text-blue-800/60 dark:text-blue-400/50 uppercase tracking-wider">Capital Disponível</p>
-            <i class="fa-solid fa-vault text-blue-500/50"></i>
-        </div>
-        <div class="space-y-1">
-            <div class="flex justify-between text-sm text-gray-500 dark:text-gray-400">
-                <span>Saldo Atual:</span>
-                <span id="dash-saldo-atual" class="font-mono valor-sensivel">R$ 0,00</span>
+        <div class="flex justify-between items-start mb-4">
+            <div>
+                <p class="text-sm font-medium text-blue-800 dark:text-blue-400/80 uppercase tracking-wider mb-1">Capital Disponível</p>
+                <h3 class="text-3xl font-bold text-blue-600 dark:text-blue-500 valor-sensivel" id="dash-capital-disponivel">R$ 0,00</h3>
             </div>
-            <div class="flex justify-between text-sm text-gray-500 dark:text-gray-400">
-                <span>+ Entradas a Receber:</span>
-                <span id="dash-entradas-receber" class="font-mono valor-sensivel">R$ 0,00</span>
-            </div>
-            <hr class="border-gray-100 dark:border-darkborder my-2">
-            <div class="pt-1">
-                <p class="text-xs text-blue-500 font-medium mb-0.5">Total Disponível:</p>
-                <h3 class="text-3xl font-black text-blue-600 dark:text-blue-400 valor-sensivel" id="dash-total-caixa">R$ 0,00</h3>
+            <div class="p-3 bg-blue-50 dark:bg-blue-900/20 text-blue-500 rounded-xl">
+                <i class="fa-solid fa-vault text-xl"></i>
             </div>
         </div>
     </div>
