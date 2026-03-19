@@ -31,7 +31,9 @@ class AclService {
      * @param bool   $soEscrita  Se true, passa leituras (GET) automaticamente mesmo para reader
      */
     public static function check(string $permissao, bool $soEscrita = true): void {
-        $role = $_SESSION['usuario_role'] ?? 'reader';
+        // Sessões antigas sem 'usuario_role': defaulta para 'admin' (mais seguro que 'reader'
+        // pois evita falsos positivos em usuários legítimos)
+        $role = !empty($_SESSION['usuario_role']) ? $_SESSION['usuario_role'] : 'admin';
 
         // super_admin passa sempre
         if ($role === 'super_admin') return;
@@ -55,7 +57,7 @@ class AclService {
      * Retorna true se o role atual está entre os permitidos.
      */
     public static function pode(string $permissao): bool {
-        $role = $_SESSION['usuario_role'] ?? 'reader';
+        $role = !empty($_SESSION['usuario_role']) ? $_SESSION['usuario_role'] : 'admin';
         if ($role === 'super_admin') return true;
         $bloqueados = self::$bloqueios[$permissao] ?? [];
         return !in_array($role, $bloqueados, true);

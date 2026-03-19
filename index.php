@@ -100,7 +100,9 @@ $role = $_SESSION['usuario_role'] ?? 'reader';
             <a href="?pagina=despesas-listar" class="flex items-center gap-3 py-3 px-4 rounded-lg transition duration-200 hover:bg-gray-50 dark:hover:bg-white/5 <?= str_starts_with($pagina, 'despesas') ? 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-blue-400' : 'text-gray-600 dark:text-gray-300' ?>"><i class="fa-solid fa-arrow-trend-down text-red-500 w-5 text-center"></i> Despesas</a>
             
             <p class="px-4 pt-4 pb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Configurações</p>
+            <?php if ($role === 'super_admin'): ?>
             <a href="?pagina=instituicoes-listar" class="flex items-center gap-3 py-3 px-4 rounded-lg transition duration-200 hover:bg-gray-50 dark:hover:bg-white/5 <?= str_starts_with($pagina, 'instituicoes') ? 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-blue-400' : 'text-gray-600 dark:text-gray-300' ?>"><i class="fa-solid fa-building w-5 text-center"></i> Instituições</a>
+            <?php endif; ?>
             <a href="?pagina=contas-listar" class="flex items-center gap-3 py-3 px-4 rounded-lg transition duration-200 hover:bg-gray-50 dark:hover:bg-white/5 <?= $pagina === 'contas-listar' ? 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-blue-400' : 'text-gray-600 dark:text-gray-300' ?>"><i class="fa-solid fa-building-columns w-5 text-center"></i> Contas Bancárias</a>
             <?php if ($role !== 'manager' && $role !== 'reader'): ?>
             <a href="?pagina=contas-transferencias" class="flex items-center gap-3 py-3 px-4 rounded-lg transition duration-200 hover:bg-gray-50 dark:hover:bg-white/5 <?= $pagina === 'contas-transferencias' ? 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-blue-400' : 'text-gray-600 dark:text-gray-300' ?>"><i class="fa-solid fa-money-bill-transfer w-5 text-center"></i> Transferências</a>
