@@ -5,42 +5,41 @@ require_once __DIR__ . '/../../src/Repositories/CaixaRepository.php';
 require_once __DIR__ . '/../../src/Repositories/ContaRepository.php';
 
 AuthHelper::requireLogin();
-
+$instituicaoId = AuthHelper::getInstituicaoId();
 $mesAno = $_GET['mes'] ?? date('Y-m');
 
-// 1. Saldo Real hoje (Total em todas as contas)
+// 1. Saldo Real hoje (Sum of all accounts - matches "Saldos Reais" box)
 $repoConta = new ContaRepository();
-$saldosContas = $repoConta->saldos(AuthHelper::getInstituicaoId());
-$totalReal = 0;
+$saldosContas = $repoConta->saldos($instituicaoId);
+$totalNasContas = 0;
 foreach ($saldosContas as $c) {
-    $totalReal += (float)$c['saldo_atual_real'];
+    $totalNasContas += (float)$c['saldo_atual_real'];
 }
 
-// 2. Entradas do Mês (Já recebidas)
+// 2. Entradas do Mês (Total registered in the month)
 $repoCaixa = new CaixaRepository();
-$entradasMes = (float)$repoCaixa->resumoMes(AuthHelper::getInstituicaoId(), $mesAno);
+$entradasMes = (float)$repoCaixa->resumoMes(instituicaoId, $mesAno);
 
-// 3. Composição Matemática (Para evitar duplicidade no visual "fator A + fator B = Total")
-// Saldo Base (Anterior) + Entradas do Mês = Total Real
-$saldoBase = $totalReal - $entradasMes;
+// 3. Mathematical Sum (Per user's explicit request: Bank Total + Monthly Income = Total Available)
+$totalDisponivel = $totalNasContas + $entradasMes;
 
-// 4. Saídas do Mês (Total: Pagas + Pendentes)
+// 4. Saídas do Mês (Total: Paid + Pending)
 $repoLancamento = new LancamentoRepository();
-$resumoDespesas = $repoLancamento->resumoMes(AuthHelper::getInstituicaoId(), $mesAno);
+$resumoDespesas = $repoLancamento->resumoMes(instituicaoId, $mesAno);
 $saidasMes = (float)($resumoDespesas['total_saidas'] ?? 0);
 $custoVida = (float)($resumoDespesas['custo_vida'] ?? 0);
 
-// 5. Projeção de Sobra (Total Real - Saídas Totais)
-$projecaoSobra = $totalReal - $saidasMes;
+// 5. Projeção de Sobra (Unified Total Available - Total Expenses)
+$projecaoSobra = $totalDisponivel - $saidasMes;
 
 echo json_encode([
     'sucesso' => true,
-    'saldo_base' => $saldoBase,
-    'saldo_base_formatado' => 'R$ ' . number_format($saldoBase, 2, ',', '.'),
+    'saldo_base' => $totalNasContas,
+    'saldo_base_formatado' => 'R$ ' . number_format($totalNasContas, 2, ',', '.'),
     'entradas_mes' => $entradasMes,
     'entradas_mes_formatado' => 'R$ ' . number_format($entradasMes, 2, ',', '.'),
-    'total_disponivel' => $totalReal,
-    'total_disponivel_formatado' => 'R$ ' . number_format($totalReal, 2, ',', '.'),
+    'total_disponivel' => $totalDisponivel,
+    'total_disponivel_formatado' => 'R$ ' . number_format($totalDisponivel, 2, ',', '.'),
     'saidas_mes' => $saidasMes,
     'saidas_mes_formatado' => 'R$ ' . number_format($saidasMes, 2, ',', '.'),
     'projecao_sobra' => $projecaoSobra,
