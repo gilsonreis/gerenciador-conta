@@ -4,14 +4,14 @@
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-    <div class="bg-white dark:bg-darkcard rounded-2xl p-6 shadow-sm border border-emerald-100 dark:border-emerald-900/30">
+    <div class="bg-white dark:bg-darkcard rounded-2xl p-6 shadow-sm border border-blue-100 dark:border-blue-900/30">
         <div class="flex justify-between items-start mb-4">
             <div>
-                <p class="text-sm font-medium text-emerald-800 dark:text-emerald-400/80 uppercase tracking-wider mb-1">Entradas Previstas</p>
-                <h3 class="text-3xl font-bold text-emerald-600 dark:text-emerald-500 valor-sensivel" id="dash-entradas">R$ 0,00</h3>
+                <p class="text-sm font-medium text-blue-800 dark:text-blue-400/80 uppercase tracking-wider mb-1">Capital Disponível</p>
+                <h3 class="text-3xl font-bold text-blue-600 dark:text-blue-500 valor-sensivel" id="dash-capital">R$ 0,00</h3>
             </div>
-            <div class="p-3 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-500 rounded-xl">
-                <i class="fa-solid fa-arrow-trend-up text-xl"></i>
+            <div class="p-3 bg-blue-50 dark:bg-blue-900/20 text-blue-500 rounded-xl">
+                <i class="fa-solid fa-vault text-xl"></i>
             </div>
         </div>
     </div>
@@ -28,15 +28,15 @@
         </div>
     </div>
     
-    <div class="bg-white dark:bg-darkcard rounded-2xl p-6 shadow-sm border border-blue-100 dark:border-blue-900/30 relative overflow-hidden" id="dash-saldo-card">
-        <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-blue-50 dark:bg-blue-900/10 rounded-full blur-3xl z-0 pointer-events-none transition-colors duration-500" id="dash-saldo-bg"></div>
+    <div class="bg-white dark:bg-darkcard rounded-2xl p-6 shadow-sm border border-emerald-100 dark:border-emerald-900/30 relative overflow-hidden" id="dash-projecao-card">
+        <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-emerald-50 dark:bg-emerald-900/10 rounded-full blur-3xl z-0 pointer-events-none transition-colors duration-500" id="dash-projecao-bg"></div>
         <div class="flex justify-between items-start mb-4 relative z-10">
             <div>
-                <p class="text-sm font-medium text-blue-800 dark:text-blue-400/80 uppercase tracking-wider mb-1" id="dash-saldo-label">Saldo do Mês</p>
-                <h3 class="text-3xl font-bold text-blue-600 dark:text-blue-500 transition-colors duration-500 valor-sensivel" id="dash-saldo">R$ 0,00</h3>
+                <p class="text-sm font-medium text-emerald-800 dark:text-emerald-400/80 uppercase tracking-wider mb-1" id="dash-projecao-label">Projeção de Sobra</p>
+                <h3 class="text-3xl font-bold text-emerald-600 dark:text-emerald-500 transition-colors duration-500 valor-sensivel" id="dash-projecao">R$ 0,00</h3>
             </div>
-            <div class="p-3 bg-blue-50 dark:bg-blue-900/20 text-blue-500 rounded-xl transition-colors duration-500" id="dash-saldo-icon">
-                <i class="fa-solid fa-scale-balanced text-xl"></i>
+            <div class="p-3 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-500 rounded-xl transition-colors duration-500" id="dash-projecao-icon">
+                <i class="fa-solid fa-piggy-bank text-xl"></i>
             </div>
         </div>
     </div>
