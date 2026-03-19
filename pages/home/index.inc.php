@@ -1,3 +1,6 @@
+<?php if ($role === 'super_admin'): ?>
+<?php require_once __DIR__ . '/_super_admin_dashboard.inc.php'; ?>
+<?php else: ?>
 <div>
     <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-2">Visão Geral</h2>
     <p class="text-gray-500 dark:text-gray-400 mb-8">Acompanhe a saúde financeira da sua família no mês atual.</p>
@@ -144,4 +147,4 @@
         </div>
     </div>
 </div>
-
+<?php endif; ?>
