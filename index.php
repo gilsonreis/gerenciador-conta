@@ -105,6 +105,7 @@ if (strpos($pagina, '-') !== false) {
             
             <p class="px-4 pt-4 pb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Análise</p>
             <a href="?pagina=relatorios-index" class="flex items-center gap-3 py-3 px-4 rounded-lg transition duration-200 hover:bg-gray-50 dark:hover:bg-white/5 <?= str_starts_with($pagina, 'relatorios') ? 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-blue-400' : 'text-gray-600 dark:text-gray-300' ?>"><i class="fa-solid fa-chart-pie w-5 text-center"></i> Relatórios</a>
+            <a href="?pagina=snapshots-listar" class="flex items-center gap-3 py-3 px-4 rounded-lg transition duration-200 hover:bg-gray-50 dark:hover:bg-white/5 <?= str_starts_with($pagina, 'snapshots') ? 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-blue-400' : 'text-gray-600 dark:text-gray-300' ?>"><i class="fa-solid fa-camera-retro w-5 text-center"></i> Saldos de Abertura</a>
         </nav>
         <div class="p-4 mt-auto">
             <a href="?pagina=auth-logout" class="flex justify-center items-center gap-2 w-full py-2.5 px-4 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition"><i class="fa-solid fa-right-from-bracket"></i> Sair</a>
