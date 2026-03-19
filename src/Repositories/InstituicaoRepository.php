@@ -54,7 +54,30 @@ class InstituicaoRepository {
 
         if (empty($dados['id'])) {
             $stmt = $this->db->prepare("INSERT INTO instituicoes (nome) VALUES (?)");
-            return $stmt->execute([$dados['nome']]);
+            if (!$stmt->execute([$dados['nome']])) return false;
+
+            // Seed: categorias padrão para a nova instituição
+            $novaInstId = (int)$this->db->lastInsertId();
+            $categoriasPadrao = [
+                'Alimentação',
+                'Moradia',
+                'Transporte',
+                'Lazer e Streaming',
+                'Educação',
+                'Cartão de Crédito',
+                'Delivery',
+                'Compras avulsas',
+                'Ferramenta de Trabalho / IA',
+                'Imposto',
+                'Farmácia / Saúde',
+                'Internet & Celular',
+            ];
+            $stmtCat = $this->db->prepare("INSERT INTO categorias (instituicao_id, nome) VALUES (?, ?)");
+            foreach ($categoriasPadrao as $cat) {
+                $stmtCat->execute([$novaInstId, $cat]);
+            }
+
+            return true;
         } else {
             $stmt = $this->db->prepare("UPDATE instituicoes SET nome = ? WHERE id = ?");
             return $stmt->execute([$dados['nome'], $dados['id']]);
