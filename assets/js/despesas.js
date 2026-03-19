@@ -213,8 +213,13 @@ const despesasJS = {
         const status = $('#despesa_status').val();
         const container = $('#container-conta-pagamento');
         const select = $('#conta_pagamento_id');
+        const dataPgto = $('#data_pagamento');
 
         if (status === 'pago') {
+            // Pre-preenche com hoje se estiver vazio e não for edição bloqueada
+            if (!dataPgto.prop('disabled') && !dataPgto.val()) {
+                dataPgto.val(new Date().toISOString().substring(0, 10));
+            }
             container.slideDown(200).removeClass('hidden');
             select.prop('required', true);
         } else {
@@ -222,6 +227,7 @@ const despesasJS = {
                 $(this).addClass('hidden');
             });
             select.prop('required', false).val('');
+            dataPgto.val('');
         }
     },
 
@@ -245,6 +251,10 @@ const despesasJS = {
                 
                 // Reseta status e conta
                 $('#despesa_status').val('pendente');
+                // Reseta campo de data de pagamento
+                $('#data_pagamento').val('').prop('disabled', false);
+                $('#data-pagamento-hint').removeClass('hidden');
+                $('#data-pagamento-locked-hint').addClass('hidden');
                 this.toggleContaPagamento();
 
                 this.mostrarModal();

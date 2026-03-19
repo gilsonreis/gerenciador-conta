@@ -110,6 +110,22 @@
                 <p class="text-[10px] text-amber-600 dark:text-amber-400 mt-1 flex items-center gap-1">
                     <i class="fa-solid fa-circle-info"></i> No parcelamento, apenas a 1ª parcela será baixada agora.
                 </p>
+
+                <!-- Data de Pagamento (Regime de Caixa) -->
+                <div class="mt-3">
+                    <label for="data_pagamento" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        <i class="fa-solid fa-calendar-check text-primary mr-1 text-xs"></i>
+                        Data de Pagamento
+                    </label>
+                    <input type="date" id="data_pagamento" name="data_pagamento"
+                        class="w-full px-4 py-2.5 bg-white dark:bg-[#121212] border border-gray-300 dark:border-darkborder rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-gray-900 dark:text-white transition-colors [color-scheme:light] dark:[color-scheme:dark]">
+                    <p id="data-pagamento-hint" class="text-[10px] text-gray-400 dark:text-gray-500 mt-1">
+                        Pode informar uma data retroativa se o pagamento já ocorreu.
+                    </p>
+                    <p id="data-pagamento-locked-hint" class="text-[10px] text-amber-600 dark:text-amber-400 mt-1 hidden flex items-center gap-1">
+                        <i class="fa-solid fa-lock"></i> Data bloqueada para preservar o histórico de caixa.
+                    </p>
+                </div>
             </div>
 
             <!-- Actions -->
