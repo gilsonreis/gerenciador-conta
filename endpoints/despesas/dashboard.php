@@ -18,14 +18,14 @@ foreach ($saldosContas as $c) {
 
 // 2. Entradas do Mês (Total registered in the month)
 $repoCaixa = new CaixaRepository();
-$entradasMes = (float)$repoCaixa->resumoMes(instituicaoId, $mesAno);
+$entradasMes = (float)$repoCaixa->resumoMes($instituicaoId, $mesAno);
 
 // 3. Mathematical Sum (Per user's explicit request: Bank Total + Monthly Income = Total Available)
 $totalDisponivel = $totalNasContas + $entradasMes;
 
 // 4. Saídas do Mês (Total: Paid + Pending)
 $repoLancamento = new LancamentoRepository();
-$resumoDespesas = $repoLancamento->resumoMes(instituicaoId, $mesAno);
+$resumoDespesas = $repoLancamento->resumoMes($instituicaoId, $mesAno);
 $saidasMes = (float)($resumoDespesas['total_saidas'] ?? 0);
 $custoVida = (float)($resumoDespesas['custo_vida'] ?? 0);
 
