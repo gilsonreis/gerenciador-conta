@@ -51,6 +51,32 @@
                 </div>
             </div>
 
+            <!-- Perfil / Role -->
+            <div class="mb-4">
+                <label for="usuario_role" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Perfil de Acesso</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fa-solid fa-shield-halved text-gray-400"></i>
+                    </div>
+                    <select id="usuario_role" name="role" required
+                        class="pl-10 w-full px-4 py-2 bg-white dark:bg-[#121212] border border-gray-300 dark:border-darkborder rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-gray-900 dark:text-white transition-colors appearance-none">
+                        <?php if (($_SESSION['usuario_role'] ?? '') === 'super_admin'): ?>
+                        <option value="super_admin">👑 Super Admin</option>
+                        <?php endif; ?>
+                        <option value="admin" selected>🔑 Admin</option>
+                        <option value="manager">📊 Gestor</option>
+                        <option value="reader">👁️ Leitor</option>
+                    </select>
+                </div>
+                <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                    <?php if (($_SESSION['usuario_role'] ?? '') === 'super_admin'): ?>
+                    Admin controla tudo na instituição · Gestor lança e paga · Leitor apenas visualiza
+                    <?php else: ?>
+                    Gestor pode lançar e pagar despesas · Leitor apenas visualiza
+                    <?php endif; ?>
+                </p>
+            </div>
+
             <div class="mb-4" id="bloco-alertas" style="display: none;">
                 <label class="flex items-center gap-2 cursor-pointer group p-3 border border-gray-200 dark:border-darkborder rounded-lg hover:border-primary/50 dark:hover:border-primary/50 transition-colors">
                     <input type="checkbox" id="usuario_recebe_alertas" name="recebe_alertas" value="1" checked

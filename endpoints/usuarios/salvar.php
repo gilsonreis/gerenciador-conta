@@ -25,7 +25,23 @@ $nome  = trim($_POST['nome']  ?? '');
 $email = trim($_POST['email'] ?? '');
 $senha = $_POST['senha'] ?? '';
 $id    = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT) ?: null;
-$role  = $_POST['role'] ?? null;
+$role  = $_POST['role'] ?? 'admin';
+
+// ── Blindagem de escalada de privilégio ───────────────────────────────
+// Mapeia quais roles o usuário logado pode atribuir
+$callerRole = AuthHelper::getRole();
+$rolesPermitidos = match($callerRole) {
+    'super_admin' => ['super_admin', 'admin', 'manager', 'reader'],
+    'admin'       => ['admin', 'manager', 'reader'],
+    default       => [], // gestor/leitor não cadastram ninguém (AclService já bloqueia)
+};
+
+if (!in_array($role, $rolesPermitidos, true)) {
+    http_response_code(403);
+    echo json_encode(['erro' => 'Você não tem permissão para atribuir o perfil selecionado.']);
+    exit;
+}
+// ──────────────────────────────────────────────────────────────────────
 
 if (empty($nome) || empty($email)) {
     http_response_code(400);

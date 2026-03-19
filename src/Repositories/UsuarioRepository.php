@@ -29,9 +29,14 @@ class UsuarioRepository {
     }
 
     public function buscar(int $instituicaoId, int $id) {
-        $sql = "SELECT id, instituicao_id, nome, email, recebe_alertas FROM usuarios WHERE id = :id AND instituicao_id = :instituicao_id";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute(['id' => $id, 'instituicao_id' => $instituicaoId]);
+        if ($instituicaoId === 0) {
+            // super_admin pode buscar qualquer usuário
+            $stmt = $this->db->prepare("SELECT id, instituicao_id, nome, email, role, recebe_alertas FROM usuarios WHERE id = :id");
+            $stmt->execute(['id' => $id]);
+        } else {
+            $stmt = $this->db->prepare("SELECT id, instituicao_id, nome, email, role, recebe_alertas FROM usuarios WHERE id = :id AND instituicao_id = :instituicao_id");
+            $stmt->execute(['id' => $id, 'instituicao_id' => $instituicaoId]);
+        }
         return $stmt->fetch();
     }
 

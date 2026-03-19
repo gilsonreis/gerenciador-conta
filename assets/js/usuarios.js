@@ -71,19 +71,31 @@ const usuariosJS = {
     },
     editar: function(id) {
         $.get('ajax.php?acao=usuarios-buscar', {id: id}, function(res) {
-            usuariosJS.carregarInstituicoes(res.dados.instituicao_id, () => {
+            const aplicarDados = () => {
                 $('#usuario_id').val(res.dados.id);
                 $('#usuario_nome').val(res.dados.nome);
                 $('#usuario_email').val(res.dados.email);
                 $('#usuario_senha').val('').removeAttr('required'); // Opcional ao editar
-                
+
+                // Pré-seleciona o perfil do usuário
+                if ($('#usuario_role').length) {
+                    $('#usuario_role').val(res.dados.role || 'admin');
+                }
+
                 // Exibe config de alertas recebida em buscar
                 $('#bloco-alertas').show();
                 $('#usuario_recebe_alertas').prop('checked', res.dados.recebe_alertas != 0);
-                
+
                 $('#modal-usuario-title').text('Editar Usuário');
                 usuariosJS.mostrarModal();
-            });
+            };
+
+            // Só carrega instituições se o select existir (super_admin)
+            if ($('#usuario_instituicao').length && $('#usuario_instituicao').is('select')) {
+                usuariosJS.carregarInstituicoes(res.dados.instituicao_id, aplicarDados);
+            } else {
+                aplicarDados();
+            }
         });
     },
     excluir: function(id) {
