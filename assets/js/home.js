@@ -11,33 +11,37 @@ const homeJS = {
             method: 'GET',
             success: function(res) {
                 if(res.sucesso) {
-                    $('#dash-entradas').text(res.entradas_formatado);
+                    $('#dash-capital').text(res.capital_disponivel_formatado);
                     $('#dash-saidas').text(res.saidas_formatado);
                     $('#dash-custovida').text(res.custovida_formatado);
                     
-                    const saldoElem = $('#dash-saldo');
-                    const saldoCard = $('#dash-saldo-card');
-                    const saldoBg = $('#dash-saldo-bg');
-                    const saldoIcon = $('#dash-saldo-icon');
-                    const saldoLabel = $('#dash-saldo-label');
+                    const projElem = $('#dash-projecao');
+                    const projCard = $('#dash-projecao-card');
+                    const projBg = $('#dash-projecao-bg');
+                    const projIcon = $('#dash-projecao-icon');
+                    const projLabel = $('#dash-projecao-label');
                     
-                    saldoElem.text(res.saldo_formatado);
+                    projElem.text(res.projecao_sobra_formatado);
                     
                     // Cleanup previous state classes
-                    saldoElem.removeClass('text-blue-600 dark:text-blue-500 text-emerald-600 dark:text-emerald-500 text-red-600 dark:text-red-500');
-                    saldoCard.removeClass('border-blue-100 dark:border-blue-900/30 border-emerald-100 dark:border-emerald-900/30 border-red-100 dark:border-red-900/30');
-                    saldoIcon.removeClass('bg-blue-50 dark:bg-blue-900/20 text-blue-500 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-500 bg-red-50 dark:bg-red-900/20 text-red-500');
+                    projElem.removeClass('text-emerald-600 dark:text-emerald-500 text-red-600 dark:text-red-500');
+                    projCard.removeClass('border-emerald-100 dark:border-emerald-900/30 border-red-100 dark:border-red-900/30');
+                    projIcon.removeClass('bg-emerald-50 dark:bg-emerald-900/20 text-emerald-500 bg-red-50 dark:bg-red-900/20 text-red-500');
+                    projLabel.removeClass('text-emerald-800 dark:text-emerald-400/80 text-red-800 dark:text-red-400/80');
+                    projBg.removeClass('bg-emerald-50 dark:bg-emerald-900/10 bg-red-50 dark:bg-red-900/10');
                     
-                    if (res.saldo >= 0) {
-                        saldoElem.addClass('text-emerald-600 dark:text-emerald-500');
-                        saldoCard.addClass('border-emerald-100 dark:border-emerald-900/30');
-                        saldoIcon.addClass('bg-emerald-50 dark:bg-emerald-900/20 text-emerald-500');
-                        saldoLabel.addClass('text-emerald-800 dark:text-emerald-400/80').removeClass('text-blue-800 dark:text-blue-400/80');
+                    if (res.projecao_sobra >= 0) {
+                        projElem.addClass('text-emerald-600 dark:text-emerald-500');
+                        projCard.addClass('border-emerald-100 dark:border-emerald-900/30');
+                        projIcon.addClass('bg-emerald-50 dark:bg-emerald-900/20 text-emerald-500');
+                        projLabel.addClass('text-emerald-800 dark:text-emerald-400/80');
+                        projBg.addClass('bg-emerald-50 dark:bg-emerald-900/10');
                     } else {
-                        saldoElem.addClass('text-red-600 dark:text-red-500');
-                        saldoCard.addClass('border-red-100 dark:border-red-900/30');
-                        saldoIcon.addClass('bg-red-50 dark:bg-red-900/20 text-red-500');
-                        saldoLabel.addClass('text-red-800 dark:text-red-400/80').removeClass('text-blue-800 dark:text-blue-400/80');
+                        projElem.addClass('text-red-600 dark:text-red-500');
+                        projCard.addClass('border-red-100 dark:border-red-900/30');
+                        projIcon.addClass('bg-red-50 dark:bg-red-900/20 text-red-500');
+                        projLabel.addClass('text-red-800 dark:text-red-400/80');
+                        projBg.addClass('bg-red-50 dark:bg-red-900/10');
                     }
                 }
             }
