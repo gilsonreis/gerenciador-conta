@@ -29,6 +29,7 @@
                 </div>
             </div>
 
+            <?php if (($_SESSION['usuario_role'] ?? '') === 'super_admin'): ?>
             <div class="mb-4">
                 <label for="usuario_instituicao" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Instituição/Família</label>
                 <select id="usuario_instituicao" name="instituicao_id" required
@@ -36,6 +37,17 @@
                     <option value="">Carregando...</option>
                 </select>
             </div>
+            <?php else: ?>
+            <!-- Admin/Manager: instituição fixada pela sessão, não pode ser trocada -->
+            <input type="hidden" name="instituicao_id" value="<?= (int)$_SESSION['instituicao_id'] ?>">
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Instituição/Família</label>
+                <div class="flex items-center gap-2 px-4 py-2.5 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-darkborder rounded-lg">
+                    <i class="fa-solid fa-building text-gray-400 text-sm"></i>
+                    <span class="text-sm text-gray-500 dark:text-gray-400 italic">Fixada pela sua conta (somente super_admin pode alterar)</span>
+                </div>
+            </div>
+            <?php endif; ?>
 
             <div class="mb-4">
                 <label for="usuario_email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">E-mail</label>
