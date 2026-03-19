@@ -117,7 +117,7 @@
             </div>
             <span class="text-xs text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-white/5 px-2 py-1 rounded-full">30 dias</span>
         </div>
-        <div class="overflow-y-auto flex-1 pr-1" style="max-height: 250px;">
+        <div class="overflow-y-auto flex-1 pr-1 scrollbar-thin" style="max-height: 320px; scrollbar-width: thin; scrollbar-color: #d1d5db transparent;">
             <table class="w-full text-left border-collapse">
                 <tbody id="vencimentos-table" class="divide-y divide-gray-100 dark:divide-darkborder">
                     <!-- Preenchido via JavaScript -->

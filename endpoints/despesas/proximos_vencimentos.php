@@ -23,7 +23,6 @@ $sql = "
     AND p.data_pagamento IS NULL
     AND p.data_vencimento BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 30 DAY)
     ORDER BY p.data_vencimento ASC
-    LIMIT 8
 ";
 
 $stmt = $db->prepare($sql);
