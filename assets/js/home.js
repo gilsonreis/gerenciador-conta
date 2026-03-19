@@ -17,6 +17,31 @@ const homeJS = {
                     $('#dash-saidas-mes').text(res.saidas_mes_formatado);
                     $('#dash-custovida').text(res.custovida_formatado);
                     
+                    // Card 1 Dynamic Coloring
+                    const capCard = $('#dash-capital-card');
+                    const capIcon = $('#dash-capital-icon');
+                    const capValue = $('#dash-capital-value-container');
+                    
+                    // Cleanup Card 1
+                    capCard.removeClass('border-emerald-100 dark:border-emerald-900/30 border-red-100 dark:border-red-900/30 border-gray-100 dark:border-darkborder');
+                    capIcon.removeClass('bg-emerald-50 dark:bg-emerald-900/20 text-emerald-500 bg-red-50 dark:bg-red-900/20 text-red-500 bg-gray-50 dark:bg-gray-900/20 text-gray-500');
+                    capValue.removeClass('text-emerald-600 dark:text-emerald-500 text-red-600 dark:text-red-500 text-gray-600 dark:text-gray-500');
+                    
+                    if (res.total_disponivel > 0) {
+                        capCard.addClass('border-emerald-100 dark:border-emerald-900/30');
+                        capIcon.addClass('bg-emerald-50 dark:bg-emerald-900/20 text-emerald-500');
+                        capValue.addClass('text-emerald-600 dark:text-emerald-500');
+                    } else if (res.total_disponivel < 0) {
+                        capCard.addClass('border-red-100 dark:border-red-900/30');
+                        capIcon.addClass('bg-red-50 dark:bg-red-900/20 text-red-500');
+                        capValue.addClass('text-red-600 dark:text-red-500');
+                    } else {
+                        capCard.addClass('border-gray-100 dark:border-darkborder');
+                        capIcon.addClass('bg-gray-50 dark:bg-gray-900/20 text-gray-500');
+                        capValue.addClass('text-gray-600 dark:text-gray-500');
+                    }
+
+                    // Card 3 Dynamic Coloring
                     const projElem = $('#dash-projecao-sobra');
                     const projCard = $('#dash-projecao-card');
                     const projBg = $('#dash-projecao-bg');

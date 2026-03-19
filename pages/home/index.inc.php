@@ -5,7 +5,7 @@
 
 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
     <!-- Card 1: Composição do Capital (Conta Armada) -->
-    <div class="bg-white dark:bg-darkcard rounded-2xl p-6 shadow-sm border border-blue-100 dark:border-blue-900/30">
+    <div id="dash-capital-card" class="bg-white dark:bg-darkcard rounded-2xl p-6 shadow-sm border border-emerald-100 dark:border-emerald-900/30">
         <div class="flex flex-col items-end space-y-1 font-mono text-sm">
             <div class="flex justify-between w-full text-gray-500 dark:text-gray-400">
                 <span>Saldo Anterior:</span>
@@ -23,11 +23,16 @@
                 </div>
             </div>
 
-            <div class="pt-2 w-full flex flex-col items-end">
-                <span class="text-[10px] text-gray-400 dark:text-gray-500 block uppercase font-bold tracking-wider mb-1">Total Disponível Agora</span>
-                <div class="flex items-baseline text-blue-600 dark:text-blue-500 font-bold">
-                    <span class="text-lg mr-2">R$</span>
-                    <span class="text-3xl valor-sensivel w-[180px] text-right" id="dash-total-agora">0,00</span>
+            <div class="pt-2 w-full flex items-center justify-between">
+                <div id="dash-capital-icon" class="p-3 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-500 rounded-xl">
+                    <i class="fa-solid fa-vault text-xl"></i>
+                </div>
+                <div class="flex flex-col items-end">
+                    <span class="text-[10px] text-gray-400 dark:text-gray-500 block uppercase font-bold tracking-wider mb-1">Total Disponível Agora</span>
+                    <div id="dash-capital-value-container" class="flex items-baseline text-emerald-600 dark:text-emerald-500 font-bold">
+                        <span class="text-lg mr-2">R$</span>
+                        <span class="text-3xl valor-sensivel w-[180px] text-right" id="dash-total-agora">0,00</span>
+                    </div>
                 </div>
             </div>
         </div>
