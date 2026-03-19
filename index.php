@@ -86,8 +86,14 @@ $role = $_SESSION['usuario_role'] ?? 'reader';
         <div class="p-6 border-b border-gray-200 dark:border-darkborder mb-4">
             <h1 class="text-xl font-bold bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent"><i class="fa-solid fa-wallet mr-2"></i>Controle Familiar</h1>
             <div class="flex justify-between items-center mt-2">
-                <p class="text-sm text-gray-500 dark:text-gray-400 truncate"><i class="fa-solid fa-user-circle mr-1"></i><?= htmlspecialchars($_SESSION['usuario_nome'] ?? 'Usuário') ?></p>
-                <button type="button" class="btn-toggle-privacidade text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors" title="Alternar Modo Privacidade">
+                <button type="button" onclick="perfilJS.abrir()"
+                    class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-blue-400 transition-colors group min-w-0"
+                    title="Editar meu perfil">
+                    <i class="fa-solid fa-circle-user text-base shrink-0"></i>
+                    <span id="sidebar-usuario-nome" class="truncate"><?= htmlspecialchars($_SESSION['usuario_nome'] ?? 'Usuário') ?></span>
+                    <i class="fa-solid fa-pen-to-square text-[11px] opacity-0 group-hover:opacity-100 transition-opacity shrink-0"></i>
+                </button>
+                <button type="button" class="btn-toggle-privacidade text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors shrink-0" title="Alternar Modo Privacidade">
                     <i class="fa-regular fa-eye text-lg"></i>
                 </button>
             </div>
@@ -168,6 +174,10 @@ $role = $_SESSION['usuario_role'] ?? 'reader';
         </div>
     </main>
 
+    <?php if (isset($_SESSION['usuario_id'])): ?>
+    <?php include __DIR__ . '/pages/_modal_perfil.inc.php'; ?>
+    <?php endif; ?>
+
     <!-- SweetAlert2 para alertas bonitos -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Chart.js -->
@@ -185,6 +195,8 @@ $role = $_SESSION['usuario_role'] ?? 'reader';
     <?php if ($pagina === 'auth-login'): ?>
         <script src="assets/js/auth.js?v=<?= time() ?>"></script>
     <?php else: ?>
+        <!-- Perfil: sempre carregado para qualquer página autenticada -->
+        <script src="assets/js/perfil.js?v=<?= time() ?>"></script>
         <?php 
         if (isset($diretorio) && file_exists(__DIR__ . "/assets/js/{$diretorio}.js")) {
             echo "<script src=\"assets/js/{$diretorio}.js?v=" . time() . "\"></script>";
