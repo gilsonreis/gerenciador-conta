@@ -7,6 +7,7 @@ $instituicaoId = AuthHelper::getInstituicaoId();
 $db = Database::getConnection();
 
 // Radar de 30 dias: parcelas não pagas com vencimento entre hoje e +30 dias
+$instWhere = $instituicaoId === 0 ? '' : 'AND l.instituicao_id = :inst';
 $sql = "
     SELECT
         p.id,
@@ -19,14 +20,15 @@ $sql = "
     FROM parcelas p
     JOIN lancamentos l ON p.lancamento_id = l.id
     JOIN categorias cat ON l.categoria_id = cat.id
-    WHERE l.instituicao_id = :inst
-    AND p.data_pagamento IS NULL
+    WHERE p.data_pagamento IS NULL
+    $instWhere
     AND p.data_vencimento BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 30 DAY)
     ORDER BY p.data_vencimento ASC
 ";
 
+$params = $instituicaoId === 0 ? [] : ['inst' => $instituicaoId];
 $stmt = $db->prepare($sql);
-$stmt->execute(['inst' => $instituicaoId]);
+$stmt->execute($params);
 $vencimentos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $resultado = array_map(function($v) {

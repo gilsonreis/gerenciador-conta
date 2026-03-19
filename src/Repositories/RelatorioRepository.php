@@ -40,8 +40,7 @@ class RelatorioRepository {
                 ce.conta_id
             FROM caixa_entradas ce
             JOIN contas co ON ce.conta_id = co.id
-            WHERE ce.instituicao_id = :inst1
-        ";
+            " . ($instituicaoId === 0 ? '' : 'WHERE ce.instituicao_id = :inst1');
 
         $subQuerySaidas = "
             SELECT 
@@ -56,20 +55,18 @@ class RelatorioRepository {
             JOIN lancamentos l ON p.lancamento_id = l.id
             JOIN categorias cat ON l.categoria_id = cat.id
             JOIN contas co ON p.conta_pagamento_id = co.id
-            WHERE l.instituicao_id = :inst2 AND p.data_pagamento IS NOT NULL
-        ";
+            " . ($instituicaoId === 0 ? 'WHERE p.data_pagamento IS NOT NULL' : 'WHERE l.instituicao_id = :inst2 AND p.data_pagamento IS NOT NULL');
 
         $unionQuery = "";
         if (empty($filtros['tipo_movimento']) || $filtros['tipo_movimento'] === 'todos') {
             $unionQuery = "($subQueryEntradas) UNION ALL ($subQuerySaidas)";
-            $params['inst1'] = $instituicaoId;
-            $params['inst2'] = $instituicaoId;
+            if ($instituicaoId !== 0) { $params['inst1'] = $instituicaoId; $params['inst2'] = $instituicaoId; }
         } elseif ($filtros['tipo_movimento'] === 'entrada') {
             $unionQuery = "$subQueryEntradas";
-            $params['inst1'] = $instituicaoId;
+            if ($instituicaoId !== 0) { $params['inst1'] = $instituicaoId; }
         } elseif ($filtros['tipo_movimento'] === 'saida') {
             $unionQuery = "$subQuerySaidas";
-            $params['inst2'] = $instituicaoId;
+            if ($instituicaoId !== 0) { $params['inst2'] = $instituicaoId; }
         }
 
         $whereSql = !empty($whereFilters) ? "WHERE " . implode(" AND ", $whereFilters) : "";
@@ -87,11 +84,10 @@ class RelatorioRepository {
         return $stmt->fetchAll();
     }
     public function despesasPorCategoria(int $instituicaoId, int $mes, int $ano, string $status = 'todas') {
-        $params = [
-            'inst' => $instituicaoId,
-            'mes_ano' => sprintf('%04d-%02d', $ano, $mes)
-        ];
-        
+        $instWhere = $instituicaoId === 0 ? '' : 'AND l.instituicao_id = :inst';
+        $params = ['mes_ano' => sprintf('%04d-%02d', $ano, $mes)];
+        if ($instituicaoId !== 0) $params['inst'] = $instituicaoId;
+
         $whereStatus = "";
         if ($status === 'pagas') {
             $whereStatus = "AND p.data_pagamento IS NOT NULL";
@@ -106,8 +102,8 @@ class RelatorioRepository {
             FROM parcelas p
             JOIN lancamentos l ON p.lancamento_id = l.id
             JOIN categorias c ON l.categoria_id = c.id
-            WHERE l.instituicao_id = :inst
-            AND DATE_FORMAT(p.data_vencimento, '%Y-%m') = :mes_ano
+            WHERE DATE_FORMAT(p.data_vencimento, '%Y-%m') = :mes_ano
+            $instWhere
             $whereStatus
             GROUP BY c.id
             ORDER BY total DESC
@@ -118,9 +114,11 @@ class RelatorioRepository {
         return $stmt->fetchAll();
     }
     public function contasAPagar(int $instituicaoId, array $filtros) {
-        $params = ['inst' => $instituicaoId];
+        $instWhere = $instituicaoId === 0 ? '' : 'AND l.instituicao_id = :inst';
+        $params = [];
+        if ($instituicaoId !== 0) $params['inst'] = $instituicaoId;
         $whereFilters = [];
-        
+
         $status = $filtros['status_vencimento'] ?? 'todos';
         $mes = (int)($filtros['mes'] ?? date('m'));
         $ano = (int)($filtros['ano'] ?? date('Y'));
@@ -147,8 +145,8 @@ class RelatorioRepository {
             JOIN lancamentos l ON p.lancamento_id = l.id
             JOIN categorias cat ON l.categoria_id = cat.id
             JOIN usuarios u ON l.usuario_id = u.id
-            WHERE l.instituicao_id = :inst
-            AND p.data_pagamento IS NULL
+            WHERE p.data_pagamento IS NULL
+            $instWhere
             $whereSql
             ORDER BY p.data_vencimento ASC
         ";
@@ -160,15 +158,20 @@ class RelatorioRepository {
     public function resumoConsolidado(int $instituicaoId, array $filtros) {
         $agrupamento = $filtros['agrupamento'] ?? 'mensal';
         $formato = ($agrupamento === 'anual') ? '%Y' : '%m/%Y';
-        
+
+        $instWhere1 = $instituicaoId === 0 ? '' : 'AND instituicao_id = :inst1';
+        $instWhere2 = $instituicaoId === 0 ? '' : 'AND l.instituicao_id = :inst2';
+
         $params = [
-            'inst1' => $instituicaoId,
             'inicio1' => $filtros['data_inicio'],
-            'fim1' => $filtros['data_fim'],
-            'inst2' => $instituicaoId,
+            'fim1'    => $filtros['data_fim'],
             'inicio2' => $filtros['data_inicio'],
-            'fim2' => $filtros['data_fim']
+            'fim2'    => $filtros['data_fim']
         ];
+        if ($instituicaoId !== 0) {
+            $params['inst1'] = $instituicaoId;
+            $params['inst2'] = $instituicaoId;
+        }
 
         $sql = "
             SELECT 
@@ -182,8 +185,8 @@ class RelatorioRepository {
                     valor as entrada, 
                     0 as saida 
                 FROM caixa_entradas 
-                WHERE instituicao_id = :inst1 
-                AND data_entrada BETWEEN :inicio1 AND :fim1
+                WHERE data_entrada BETWEEN :inicio1 AND :fim1
+                $instWhere1
                 
                 UNION ALL
                 
@@ -193,8 +196,8 @@ class RelatorioRepository {
                     (valor - desconto) as valor 
                 FROM parcelas p
                 JOIN lancamentos l ON p.lancamento_id = l.id
-                WHERE l.instituicao_id = :inst2 
-                AND data_pagamento BETWEEN :inicio2 AND :fim2 
+                WHERE data_pagamento BETWEEN :inicio2 AND :fim2 
+                $instWhere2
                 AND data_pagamento IS NOT NULL
             ) as consolidador 
             GROUP BY periodo 
