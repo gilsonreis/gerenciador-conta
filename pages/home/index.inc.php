@@ -7,22 +7,38 @@
     <!-- Card 1: Composição do Capital (Conta Armada) -->
     <div id="dash-capital-card" class="bg-white dark:bg-darkcard rounded-2xl p-6 shadow-sm border border-emerald-100 dark:border-emerald-900/30">
         <div class="flex flex-col items-end space-y-1 font-mono text-sm">
+
+            <!-- Linha 1: Saldo de Abertura (com tooltip por conta) -->
             <div class="flex justify-between w-full text-gray-500 dark:text-gray-400">
                 <span>Saldo Anterior:</span>
-                <div class="flex">
+                <!-- Tooltip Trigger -->
+                <div class="relative group flex cursor-help">
                     <span class="mr-2">R$</span>
-                    <span id="dash-saldo-anterior" class="w-[110px] text-right valor-sensivel">0,00</span>
-                </div>
-            </div>
-            
-            <div class="flex justify-between w-full border-b border-gray-300 dark:border-darkborder pb-1 text-gray-500 dark:text-gray-400">
-                <span>+ Entradas do Mês:</span>
-                <div class="flex">
-                    <span class="mr-2">R$</span>
-                    <span id="dash-entradas-mes-card" class="w-[110px] text-right valor-sensivel">0,00</span>
+                    <span id="dash-saldo-anterior" class="w-[110px] text-right valor-sensivel border-b border-dashed border-gray-400 dark:border-gray-600">0,00</span>
+                    <!-- Tooltip Bubble -->
+                    <div id="tooltip-abertura" class="absolute right-0 top-6 z-50 hidden group-hover:block w-64 bg-gray-900 text-white text-xs rounded-xl shadow-2xl p-3 pointer-events-none">
+                        <p class="font-bold text-gray-300 uppercase tracking-wider mb-2 text-[10px]">💰 Composição em 01 do mês:</p>
+                        <div id="tooltip-abertura-list" class="space-y-1"></div>
+                    </div>
                 </div>
             </div>
 
+            <!-- Linha 2: Entradas do Mês (com tooltip top 5) -->
+            <div class="flex justify-between w-full border-b border-gray-300 dark:border-darkborder pb-1 text-gray-500 dark:text-gray-400">
+                <span>+ Entradas do Mês:</span>
+                <!-- Tooltip Trigger -->
+                <div class="relative group flex cursor-help">
+                    <span class="mr-2">R$</span>
+                    <span id="dash-entradas-mes-card" class="w-[110px] text-right valor-sensivel border-b border-dashed border-gray-400 dark:border-gray-600">0,00</span>
+                    <!-- Tooltip Bubble -->
+                    <div id="tooltip-entradas" class="absolute right-0 top-6 z-50 hidden group-hover:block w-64 bg-gray-900 text-white text-xs rounded-xl shadow-2xl p-3 pointer-events-none">
+                        <p class="font-bold text-gray-300 uppercase tracking-wider mb-2 text-[10px]">📥 Maiores receitas do mês:</p>
+                        <div id="tooltip-entradas-list" class="space-y-1"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total -->
             <div class="pt-2 w-full flex items-center justify-between">
                 <div id="dash-capital-icon" class="p-3 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-500 rounded-xl">
                     <i class="fa-solid fa-vault text-xl"></i>

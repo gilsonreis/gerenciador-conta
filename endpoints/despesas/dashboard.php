@@ -44,6 +44,32 @@ $custoVida = (float)($resumoDespesas['custo_vida'] ?? 0);
 // 5. Projeção de Sobra = Total Disponível - Saídas do Mês
 $projecaoSobra = $totalDisponivel - $saidasMes;
 
+// 6. Detalhamento para Tooltips
+// a) Detalhes do snapshot de abertura (por conta)
+$detalhesAbertura = $repoSnapshot->listarPorMes($instituicaoId, $mesAno);
+$tooltipAbertura = array_map(fn($row) => [
+    'conta' => $row['conta_nome'],
+    'valor' => 'R$ ' . number_format((float)$row['valor_abertura'], 2, ',', '.')
+], $detalhesAbertura);
+
+// Fallback textual se não houver snapshots
+if (empty($tooltipAbertura)) {
+    $tooltipAbertura = [['conta' => 'Estimativa', 'valor' => 'Nenhum snapshot encontrado para este mês.']];
+}
+
+// b) Top 5 entradas do mês (por valor DESC)
+$detalhesEntradas = $repoCaixa->listarPorMes($instituicaoId, $mesAno);
+usort($detalhesEntradas, fn($a, $b) => $b['valor'] <=> $a['valor']);
+$top5Entradas = array_slice($detalhesEntradas, 0, 5);
+$tooltipEntradas = array_map(fn($row) => [
+    'descricao' => $row['descricao'] ?: 'Sem descrição',
+    'valor' => 'R$ ' . number_format((float)$row['valor'], 2, ',', '.')
+], $top5Entradas);
+
+if (empty($tooltipEntradas)) {
+    $tooltipEntradas = [['descricao' => 'Nenhuma entrada registrada ainda.', 'valor' => '']];
+}
+
 echo json_encode([
     'sucesso' => true,
     'saldo_base' => $saldoAbertura,
@@ -56,6 +82,8 @@ echo json_encode([
     'saidas_mes_formatado' => 'R$ ' . number_format($saidasMes, 2, ',', '.'),
     'projecao_sobra' => $projecaoSobra,
     'projecao_sobra_formatado' => 'R$ ' . number_format($projecaoSobra, 2, ',', '.'),
-    'custovida_formatado' => 'R$ ' . number_format($custoVida, 2, ',', '.')
+    'custovida_formatado' => 'R$ ' . number_format($custoVida, 2, ',', '.'),
+    'tooltip_abertura' => $tooltipAbertura,
+    'tooltip_entradas' => $tooltipEntradas,
 ]);
 

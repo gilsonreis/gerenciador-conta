@@ -16,7 +16,36 @@ const homeJS = {
                     $('#dash-total-agora').text(res.total_disponivel_formatado.replace('R$ ', ''));
                     $('#dash-saidas-mes').text(res.saidas_mes_formatado);
                     $('#dash-custovida').text(res.custovida_formatado);
-                    
+
+                    // Tooltip: Composição do Saldo de Abertura (por conta)
+                    if (res.tooltip_abertura && res.tooltip_abertura.length) {
+                        let htmlAbertura = '';
+                        res.tooltip_abertura.forEach(item => {
+                            htmlAbertura += `
+                                <div class="flex justify-between items-center gap-3">
+                                    <span class="text-gray-400 truncate">${item.conta}</span>
+                                    <span class="text-white font-mono font-semibold whitespace-nowrap">${item.valor}</span>
+                                </div>`;
+                        });
+                        $('#tooltip-abertura-list').html(htmlAbertura);
+                    }
+
+                    // Tooltip: Top 5 Entradas do Mês
+                    if (res.tooltip_entradas && res.tooltip_entradas.length) {
+                        let htmlEntradas = '';
+                        res.tooltip_entradas.forEach(item => {
+                            htmlEntradas += `
+                                <div class="flex justify-between items-center gap-3">
+                                    <span class="text-gray-400 truncate">${item.descricao}</span>
+                                    <span class="text-emerald-400 font-mono font-semibold whitespace-nowrap">${item.valor}</span>
+                                </div>`;
+                        });
+                        if (res.tooltip_entradas.length === 5) {
+                            htmlEntradas += `<p class="text-gray-500 text-[10px] mt-2 text-center">Exibindo top 5 por valor</p>`;
+                        }
+                        $('#tooltip-entradas-list').html(htmlEntradas);
+                    }
+
                     // Card 1 Dynamic Coloring
                     const capCard = $('#dash-capital-card');
                     const capIcon = $('#dash-capital-icon');
