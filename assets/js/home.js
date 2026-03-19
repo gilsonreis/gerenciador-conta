@@ -2,6 +2,7 @@ const homeJS = {
     init: function() {
         this.carregarDashboard();
         this.carregarSaldos();
+        this.carregarVencimentos();
         this.carregarGraficos();
     },
 
@@ -241,7 +242,63 @@ const homeJS = {
             }
         });
     }
-};
+    carregarVencimentos: function() {
+        $.ajax({
+            url: 'ajax.php?acao=despesas-proximos_vencimentos',
+            method: 'GET',
+            success: function(res) {
+                if (!res.sucesso) return;
+
+                const tbody = $('#vencimentos-table');
+
+                if (res.dados.length === 0) {
+                    tbody.html(`
+                        <tr>
+                            <td colspan="3" class="py-8 text-center">
+                                <div class="flex flex-col items-center gap-2">
+                                    <i class="fa-solid fa-circle-check text-emerald-400 text-2xl"></i>
+                                    <span class="text-sm text-gray-400 dark:text-gray-500">Nenhum vencimento próximo.<br>Tudo limpo!</span>
+                                </div>
+                            </td>
+                        </tr>`);
+                    return;
+                }
+
+                // Mapa de urgência → classes Tailwind
+                const urgenciaCores = {
+                    'hoje':    { badge: 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400',   valor: 'text-red-600 dark:text-red-400' },
+                    'critico': { badge: 'bg-red-100 dark:bg-red-900/30 text-red-500 dark:text-red-400',   valor: 'text-red-500 dark:text-red-400' },
+                    'alerta':  { badge: 'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400', valor: 'text-orange-500 dark:text-orange-400' },
+                    'normal':  { badge: 'bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400',   valor: 'text-gray-700 dark:text-gray-300' },
+                };
+
+                let html = '';
+                res.dados.forEach(v => {
+                    const cores = urgenciaCores[v.urgencia] || urgenciaCores['normal'];
+                    const diasLabel = v.dias_restantes === 0
+                        ? '<span class="font-bold">Hoje</span>'
+                        : v.data_formatada;
+
+                    html += `
+                        <tr class="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+                            <td class="py-2.5 pr-2">
+                                <span class="text-sm text-gray-700 dark:text-gray-300 font-medium truncate block max-w-[130px]" title="${v.descricao}">${v.descricao}</span>
+                                <span class="text-xs text-gray-400">${v.categoria}</span>
+                            </td>
+                            <td class="py-2.5 px-1">
+                                <span class="text-xs px-2 py-0.5 rounded-full font-medium whitespace-nowrap ${cores.badge}">${diasLabel}</span>
+                            </td>
+                            <td class="py-2.5 text-right font-mono font-bold text-sm whitespace-nowrap ${cores.valor}">
+                                ${v.valor_formatado}
+                            </td>
+                        </tr>`;
+                });
+
+                tbody.html(html);
+            }
+        });
+    },
+
 
 $(document).ready(function() {
     homeJS.init();
