@@ -6,14 +6,26 @@ require_once __DIR__ . '/../../src/Services/AclService.php';
 AuthHelper::requireLogin();
 AclService::check('usuarios');
 
-// Regra RBAC: admin não pode escolher a instituição do novo usuário
-// A instituição é sempre a do próprio admin logado
-$instituicaoId = AuthHelper::getInstituicaoId();
+// Regra RBAC: determina a institução correta para o novo usuário
+$isSuperAdmin = AuthHelper::getInstituicaoId() === 0;
+if ($isSuperAdmin) {
+    // Super admin escolhe a instituição via POST (vem do select do form)
+    $instituicaoId = filter_input(INPUT_POST, 'instituicao_id', FILTER_VALIDATE_INT) ?: 0;
+    if (empty($instituicaoId)) {
+        http_response_code(400);
+        echo json_encode(['erro' => 'Selecione uma Instituição para o usuário.']);
+        exit;
+    }
+} else {
+    // Admin/gestor: sempre usa a própria instituição da sessão
+    $instituicaoId = AuthHelper::getInstituicaoIdReal();
+}
 
-$nome = trim($_POST['nome'] ?? '');
+$nome  = trim($_POST['nome']  ?? '');
 $email = trim($_POST['email'] ?? '');
-$senha = $_POST['senha'] ?? ''; // Can be empty if editing and preserving previous password
-$id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT) ?: null;
+$senha = $_POST['senha'] ?? '';
+$id    = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT) ?: null;
+$role  = $_POST['role'] ?? null;
 
 if (empty($nome) || empty($email)) {
     http_response_code(400);
@@ -28,27 +40,34 @@ if (!$id && empty($senha)) {
 }
 
 $dados = [
-    'id' => $id,
-    'nome' => $nome,
+    'id'    => $id,
+    'nome'  => $nome,
     'email' => $email,
-    'senha' => $senha
+    'senha' => $senha,
+    'role'  => $role,
 ];
 
 $repo = new UsuarioRepository();
 
 try {
-    if ($repo->salvar(AuthHelper::getInstituicaoId(), $dados)) {
+    if ($repo->salvar($instituicaoId, $dados)) {
         echo json_encode(['sucesso' => true, 'mensagem' => 'Usuário salvo com sucesso']);
     } else {
         http_response_code(500);
         echo json_encode(['erro' => 'Falha ao salvar o usuário']);
     }
 } catch (PDOException $e) {
-    if ($e->getCode() == 23000) { // UNIQUE constraint
-        http_response_code(409);
-        echo json_encode(['erro' => 'Este e-mail já está sendo utilizado.']);
+    if ($e->getCode() == 23000) {
+        // Diferencia violação de UNIQUE (email duplicado) vs FK (instituição inválida)
+        if (str_contains($e->getMessage(), 'email') || str_contains($e->getMessage(), 'Duplicate')) {
+            http_response_code(409);
+            echo json_encode(['erro' => 'Este e-mail já está sendo utilizado.']);
+        } else {
+            http_response_code(400);
+            echo json_encode(['erro' => 'Instituição inválida ou usuário sem vínculo.']);
+        }
     } else {
         http_response_code(500);
-        echo json_encode(['erro' => 'Erro no banco de dados.']);
+        echo json_encode(['erro' => 'Erro no banco de dados.', 'detalhe' => $e->getMessage()]);
     }
 }

@@ -36,38 +36,48 @@ class UsuarioRepository {
     }
 
     public function salvar(int $instituicaoId, array $dados) {
-        // Se a instituição foi enviada no form, usa a nova; se não, mantém a atual de quem está logado
-        $instituicaoAlvo = !empty($dados['instituicao_id']) ? $dados['instituicao_id'] : $instituicaoId;
+        // Se a instituição foi enviada no form, usa a nova; se não, usa a do logado
+        $instituicaoAlvo = !empty($dados['instituicao_id']) ? (int)$dados['instituicao_id'] : $instituicaoId;
 
         if (!empty($dados['id'])) {
-            $sql = "UPDATE usuarios SET instituicao_id = :instituicao_alvo, nome = :nome, email = :email, recebe_alertas = :recebe_alertas WHERE id = :id AND instituicao_id = :instituicao_id";
+            // UPDATE: super_admin (inst=0) pode editar qualquer usuário sem filtro de inst
+            $instFilter = $instituicaoId === 0 ? '' : 'AND instituicao_id = :instituicao_id';
+            $sql = "UPDATE usuarios SET instituicao_id = :instituicao_alvo, nome = :nome, email = :email, recebe_alertas = :recebe_alertas WHERE id = :id $instFilter";
             $params = [
-                'nome' => $dados['nome'], 
-                'email' => $dados['email'], 
-                'id' => $dados['id'], 
-                'instituicao_alvo' => $instituicaoAlvo,
-                'instituicao_id' => $instituicaoId,
-                'recebe_alertas' => isset($dados['recebe_alertas']) ? 1 : 0
+                'nome'            => $dados['nome'],
+                'email'           => $dados['email'],
+                'id'              => $dados['id'],
+                'instituicao_alvo'=> $instituicaoAlvo,
+                'recebe_alertas'  => isset($dados['recebe_alertas']) ? 1 : 0
             ];
-            
+            if ($instituicaoId !== 0) $params['instituicao_id'] = $instituicaoId;
+
+            if (!empty($dados['role'])) {
+                $sql = str_replace('recebe_alertas = :recebe_alertas WHERE', 'recebe_alertas = :recebe_alertas, role = :role WHERE', $sql);
+                $params['role'] = $dados['role'];
+            }
+
             if (!empty($dados['senha'])) {
-                $sql = "UPDATE usuarios SET instituicao_id = :instituicao_alvo, nome = :nome, email = :email, recebe_alertas = :recebe_alertas, senha = :senha WHERE id = :id AND instituicao_id = :instituicao_id";
+                $sql = str_replace('recebe_alertas = :recebe_alertas', 'recebe_alertas = :recebe_alertas, senha = :senha', $sql);
                 $params['senha'] = password_hash($dados['senha'], PASSWORD_DEFAULT);
             }
-            
+
             $stmt = $this->db->prepare($sql);
             return $stmt->execute($params);
         } else {
-            // New users default to true for receives_alerts
-            $recebe_alertas = isset($dados['recebe_alertas']) ? 1 : 1; 
-            $sql = "INSERT INTO usuarios (instituicao_id, nome, email, senha, recebe_alertas) VALUES (:instituicao_alvo, :nome, :email, :senha, :recebe_alertas)";
-            $stmt = $this->db->prepare($sql);
+            // INSERT
+            $role = !empty($dados['role']) ? $dados['role'] : 'admin';
+            $stmt = $this->db->prepare("
+                INSERT INTO usuarios (instituicao_id, nome, email, senha, recebe_alertas, role)
+                VALUES (:instituicao_alvo, :nome, :email, :senha, :recebe_alertas, :role)
+            ");
             return $stmt->execute([
-                'instituicao_alvo' => $instituicaoAlvo, 
-                'nome' => $dados['nome'], 
-                'email' => $dados['email'],
-                'senha' => password_hash($dados['senha'] ?? '123456', PASSWORD_DEFAULT),
-                'recebe_alertas' => $recebe_alertas
+                'instituicao_alvo' => $instituicaoAlvo,
+                'nome'             => $dados['nome'],
+                'email'            => $dados['email'],
+                'senha'            => password_hash($dados['senha'] ?? '123456', PASSWORD_DEFAULT),
+                'recebe_alertas'   => 1,
+                'role'             => $role,
             ]);
         }
     }
