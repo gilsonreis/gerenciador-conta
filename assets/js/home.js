@@ -11,9 +11,9 @@ const homeJS = {
             method: 'GET',
             success: function(res) {
                 if(res.sucesso) {
-                    $('#dash-saldo-anterior').text(res.saldo_base_formatado);
-                    $('#dash-entradas-mes-card').text(res.entradas_mes_formatado);
-                    $('#dash-total-agora').text(res.total_disponivel_formatado);
+                    $('#dash-saldo-anterior').text(res.saldo_base_formatado.replace('R$ ', ''));
+                    $('#dash-entradas-mes-card').text(res.entradas_mes_formatado.replace('R$ ', ''));
+                    $('#dash-total-agora').text(res.total_disponivel_formatado.replace('R$ ', ''));
                     $('#dash-saidas-mes').text(res.saidas_mes_formatado);
                     $('#dash-custovida').text(res.custovida_formatado);
                     
