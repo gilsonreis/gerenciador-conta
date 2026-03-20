@@ -28,7 +28,8 @@ const caixaJS = {
         const cols = window.userRole === 'super_admin' ? 5 : 4;
         $('#tabela-caixa').html(`<tr><td colspan="${cols}" class="p-8 text-center text-gray-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Carregando...</td></tr>`);
 
-        $.get('ajax.php?acao=caixa-listar', { mes: this.mesAtual }, function(res) {
+        const filtroInst = $('#filtro-instituicao-caixa').val() || '';
+        $.get('ajax.php?acao=caixa-listar', { mes: this.mesAtual, filtro_instituicao_id: filtroInst }, function(res) {
             $('#resumo-total-entradas').text(res.resumo.total_entradas_formatado);
 
             let html = '';
@@ -72,6 +73,22 @@ const caixaJS = {
             $('#tabela-caixa').html(html);
         });
     },
+    carregarInstituicoesFiltro: function() {
+        const sel = $('#filtro-instituicao-caixa');
+        if (!sel.length) return;
+        $.get('ajax.php?acao=instituicoes-listar', function(res) {
+            let html = '<option value="">Todas as Instituições</option>';
+            (res.dados || []).forEach(i => {
+                html += `<option value="${i.id}">${i.nome}</option>`;
+            });
+            sel.html(html);
+        });
+    },
+
+    onInstituicaoChange: function() {
+        this.carregar();
+    },
+
     carregarContas: function(callback, instituicaoId) {
         const params = instituicaoId ? {instituicao_id: instituicaoId} : {};
         $.get('ajax.php?acao=contas-listar', params, function(res) {

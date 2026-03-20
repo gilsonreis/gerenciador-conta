@@ -8,6 +8,20 @@
     </button>
 </div>
 
+<?php if (($_SESSION['usuario_role'] ?? '') === 'super_admin'): ?>
+<div class="flex gap-4 mb-4">
+    <div class="w-full sm:w-1/3">
+        <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">
+            <i class="fa-solid fa-building mr-1"></i> Instituição
+        </label>
+        <select id="filtro-instituicao-contas" onchange="contasJS.onInstituicaoChange()"
+            class="w-full px-3 py-2 bg-white dark:bg-[#121212] border border-gray-300 dark:border-darkborder rounded-lg text-sm focus:ring-2 focus:ring-primary text-gray-900 dark:text-gray-100">
+            <option value="">Todas as Instituições</option>
+        </select>
+    </div>
+</div>
+<?php endif; ?>
+
 <div class="bg-white dark:bg-darkcard rounded-2xl shadow-sm border border-gray-100 dark:border-darkborder overflow-hidden">
     <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">

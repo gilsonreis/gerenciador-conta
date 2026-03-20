@@ -10,12 +10,13 @@ $isSuperAdmin = $instId === 0;
 $repo         = new ContaRepository();
 
 if ($isSuperAdmin) {
-    // Super admin: busca todas com JOIN para nome da instituição
-    $filtroInst = filter_input(INPUT_GET, 'instituicao_id', FILTER_VALIDATE_INT) ?: 0;
-    $db = Database::getConnection();
-    $where = $filtroInst ? 'WHERE c.instituicao_id = :inst' : '';
+    // filtro_instituicao_id = UI filter; instituicao_id = modal filter (caixa)
+    $filtroInst = filter_input(INPUT_GET, 'filtro_instituicao_id', FILTER_VALIDATE_INT)
+                  ?: (filter_input(INPUT_GET, 'instituicao_id', FILTER_VALIDATE_INT) ?: 0);
+    $db     = Database::getConnection();
+    $where  = $filtroInst ? 'WHERE c.instituicao_id = :inst' : '';
     $params = $filtroInst ? ['inst' => $filtroInst] : [];
-    $stmt = $db->prepare("
+    $stmt   = $db->prepare("
         SELECT c.*, i.nome as instituicao_nome
         FROM contas c
         LEFT JOIN instituicoes i ON c.instituicao_id = i.id
@@ -35,7 +36,7 @@ foreach ($contas as &$conta) {
 }
 
 echo json_encode([
-    'sucesso'       => true,
-    'dados'         => $contas,
-    'is_super_admin'=> $isSuperAdmin,
+    'sucesso'        => true,
+    'dados'          => $contas,
+    'is_super_admin' => $isSuperAdmin,
 ]);

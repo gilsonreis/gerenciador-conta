@@ -20,6 +20,20 @@
     </div>
 </div>
 
+<?php if (($_SESSION['usuario_role'] ?? '') === 'super_admin'): ?>
+<div class="flex gap-4 mb-4">
+    <div class="w-full sm:w-1/3">
+        <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">
+            <i class="fa-solid fa-building mr-1"></i> Instituição
+        </label>
+        <select id="filtro-instituicao-caixa" onchange="caixaJS.onInstituicaoChange()"
+            class="w-full px-3 py-2 bg-white dark:bg-[#121212] border border-gray-300 dark:border-darkborder rounded-lg text-sm focus:ring-2 focus:ring-primary text-gray-900 dark:text-gray-100">
+            <option value="">Todas as Instituições</option>
+        </select>
+    </div>
+</div>
+<?php endif; ?>
+
 <!-- Resumo Cards -->
 <div class="grid grid-cols-1 mb-6">
     <div class="bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/20 dark:to-emerald-800/10 rounded-2xl p-6 shadow-sm border border-emerald-200 dark:border-emerald-800/30 flex justify-between items-center group transition duration-300 relative overflow-hidden">

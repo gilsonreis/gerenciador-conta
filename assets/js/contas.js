@@ -3,7 +3,8 @@ const contasJS = {
         const cols = window.userRole === 'super_admin' ? 4 : 3;
         $('#tabela-contas').html(`<tr><td colspan="${cols}" class="p-8 text-center text-gray-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Carregando...</td></tr>`);
 
-        $.get('ajax.php?acao=contas-listar', function(res) {
+        const filtroInst = $('#filtro-instituicao-contas').val() || '';
+        $.get('ajax.php?acao=contas-listar', { filtro_instituicao_id: filtroInst }, function(res) {
             let html = '';
             if(res.dados.length === 0) {
                 html = `<tr><td colspan="${cols}" class="p-8 text-center text-gray-500 dark:text-gray-400">Nenhuma conta/carteira cadastrada nesta institução.</td></tr>`;
@@ -39,6 +40,22 @@ const contasJS = {
             }
             $('#tabela-contas').html(html);
         });
+    },
+
+    carregarInstituicoesFiltro: function() {
+        const sel = $('#filtro-instituicao-contas');
+        if (!sel.length) return;
+        $.get('ajax.php?acao=instituicoes-listar', function(res) {
+            let html = '<option value="">Todas as Instituições</option>';
+            (res.dados || []).forEach(i => {
+                html += `<option value="${i.id}">${i.nome}</option>`;
+            });
+            sel.html(html);
+        });
+    },
+
+    onInstituicaoChange: function() {
+        this.carregar();
     },
 
     carregarInstituicoes: function(selectedId, callback) {
@@ -130,6 +147,7 @@ const contasJS = {
 
 $(document).ready(function() {
     if($('#tabela-contas').length) {
+        contasJS.carregarInstituicoesFiltro();
         contasJS.carregar();
     }
     

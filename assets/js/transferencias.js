@@ -31,7 +31,8 @@ const transferenciasJS = {
         const cols = window.userRole === 'super_admin' ? 6 : 5;
         $('#tabela-transferencias').html(`<tr><td colspan="${cols}" class="p-8 text-center text-gray-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Carregando...</td></tr>`);
 
-        $.get('ajax.php?acao=transferencias-listar', function(res) {
+        const filtroInst = $('#filtro-instituicao-transferencias').val() || '';
+        $.get('ajax.php?acao=transferencias-listar', { filtro_instituicao_id: filtroInst }, function(res) {
             let html = '';
             if (res.dados.length === 0) {
                 html = `<tr><td colspan="${cols}" class="p-8 text-center text-gray-500 font-medium">Nenhuma transferência realizada ainda.</td></tr>`;
@@ -71,6 +72,22 @@ const transferenciasJS = {
             }
             $('#tabela-transferencias').html(html);
         });
+    },
+
+    carregarInstituicoesFiltro: function() {
+        const sel = $('#filtro-instituicao-transferencias');
+        if (!sel.length) return;
+        $.get('ajax.php?acao=instituicoes-listar', function(res) {
+            let html = '<option value="">Todas as Instituições</option>';
+            (res.dados || []).forEach(i => {
+                html += `<option value="${i.id}">${i.nome}</option>`;
+            });
+            sel.html(html);
+        });
+    },
+
+    onInstituicaoChange: function() {
+        this.listar();
     },
 
     abrirModal: function() {
@@ -151,6 +168,7 @@ const transferenciasJS = {
 
 $(document).ready(function() {
     if ($('#tabela-transferencias').length) {
+        transferenciasJS.carregarInstituicoesFiltro();
         transferenciasJS.listar();
     }
 

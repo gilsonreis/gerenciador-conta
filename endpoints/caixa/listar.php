@@ -17,6 +17,11 @@ $isSuperAdmin = $instId === 0;
 $repo         = new CaixaRepository();
 
 if ($isSuperAdmin) {
+    $filtroInst    = filter_input(INPUT_GET, 'filtro_instituicao_id', FILTER_VALIDATE_INT) ?: 0;
+    $filtroWhere   = $filtroInst ? 'AND ce.instituicao_id = :filtro_inst' : '';
+    $params        = ['mes' => $mesAno];
+    if ($filtroInst) $params['filtro_inst'] = $filtroInst;
+
     $db   = Database::getConnection();
     $stmt = $db->prepare("
         SELECT
@@ -33,10 +38,11 @@ if ($isSuperAdmin) {
         JOIN instituicoes i  ON ce.instituicao_id = i.id
         JOIN usuarios u      ON ce.usuario_id     = u.id
         WHERE DATE_FORMAT(ce.data_entrada, '%Y-%m') = :mes
+        $filtroWhere
         ORDER BY ce.data_entrada ASC
     ");
-    $stmt->execute(['mes' => $mesAno]);
-    $entradas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $stmt->execute($params);
+    $entradas      = $stmt->fetchAll(PDO::FETCH_ASSOC);
     $totalEntradas = array_sum(array_column($entradas, 'valor'));
 } else {
     $entradas      = $repo->listarPorMes($instId, $mesAno);

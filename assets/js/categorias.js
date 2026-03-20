@@ -1,6 +1,7 @@
 const categoriasJS = {
     carregar: function() {
-        $.get('ajax.php?acao=categorias-listar', function(res) {
+        const filtroInst = $('#filtro-instituicao-categorias').val() || '';
+        $.get('ajax.php?acao=categorias-listar', { filtro_instituicao_id: filtroInst }, function(res) {
             let html = '';
             const cols = res.is_super_admin ? 3 : 2;
             if(res.dados.length === 0) {
@@ -85,6 +86,22 @@ const categoriasJS = {
             }
         });
     },
+    carregarInstituicoesFiltro: function() {
+        const sel = $('#filtro-instituicao-categorias');
+        if (!sel.length) return;
+        $.get('ajax.php?acao=instituicoes-listar', function(res) {
+            let html = '<option value="">Todas as Instituições</option>';
+            (res.dados || []).forEach(i => {
+                html += `<option value="${i.id}">${i.nome}</option>`;
+            });
+            sel.html(html);
+        });
+    },
+
+    onInstituicaoChange: function() {
+        this.carregar();
+    },
+
     mostrarModal: function() {
         $('#modal-categoria-backdrop').removeClass('hidden');
         $('#modal-categoria').removeClass('hidden').addClass('flex');
@@ -102,6 +119,7 @@ const categoriasJS = {
 };
 
 $(document).ready(function() {
+    categoriasJS.carregarInstituicoesFiltro();
     categoriasJS.carregar();
     
     $('#form-categoria').on('submit', function(e) {

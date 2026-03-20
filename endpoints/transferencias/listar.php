@@ -9,6 +9,10 @@ $instId       = AuthHelper::getInstituicaoId();
 $isSuperAdmin = $instId === 0;
 
 if ($isSuperAdmin) {
+    $filtroInst  = filter_input(INPUT_GET, 'filtro_instituicao_id', FILTER_VALIDATE_INT) ?: 0;
+    $filtroWhere = $filtroInst ? 'AND t.instituicao_id = :filtro_inst' : '';
+    $params      = $filtroInst ? ['filtro_inst' => $filtroInst] : [];
+
     $db   = Database::getConnection();
     $stmt = $db->prepare("
         SELECT
@@ -20,9 +24,10 @@ if ($isSuperAdmin) {
         JOIN contas co       ON t.conta_origem_id  = co.id
         JOIN contas cd       ON t.conta_destino_id = cd.id
         JOIN instituicoes i  ON t.instituicao_id   = i.id
+        WHERE 1=1 $filtroWhere
         ORDER BY t.data_transferencia DESC
     ");
-    $stmt->execute();
+    $stmt->execute($params);
     $transferencias = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } else {
     $repo           = new TransferenciaRepository();
@@ -35,7 +40,7 @@ foreach ($transferencias as &$t) {
 }
 
 echo json_encode([
-    'sucesso'       => true,
-    'dados'         => $transferencias,
-    'is_super_admin'=> $isSuperAdmin,
+    'sucesso'        => true,
+    'dados'          => $transferencias,
+    'is_super_admin' => $isSuperAdmin,
 ]);
