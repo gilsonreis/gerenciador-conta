@@ -92,8 +92,11 @@ class ContaRepository {
     }
 
     public function excluir(int $instituicaoId, int $id) {
-        $sql = "DELETE FROM contas WHERE id = :id AND instituicao_id = :instituicao_id";
-        $stmt = $this->db->prepare($sql);
+        if ($instituicaoId === 0) {
+            $stmt = $this->db->prepare("DELETE FROM contas WHERE id = :id");
+            return $stmt->execute(['id' => $id]);
+        }
+        $stmt = $this->db->prepare("DELETE FROM contas WHERE id = :id AND instituicao_id = :instituicao_id");
         return $stmt->execute(['id' => $id, 'instituicao_id' => $instituicaoId]);
     }
 }

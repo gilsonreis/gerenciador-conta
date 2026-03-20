@@ -16,7 +16,17 @@
         <!-- Form -->
         <form id="form-categoria" class="p-6">
             <input type="hidden" id="categoria_id" name="id">
-            
+
+            <?php if (($_SESSION['usuario_role'] ?? '') === 'super_admin'): ?>
+            <div class="mb-4">
+                <label for="categoria_instituicao_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Instituição</label>
+                <select id="categoria_instituicao_id" name="instituicao_id" required
+                    class="w-full px-4 py-2 bg-white dark:bg-[#121212] border border-gray-300 dark:border-darkborder rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-gray-900 dark:text-white transition-colors">
+                    <option value="">Selecione...</option>
+                </select>
+            </div>
+            <?php endif; ?>
+
             <div class="mb-4">
                 <label for="categoria_nome" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nome da Categoria</label>
                 <input type="text" id="categoria_nome" name="nome" required 

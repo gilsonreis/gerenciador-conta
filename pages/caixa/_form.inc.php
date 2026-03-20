@@ -16,7 +16,18 @@
         <!-- Form -->
         <form id="form-caixa" class="p-6">
             <input type="hidden" id="caixa_id" name="id">
-            
+
+            <?php if (($_SESSION['usuario_role'] ?? '') === 'super_admin'): ?>
+            <div class="mb-4">
+                <label for="caixa_instituicao_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Instituição</label>
+                <select id="caixa_instituicao_id" name="instituicao_id" required
+                    class="w-full px-4 py-2.5 bg-white dark:bg-[#121212] border border-gray-300 dark:border-darkborder rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary text-gray-900 dark:text-white transition-colors"
+                    onchange="caixaJS.carregarContasDaInstituicao(this.value)">
+                    <option value="">Selecione...</option>
+                </select>
+            </div>
+            <?php endif; ?>
+
             <div class="mb-4">
                 <label for="caixa_conta_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Carteira de Destino</label>
                 <select id="caixa_conta_id" name="conta_id" required 

@@ -43,12 +43,15 @@
                     <th class="p-4 font-semibold">Data</th>
                     <th class="p-4 font-semibold">Origem</th>
                     <th class="p-4 font-semibold text-right">Valor</th>
+                    <?php if (($_SESSION['usuario_role'] ?? '') === 'super_admin'): ?>
+                    <th class="p-4 font-semibold">Contexto</th>
+                    <?php endif; ?>
                     <th class="p-4 font-semibold w-24 text-center">Ações</th>
                 </tr>
             </thead>
             <tbody id="tabela-caixa" class="divide-y divide-gray-100 dark:divide-darkborder">
                 <!-- Preenchido via AJAX -->
-                <tr><td colspan="4" class="p-8 text-center text-gray-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Carregando...</td></tr>
+                <tr><td colspan="<?= ($_SESSION['usuario_role'] ?? '') === 'super_admin' ? 5 : 4 ?>" class="p-8 text-center text-gray-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Carregando...</td></tr>
             </tbody>
         </table>
     </div>

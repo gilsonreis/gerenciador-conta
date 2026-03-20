@@ -17,12 +17,15 @@
             <thead>
                 <tr class="bg-gray-50 dark:bg-white/5 border-b border-gray-100 dark:border-darkborder text-gray-500 dark:text-gray-400 text-sm uppercase tracking-wider">
                     <th class="p-4 font-semibold">Nome</th>
+                    <?php if (($_SESSION['usuario_role'] ?? '') === 'super_admin'): ?>
+                    <th class="p-4 font-semibold">Instituição</th>
+                    <?php endif; ?>
                     <th class="p-4 font-semibold w-32 text-center">Ações</th>
                 </tr>
             </thead>
             <tbody id="tabela-categorias" class="divide-y divide-gray-100 dark:divide-darkborder">
                 <!-- Preenchido via AJAX -->
-                <tr><td colspan="2" class="p-8 text-center text-gray-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Carregando...</td></tr>
+                <tr><td colspan="<?= ($_SESSION['usuario_role'] ?? '') === 'super_admin' ? 3 : 2 ?>" class="p-8 text-center text-gray-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Carregando...</td></tr>
             </tbody>
         </table>
     </div>

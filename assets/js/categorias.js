@@ -2,13 +2,22 @@ const categoriasJS = {
     carregar: function() {
         $.get('ajax.php?acao=categorias-listar', function(res) {
             let html = '';
+            const cols = res.is_super_admin ? 3 : 2;
             if(res.dados.length === 0) {
-                html = '<tr><td colspan="2" class="p-8 text-center text-gray-500 dark:text-gray-400">Nenhuma categoria cadastrada.</td></tr>';
+                html = `<tr><td colspan="${cols}" class="p-8 text-center text-gray-500 dark:text-gray-400">Nenhuma categoria cadastrada.</td></tr>`;
             } else {
                 res.dados.forEach(c => {
+                    const ctxCell = res.is_super_admin
+                        ? `<td class="p-4 text-xs text-gray-500 dark:text-gray-400">
+                              <span class="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 dark:bg-white/10 rounded-lg">
+                                <i class="fa-solid fa-building text-xs"></i> ${c.instituicao_nome || '—'}
+                              </span>
+                           </td>`
+                        : '';
                     html += `
                     <tr class="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
                         <td class="p-4 text-gray-900 dark:text-gray-100 font-medium">${c.nome}</td>
+                        ${ctxCell}
                         <td class="p-4 text-center">
                             <button onclick="categoriasJS.editar(${c.id})" class="text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 p-2 rounded-lg transition-colors" title="Editar"><i class="fa-solid fa-pen"></i></button>
                             <button onclick="categoriasJS.excluir(${c.id})" class="text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 p-2 rounded-lg transition-colors ml-1" title="Excluir"><i class="fa-solid fa-trash"></i></button>
@@ -19,18 +28,43 @@ const categoriasJS = {
             $('#tabela-categorias').html(html);
         });
     },
+    carregarInstituicoes: function(selectedId, callback) {
+        $.get('ajax.php?acao=instituicoes-listar', function(res) {
+            let html = '<option value="">Selecione...</option>';
+            (res.dados || []).forEach(i => {
+                const sel = (selectedId && i.id == selectedId) ? 'selected' : '';
+                html += `<option value="${i.id}" ${sel}>${i.nome}</option>`;
+            });
+            $('#categoria_instituicao_id').html(html);
+            if (callback) callback();
+        });
+    },
     abrirModalCadastro: function() {
-        $('#form-categoria')[0].reset();
-        $('#categoria_id').val('');
-        $('#modal-categoria-title').text('Nova Categoria');
-        this.mostrarModal();
+        const abrir = () => {
+            $('#form-categoria')[0].reset();
+            $('#categoria_id').val('');
+            $('#modal-categoria-title').text('Nova Categoria');
+            this.mostrarModal();
+        };
+        if ($('#categoria_instituicao_id').length) {
+            this.carregarInstituicoes(null, abrir);
+        } else {
+            abrir();
+        }
     },
     editar: function(id) {
         $.get('ajax.php?acao=categorias-buscar', {id: id}, function(res) {
-            $('#categoria_id').val(res.dados.id);
-            $('#categoria_nome').val(res.dados.nome);
-            $('#modal-categoria-title').text('Editar Categoria');
-            categoriasJS.mostrarModal();
+            const aplicar = () => {
+                $('#categoria_id').val(res.dados.id);
+                $('#categoria_nome').val(res.dados.nome);
+                $('#modal-categoria-title').text('Editar Categoria');
+                categoriasJS.mostrarModal();
+            };
+            if ($('#categoria_instituicao_id').length) {
+                categoriasJS.carregarInstituicoes(res.dados.instituicao_id, aplicar);
+            } else {
+                aplicar();
+            }
         });
     },
     excluir: function(id) {

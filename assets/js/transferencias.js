@@ -1,8 +1,8 @@
 const transferenciasJS = {
-    carregarContas: function() {
-        $.get('ajax.php?acao=contas-listar', function(res) {
+    carregarContas: function(instId) {
+        const params = instId ? {instituicao_id: instId} : {};
+        $.get('ajax.php?acao=contas-listar', params, function(res) {
             if (!res.dados) return;
-
             let html = '<option value="">Selecione a conta...</option>';
             res.dados.forEach(c => {
                 html += `<option value="${c.id}">${c.nome}</option>`;
@@ -11,15 +11,39 @@ const transferenciasJS = {
         });
     },
 
+    carregarInstituicoes: function(callback) {
+        $.get('ajax.php?acao=instituicoes-listar', function(res) {
+            let html = '<option value="">Selecione...</option>';
+            (res.dados || []).forEach(i => {
+                html += `<option value="${i.id}">${i.nome}</option>`;
+            });
+            $('#transferencia_instituicao_id').html(html);
+            if (callback) callback();
+        });
+    },
+
+    carregarContasDaInstituicao: function(instId) {
+        $('#conta_origem_id, #conta_destino_id').html('<option value="">Selecione a conta...</option>');
+        if (instId) this.carregarContas(instId);
+    },
+
     listar: function() {
-        $('#tabela-transferencias').html('<tr><td colspan="5" class="p-8 text-center text-gray-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Carregando...</td></tr>');
-        
+        const cols = window.userRole === 'super_admin' ? 6 : 5;
+        $('#tabela-transferencias').html(`<tr><td colspan="${cols}" class="p-8 text-center text-gray-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Carregando...</td></tr>`);
+
         $.get('ajax.php?acao=transferencias-listar', function(res) {
             let html = '';
             if (res.dados.length === 0) {
-                html = '<tr><td colspan="5" class="p-8 text-center text-gray-500 font-medium">Nenhuma transferência realizada ainda.</td></tr>';
+                html = `<tr><td colspan="${cols}" class="p-8 text-center text-gray-500 font-medium">Nenhuma transferência realizada ainda.</td></tr>`;
             } else {
                 res.dados.forEach(t => {
+                    const ctxCell = res.is_super_admin
+                        ? `<td class="p-4 text-xs text-gray-500 dark:text-gray-400">
+                              <span class="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 dark:bg-white/10 rounded-lg">
+                                <i class="fa-solid fa-building text-xs"></i> ${t.instituicao_nome || '—'}
+                              </span>
+                           </td>`
+                        : '';
                     html += `
                         <tr class="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group">
                             <td class="p-4 text-sm text-gray-500 dark:text-gray-400 font-medium whitespace-nowrap">${t.data_formatada}</td>
@@ -35,6 +59,7 @@ const transferenciasJS = {
                             </td>
                             <td class="p-4 text-sm text-gray-600 dark:text-gray-400 italic">${t.descricao}</td>
                             <td class="p-4 text-right font-bold text-gray-900 dark:text-white whitespace-nowrap valor-sensivel">${t.valor_formatado}</td>
+                            ${ctxCell}
                             <td class="p-4 text-center">
                                 <button onclick="transferenciasJS.excluir(${t.id})" class="text-gray-400 hover:text-red-500 transition-colors p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 opacity-0 group-hover:opacity-100">
                                     <i class="fa-solid fa-trash-can"></i>
@@ -42,7 +67,7 @@ const transferenciasJS = {
                             </td>
                         </tr>
                     `;
-                } );
+                });
             }
             $('#tabela-transferencias').html(html);
         });
@@ -50,9 +75,17 @@ const transferenciasJS = {
 
     abrirModal: function() {
         $('#form-transferencia')[0].reset();
-        this.carregarContas();
         $('#transferencia_data').val(new Date().toISOString().substring(0, 10));
-        
+
+        if ($('#transferencia_instituicao_id').length) {
+            // Super admin: carrega instituções; contas carregam ao selecionar instituição
+            this.carregarInstituicoes(() => {
+                $('#conta_origem_id, #conta_destino_id').html('<option value="">Selecione a conta...</option>');
+            });
+        } else {
+            this.carregarContas();
+        }
+
         $('#modal-transferencia-backdrop').removeClass('hidden');
         $('#modal-transferencia').removeClass('hidden').addClass('flex');
         setTimeout(() => {

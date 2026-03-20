@@ -24,6 +24,9 @@
                     <th class="p-4 font-semibold">Movimentação</th>
                     <th class="p-4 font-semibold">Descrição</th>
                     <th class="p-4 font-semibold text-right">Valor</th>
+                    <?php if (($_SESSION['usuario_role'] ?? '') === 'super_admin'): ?>
+                    <th class="p-4 font-semibold">Instituição</th>
+                    <?php endif; ?>
                     <th class="p-4 font-semibold w-24 text-center">Ações</th>
                 </tr>
             </thead>
@@ -48,6 +51,16 @@
 
         <form id="form-transferencia" class="p-6">
             <div class="space-y-4">
+                <?php if (($_SESSION['usuario_role'] ?? '') === 'super_admin'): ?>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Instituição</label>
+                    <select name="instituicao_id" id="transferencia_instituicao_id" required class="w-full px-4 py-2.5 bg-white dark:bg-[#121212] border border-gray-300 dark:border-darkborder rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-primary"
+                        onchange="transferenciasJS.carregarContasDaInstituicao(this.value)">
+                        <option value="">Selecione...</option>
+                    </select>
+                </div>
+                <?php endif; ?>
+
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Conta de Origem (Saída)</label>
                     <select name="conta_origem_id" id="conta_origem_id" required class="w-full px-4 py-2.5 bg-white dark:bg-[#121212] border border-gray-300 dark:border-darkborder rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-primary">

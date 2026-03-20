@@ -15,6 +15,9 @@
                 <tr class="bg-gray-50/50 dark:bg-white/5 border-b border-gray-100 dark:border-darkborder">
                     <th class="p-4 text-sm font-semibold text-gray-600 dark:text-gray-300">Conta / Carteira</th>
                     <th class="p-4 text-sm font-semibold text-gray-600 dark:text-gray-300 text-right">Saldo Inicial</th>
+                    <?php if (($_SESSION['usuario_role'] ?? '') === 'super_admin'): ?>
+                    <th class="p-4 text-sm font-semibold text-gray-600 dark:text-gray-300">Instituição</th>
+                    <?php endif; ?>
                     <th class="p-4 text-sm font-semibold text-gray-600 dark:text-gray-300 w-24 text-center">Ações</th>
                 </tr>
             </thead>

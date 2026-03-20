@@ -25,20 +25,32 @@ const caixaJS = {
 
     carregar: function() {
         $('#mes-atual-label').text(this.formatarMesAno(this.mesAtual));
-        $('#tabela-caixa').html('<tr><td colspan="4" class="p-8 text-center text-gray-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Carregando...</td></tr>');
-        
+        const cols = window.userRole === 'super_admin' ? 5 : 4;
+        $('#tabela-caixa').html(`<tr><td colspan="${cols}" class="p-8 text-center text-gray-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Carregando...</td></tr>`);
+
         $.get('ajax.php?acao=caixa-listar', { mes: this.mesAtual }, function(res) {
             $('#resumo-total-entradas').text(res.resumo.total_entradas_formatado);
 
             let html = '';
             if(res.dados.length === 0) {
-                html = '<tr><td colspan="4" class="p-8 text-center text-gray-500 dark:text-gray-400">Nenhuma entrada registrada neste mês.</td></tr>';
+                html = `<tr><td colspan="${cols}" class="p-8 text-center text-gray-500 dark:text-gray-400">Nenhuma entrada registrada neste mês.</td></tr>`;
             } else {
                 caixaJS.dadosOriginais = res.dados;
                 res.dados.forEach(e => {
-                    const descInfo = e.descricao ? `<div class="text-sm font-medium text-gray-900 dark:text-gray-100">${e.descricao}</div>` : '';
+                    const descInfo   = e.descricao ? `<div class="text-sm font-medium text-gray-900 dark:text-gray-100">${e.descricao}</div>` : '';
                     const walletBadge = `<span class="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 px-2 py-0.5 rounded text-xs font-bold ${e.descricao ? 'mt-1 inline-block' : 'mr-2'}"><i class="fa-solid fa-arrow-trend-up"></i> ${e.conta_nome}</span>`;
-                    
+                    const ctxCell = res.is_super_admin
+                        ? `<td class="p-4 text-xs text-gray-500 dark:text-gray-400">
+                              <div class="flex flex-col gap-1">
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 dark:bg-white/10 rounded">
+                                  <i class="fa-solid fa-building text-xs"></i> ${e.instituicao_nome || '—'}
+                                </span>
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 rounded">
+                                  <i class="fa-solid fa-user text-xs"></i> ${e.usuario_nome || '—'}
+                                </span>
+                              </div>
+                           </td>`
+                        : '';
                     html += `
                     <tr class="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group">
                         <td class="p-4 text-gray-500 dark:text-gray-400 text-sm whitespace-nowrap">
@@ -49,6 +61,7 @@ const caixaJS = {
                             ${walletBadge}
                         </td>
                         <td class="p-4 text-right text-emerald-600 dark:text-emerald-400 font-bold whitespace-nowrap"><span class="valor-sensivel">${caixaJS.formatarMoeda(e.valor)}</span></td>
+                        ${ctxCell}
                         <td class="p-4 text-center">
                             <button onclick="caixaJS.editar(${e.id})" class="text-blue-500 opacity-0 group-hover:opacity-100 hover:bg-blue-50 dark:hover:bg-blue-900/20 p-2 rounded-lg transition-all" title="Editar"><i class="fa-solid fa-pen"></i></button>
                             <button onclick="caixaJS.excluir(${e.id})" class="text-red-500 opacity-0 group-hover:opacity-100 hover:bg-red-50 dark:hover:bg-red-900/20 p-2 rounded-lg transition-all ml-1" title="Excluir"><i class="fa-solid fa-trash"></i></button>
@@ -59,8 +72,9 @@ const caixaJS = {
             $('#tabela-caixa').html(html);
         });
     },
-    carregarContas: function(callback) {
-        $.get('ajax.php?acao=contas-listar', function(res) {
+    carregarContas: function(callback, instituicaoId) {
+        const params = instituicaoId ? {instituicao_id: instituicaoId} : {};
+        $.get('ajax.php?acao=contas-listar', params, function(res) {
             let html = '<option value="">Selecione a Conta...</option>';
             res.dados.forEach(c => {
                 html += `<option value="${c.id}">${c.nome}</option>`;
@@ -70,15 +84,43 @@ const caixaJS = {
         });
     },
 
+    carregarInstituicoes: function(selectedId, callback) {
+        $.get('ajax.php?acao=instituicoes-listar', function(res) {
+            let html = '<option value="">Selecione...</option>';
+            (res.dados || []).forEach(i => {
+                const sel = (selectedId && i.id == selectedId) ? 'selected' : '';
+                html += `<option value="${i.id}" ${sel}>${i.nome}</option>`;
+            });
+            $('#caixa_instituicao_id').html(html);
+            // Reset contas ao trocar instituição
+            $('#caixa_conta_id').html('<option value="">Selecione a Conta...</option>');
+            if (callback) callback();
+        });
+    },
+
+    carregarContasDaInstituicao: function(instituicaoId) {
+        if (!instituicaoId) {
+            $('#caixa_conta_id').html('<option value="">Selecione a Conta...</option>');
+            return;
+        }
+        this.carregarContas(null, instituicaoId);
+    },
+
     abrirModalCadastro: function() {
-        this.carregarContas(() => {
+        const abrir = () => {
             $('#form-caixa')[0].reset();
             $('#caixa_id').val('');
             $('#caixa_descricao').val('');
-            $('#caixa_data').val(new Date().toISOString().substring(0, 10)); // Default to today
+            $('#caixa_data').val(new Date().toISOString().substring(0, 10));
             $('#modal-caixa-title').text('Nova Entrada');
             this.mostrarModal();
-        });
+        };
+        if ($('#caixa_instituicao_id').length) {
+            // Super admin: carrega instituições primeiro; contas carregam ao selecionar instituição
+            this.carregarInstituicoes(null, abrir);
+        } else {
+            this.carregarContas(abrir);
+        }
     },
     editar: function(id) {
         const row = this.dadosOriginais.find(d => d.id == id);

@@ -1,13 +1,21 @@
 const contasJS = {
     carregar: function() {
-        $('#tabela-contas').html('<tr><td colspan="3" class="p-8 text-center text-gray-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Carregando...</td></tr>');
-        
+        const cols = window.userRole === 'super_admin' ? 4 : 3;
+        $('#tabela-contas').html(`<tr><td colspan="${cols}" class="p-8 text-center text-gray-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Carregando...</td></tr>`);
+
         $.get('ajax.php?acao=contas-listar', function(res) {
             let html = '';
             if(res.dados.length === 0) {
-                html = '<tr><td colspan="3" class="p-8 text-center text-gray-500 dark:text-gray-400">Nenhuma conta/carteira cadastrada nesta instituição.</td></tr>';
+                html = `<tr><td colspan="${cols}" class="p-8 text-center text-gray-500 dark:text-gray-400">Nenhuma conta/carteira cadastrada nesta institução.</td></tr>`;
             } else {
                 res.dados.forEach(d => {
+                    const ctxCell = res.is_super_admin
+                        ? `<td class="p-4 text-xs text-gray-500 dark:text-gray-400">
+                              <span class="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 dark:bg-white/10 rounded-lg">
+                                <i class="fa-solid fa-building text-xs"></i> ${d.instituicao_nome || '—'}
+                              </span>
+                           </td>`
+                        : '';
                     html += `
                     <tr class="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group">
                         <td class="p-4 text-gray-900 dark:text-gray-100 font-medium">
@@ -21,6 +29,7 @@ const contasJS = {
                         <td class="p-4 text-right text-gray-500 dark:text-gray-400 font-medium whitespace-nowrap">
                             R$ <span class="valor-sensivel">${d.saldo_inicial_formatado}</span>
                         </td>
+                        ${ctxCell}
                         <td class="p-4 text-center">
                             <button onclick="contasJS.editar(${d.id})" class="text-blue-500 opacity-0 group-hover:opacity-100 hover:bg-blue-50 dark:hover:bg-blue-900/20 p-2 rounded-lg transition-all" title="Editar"><i class="fa-solid fa-pen"></i></button>
                             <button onclick="contasJS.excluir(${d.id})" class="text-red-500 opacity-0 group-hover:opacity-100 hover:bg-red-50 dark:hover:bg-red-900/20 p-2 rounded-lg transition-all ml-1" title="Excluir"><i class="fa-solid fa-trash"></i></button>
@@ -32,27 +41,53 @@ const contasJS = {
         });
     },
 
+    carregarInstituicoes: function(selectedId, callback) {
+        $.get('ajax.php?acao=instituicoes-listar', function(res) {
+            let html = '<option value="">Selecione...</option>';
+            (res.dados || []).forEach(i => {
+                const sel = (selectedId && i.id == selectedId) ? 'selected' : '';
+                html += `<option value="${i.id}" ${sel}>${i.nome}</option>`;
+            });
+            $('#conta_instituicao_id').html(html);
+            if (callback) callback();
+        });
+    },
+
     abrirModalCadastro: function() {
-        $('#form-conta')[0].reset();
-        $('#conta_id').val('');
-        $('#modal-conta-title').text('Nova Conta');
-        this.mostrarModal();
+        const abrir = () => {
+            $('#form-conta')[0].reset();
+            $('#conta_id').val('');
+            $('#modal-conta-title').text('Nova Conta');
+            this.mostrarModal();
+        };
+        if ($('#conta_instituicao_id').length) {
+            this.carregarInstituicoes(null, abrir);
+        } else {
+            abrir();
+        }
     },
 
     editar: function(id) {
         $.get('ajax.php?acao=contas-buscar', {id: id}, function(res) {
             if(res.sucesso) {
-                $('#conta_id').val(res.dados.id);
-                $('#conta_nome').val(res.dados.nome);
-                
-                let saldoFormatado = '';
-                if(res.dados.saldo_inicial) {
-                    saldoFormatado = parseFloat(res.dados.saldo_inicial).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                const aplicar = () => {
+                    $('#conta_id').val(res.dados.id);
+                    $('#conta_nome').val(res.dados.nome);
+
+                    let saldoFormatado = '';
+                    if(res.dados.saldo_inicial) {
+                        saldoFormatado = parseFloat(res.dados.saldo_inicial).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                    }
+                    $('#conta_saldo').val(saldoFormatado);
+
+                    $('#modal-conta-title').text('Editar Conta');
+                    contasJS.mostrarModal();
+                };
+                if ($('#conta_instituicao_id').length) {
+                    contasJS.carregarInstituicoes(res.dados.instituicao_id, aplicar);
+                } else {
+                    aplicar();
                 }
-                $('#conta_saldo').val(saldoFormatado);
-                
-                $('#modal-conta-title').text('Editar Conta');
-                contasJS.mostrarModal();
             }
         });
     },
