@@ -38,14 +38,16 @@ const despesasJS = {
         $('#tabela-despesas').html('<tr><td colspan="6" class="p-8 text-center text-gray-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Carregando...</td></tr>');
         
         const categoriaId = $('#filtro-categoria').val();
-        const contaFixa = $('#filtro-conta-fixa').val();
-        const busca = $('#filtro-busca-descricao').val();
+        const contaFixa   = $('#filtro-conta-fixa').val();
+        const busca       = $('#filtro-busca-descricao').val();
+        const filtroInst  = $('#filtro-instituicao').val() || '';
 
-        $.get('ajax.php?acao=despesas-listar', { 
+        $.get('ajax.php?acao=despesas-listar', {
             mes: this.mesAtual,
             categoria_id: categoriaId,
             conta_fixa: contaFixa,
             busca_descricao: busca,
+            filtro_instituicao_id: filtroInst,
             p: this.paginaAtual
         }, (res) => {
             $('#resumo-total-saidas').text(res.resumo.total_saidas_formatado);
@@ -202,6 +204,26 @@ const despesasJS = {
             $('#filtro-categoria').html(htmlFiltro);
             if(callback) callback();
         });
+    },
+
+    // Carrega o select de Instituição no filtro (super_admin only)
+    carregarInstituicoesFiltro: function() {
+        const sel = $('#filtro-instituicao');
+        if (!sel.length) return; // não é super_admin
+        $.get('ajax.php?acao=instituicoes-listar', function(res) {
+            let html = '<option value="">Todas as Instituições</option>';
+            (res.dados || []).forEach(i => {
+                html += `<option value="${i.id}">${i.nome}</option>`;
+            });
+            sel.html(html);
+        });
+    },
+
+    // Chamado ao mudar o filtro de Instituição:
+    // reseta página e força recarga da listagem
+    onInstituicaoChange: function() {
+        this.paginaAtual = 1;
+        this.carregar();
     },
 
     carregarContas: function(callback) {
@@ -744,6 +766,7 @@ const despesasJS = {
 $(document).ready(function() {
     // Only load if table exists
     if($('#tabela-despesas').length) {
+        despesasJS.carregarInstituicoesFiltro(); // popula filtro de instituição (no-op se não for super_admin)
         despesasJS.carregarCategorias(() => {
             despesasJS.carregar();
         });

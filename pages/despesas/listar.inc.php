@@ -53,6 +53,19 @@
 
 <!-- Filtros Avançados -->
 <div class="flex flex-col sm:flex-row gap-4 mb-4">
+    <?php if (($_SESSION['usuario_role'] ?? '') === 'super_admin'): ?>
+    <!-- Filtro de Instituição (super_admin only) -->
+    <div class="w-full sm:w-1/4">
+        <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">
+            <i class="fa-solid fa-building mr-1"></i> Instituição
+        </label>
+        <select id="filtro-instituicao" onchange="despesasJS.onInstituicaoChange()"
+            class="w-full px-3 py-2 bg-white dark:bg-[#121212] border border-gray-300 dark:border-darkborder rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary text-gray-900 dark:text-gray-100 transition-all">
+            <option value="">Todas as Instituições</option>
+        </select>
+    </div>
+    <?php endif; ?>
+
     <!-- Dropdown Categoria -->
     <div class="w-full sm:w-1/4">
         <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Categoria</label>

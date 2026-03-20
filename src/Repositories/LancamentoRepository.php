@@ -8,16 +8,26 @@ class LancamentoRepository {
         $this->db = Database::getConnection();
     }
 
-    public function listarPorMes(int $instituicaoId, string $mesAno, ?int $categoriaId = null, ?int $contaFixa = null, int $pagina = 1, int $itensPorPagina = 20, string $busca = '') {
-        $instWhere = $instituicaoId === 0 ? '' : 'AND l.instituicao_id = :instituicao_id';
+    public function listarPorMes(int $instituicaoId, string $mesAno, ?int $categoriaId = null, ?int $contaFixa = null, int $pagina = 1, int $itensPorPagina = 20, string $busca = '', ?int $filtroInstituicaoId = null) {
+        if ($instituicaoId === 0 && $filtroInstituicaoId) {
+            // Super admin com filtro de instituição selecionado
+            $instWhere = 'AND l.instituicao_id = :instituicao_id';
+            $params = ['mes_ano' => $mesAno, 'instituicao_id' => $filtroInstituicaoId];
+        } elseif ($instituicaoId === 0) {
+            // Super admin sem filtro: retorna todos
+            $instWhere = '';
+            $params = ['mes_ano' => $mesAno];
+        } else {
+            // Usuário normal: sempre filtrado pela sessão
+            $instWhere = 'AND l.instituicao_id = :instituicao_id';
+            $params = ['mes_ano' => $mesAno, 'instituicao_id' => $instituicaoId];
+        }
+
         $where = "
             WHERE DATE_FORMAT(p.data_vencimento, '%Y-%m') = :mes_ano
             $instWhere
         ";
 
-        $params = ['mes_ano' => $mesAno];
-        if ($instituicaoId !== 0) $params['instituicao_id'] = $instituicaoId;
-        
         if ($categoriaId !== null) {
             $where .= " AND l.categoria_id = :cat_id";
             $params['cat_id'] = $categoriaId;
@@ -81,8 +91,17 @@ class LancamentoRepository {
         ];
     }
 
-    public function resumoMes(int $instituicaoId, string $mesAno, ?int $categoriaId = null, ?int $contaFixa = null, string $busca = '') {
-        $instWhere = $instituicaoId === 0 ? '' : 'AND l.instituicao_id = :instituicao_id';
+    public function resumoMes(int $instituicaoId, string $mesAno, ?int $categoriaId = null, ?int $contaFixa = null, string $busca = '', ?int $filtroInstituicaoId = null) {
+        if ($instituicaoId === 0 && $filtroInstituicaoId) {
+            $instWhere = 'AND l.instituicao_id = :instituicao_id';
+            $params = ['mes_ano' => $mesAno, 'instituicao_id' => $filtroInstituicaoId];
+        } elseif ($instituicaoId === 0) {
+            $instWhere = '';
+            $params = ['mes_ano' => $mesAno];
+        } else {
+            $instWhere = 'AND l.instituicao_id = :instituicao_id';
+            $params = ['mes_ano' => $mesAno, 'instituicao_id' => $instituicaoId];
+        }
         $sql = "
             SELECT 
                 SUM(p.valor - p.desconto) as total_saidas,
@@ -93,9 +112,6 @@ class LancamentoRepository {
             $instWhere
         ";
 
-        $params = ['mes_ano' => $mesAno];
-        if ($instituicaoId !== 0) $params['instituicao_id'] = $instituicaoId;
-        
         if ($categoriaId !== null) {
             $sql .= " AND l.categoria_id = :cat_id";
             $params['cat_id'] = $categoriaId;

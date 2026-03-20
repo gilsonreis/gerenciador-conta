@@ -17,14 +17,15 @@ $categoriaId = filter_input(INPUT_GET, 'categoria_id', FILTER_VALIDATE_INT) ?: n
 $contaFixa = filter_input(INPUT_GET, 'conta_fixa');
 $contaFixaValue = ($contaFixa === '0' || $contaFixa === '1') ? (int)$contaFixa : null;
 $busca = filter_input(INPUT_GET, 'busca_descricao', FILTER_SANITIZE_SPECIAL_CHARS) ?: '';
+$filtroInstituicaoId = $isSuperAdmin ? (filter_input(INPUT_GET, 'filtro_instituicao_id', FILTER_VALIDATE_INT) ?: null) : null;
 
 $itensPorPagina = 10;
 $paginaAtual = filter_input(INPUT_GET, 'p', FILTER_VALIDATE_INT) ?: 1;
 if ($paginaAtual < 1) $paginaAtual = 1;
 
 $repo = new LancamentoRepository();
-$resultado = $repo->listarPorMes(AuthHelper::getInstituicaoId(), $mesAno, $categoriaId, $contaFixaValue, $paginaAtual, $itensPorPagina, $busca);
-$resumo = $repo->resumoMes(AuthHelper::getInstituicaoId(), $mesAno, $categoriaId, $contaFixaValue, $busca);
+$resultado = $repo->listarPorMes(AuthHelper::getInstituicaoId(), $mesAno, $categoriaId, $contaFixaValue, $paginaAtual, $itensPorPagina, $busca, $filtroInstituicaoId);
+$resumo    = $repo->resumoMes(AuthHelper::getInstituicaoId(), $mesAno, $categoriaId, $contaFixaValue, $busca, $filtroInstituicaoId);
 
 $totalPaginas = ceil($resultado['total'] / $itensPorPagina);
 
